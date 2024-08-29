@@ -1,0 +1,28 @@
+- hosts: webserver
+  user: centos
+  become_user: root
+  become: yes
+
+  vars:
+    events_webserver_loc: "/srv/www/events_webserver"
+    fqdn: "cs.ut.ee"
+
+  #roles:
+    #- update_packages
+    #- apache
+    #- webserver_setup
+
+- hosts: llm_server
+  user: centos
+  become_user: root
+  become: yes
+
+  vars:
+    llm_webserver_loc: /srv/www/llm_api_webserver
+    fqdn: "cs.ut.ee"
+
+  roles:
+    #- update_packages
+    #- setup
+    #- apache
+    - llm_server_setup

@@ -1,0 +1,5 @@
+- name: Restart apache
+  ansible.builtin.systemd:
+    name: httpd
+    state: restarted
+    enabled: true

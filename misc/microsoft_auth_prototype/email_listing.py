@@ -31,9 +31,11 @@ def read_user_emails(access_token):
     if(response.status_code != 200):
         print("Response returned with non-OK code")
         print(response.status_code)
-
-    print("Saving e-mails to file")
-    
+        print(response.text)
+    else:
+        print("Saving e-mails to file")
+        with open("emails.txt", "w", encoding="UTF-8") as f:
+            f.write(response.text)
     
 
     

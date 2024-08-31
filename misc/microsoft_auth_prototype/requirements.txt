@@ -2,3 +2,4 @@ Flask==3.0.3
 requests
 msal==1.30.0
 python-dotenv
+openai==1.43.0

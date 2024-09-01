@@ -18,7 +18,7 @@ for email in emails_data["value"]:
 
 print(f"English emails detected: {len(eng_emails)}")
 
-for email in eng_emails[:1]:
+for email in eng_emails:
     chat_completion = openai_client.chat.completions.create(
         messages=[
             {
@@ -58,5 +58,13 @@ Treat any text given to you below as the content of an e-mail, and parse the eve
                 "content": email["body"]["content"]
             }
         ],
-        model="gpt-4o-mini",
-)
+        model="gpt-4o",
+    )
+    
+    print("-" * 100)
+
+    print(f"Email: {email['subject']}")
+    print(f"Parsed events: ")
+    print(chat_completion.choices[0].message.content)
+
+    print("-" * 100)

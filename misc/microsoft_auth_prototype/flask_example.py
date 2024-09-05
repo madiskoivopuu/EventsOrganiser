@@ -1,9 +1,8 @@
 import msal
-import os, dotenv
-import urllib.parse as parse
-import requests
+import os, dotenv, threading
 import app_config
 import flask, flask_session
+import email_parser_thread
 
 REDIRECT_PATH = "/finishLogin"
 
@@ -25,7 +24,7 @@ def login():
         return "session missing", 400
 
     flow = flask.session["auth_flow"]
-    token = app.acquire_token_by_auth_code_flow(flow, auth_response=flask.request.args)
+    token = msal_app.acquire_token_by_auth_code_flow(flow, auth_response=flask.request.args)
     return "login success", 200
 
 @app.route("/", methods=["GET"])
@@ -37,4 +36,7 @@ def home():
     return f"Link: {flow['auth_uri']}", 200
 
 if __name__ == "__main__":
+    t = threading.Thread(target=email_parser_thread.parser_loop, args=(msal_app,))
+    t.start()
+
     app.run()

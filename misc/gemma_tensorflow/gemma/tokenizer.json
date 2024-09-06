@@ -1,0 +1,12 @@
+{
+    "module": "keras_nlp.src.models.gemma.gemma_tokenizer",
+    "class_name": "GemmaTokenizer",
+    "config": {
+        "name": "gemma_tokenizer",
+        "trainable": true,
+        "dtype": "int32",
+        "proto": null,
+        "sequence_length": null
+    },
+    "registered_name": "keras_nlp>GemmaTokenizer"
+}

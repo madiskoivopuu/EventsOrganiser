@@ -1,5 +1,7 @@
 *.env
 *.gguf
+emails.json
+emails_output/
 
 flask_session/
 __pycache__/

@@ -1,3 +1,5 @@
 *.env
+*.gguf
+
 flask_session/
 __pycache__/

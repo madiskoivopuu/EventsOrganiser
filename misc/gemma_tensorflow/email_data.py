@@ -8,7 +8,8 @@ class Email:
     title: str
     send_date: datetime
     content: str
-    sender_email: str
+    sender_email: str # Usually the same, but can be something different from the original sender, if that person is using a mailing list
+    from_email: str # Original sender's email
     recipient_emails: list[str]
     reader_email: str
 
@@ -24,6 +25,7 @@ class Email:
                      send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ"),
                      content=email_data["body"]["content"],
                      sender_email=email_data["sender"]["emailAddress"]["address"],
+                     from_email=email_data["from"]["emailAddress"]["address"],
                      recipient_emails=recipients,
                      reader_email=reader_email
                     )

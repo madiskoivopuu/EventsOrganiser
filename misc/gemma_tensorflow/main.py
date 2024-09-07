@@ -11,6 +11,8 @@ print("Starting to parse events")
 print("1.")
 
 events = gemma.parse_events_from_emails([emails[8]])
+print(events)
 
 print("2.")
 events = gemma.parse_events_from_emails([emails[7]])
+print(events)

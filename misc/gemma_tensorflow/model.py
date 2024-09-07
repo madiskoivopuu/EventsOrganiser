@@ -8,6 +8,8 @@ from email_data import Email
 EDIT__MODEL_FILE = "./gemma/gemma-2-9b-it-Q8_0-f16.gguf"
 
 class Gemma2EventParser():
+    MAX_GENERATED_TOKENS = 1024
+
     def __init__(self, **kwargs) -> None:
         self.model = Llama(
             model_path=EDIT__MODEL_FILE, 
@@ -28,7 +30,7 @@ class Gemma2EventParser():
                     "message": email_content
                 }
             ],
-            max_tokens=self.MAX_TOKENS,
+            max_tokens=self.MAX_GENERATED_TOKENS,
         )
         return chat_output["choices"][0]["message"]["content"]
     
@@ -58,7 +60,7 @@ class Gemma2EventParser():
                 response_format={
                     "type": "json_object"
                 },
-                max_tokens=self.MAX_TOKENS
+                max_tokens=self.MAX_GENERATED_TOKENS
             )
         
             events_plaintext.append(json.loads(chat_output["choices"][0]["message"]["content"]))

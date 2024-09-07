@@ -8,10 +8,12 @@ from email_data import Email
 EDIT__MODEL_FILE = "./gemma/gemma-2-9b-it-Q8_0-f16.gguf"
 
 class Gemma2EventParser():
-    MAX_TOKENS = 1024
-
-    def __init__(self) -> None:
-        self.model = Llama(model_path=EDIT__MODEL_FILE, chat_format="gemma")
+    def __init__(self, **kwargs) -> None:
+        self.model = Llama(
+            model_path=EDIT__MODEL_FILE, 
+            chat_format="gemma",
+            **kwargs
+        )
 
     def translate_email(self, email_content: str) -> str:
         prompt = prompt_config.get_translation_prompt()
@@ -28,7 +30,7 @@ class Gemma2EventParser():
             ],
             max_tokens=self.MAX_TOKENS,
         )
-        return chat_output["choices"][0]["text"]
+        return chat_output["choices"][0]["message"]["content"]
     
     def parse_events_from_emails(self, emails: list[Email]) -> list[str]:
         events_plaintext = []
@@ -46,11 +48,11 @@ class Gemma2EventParser():
                 messages = [
                     {
                         "role": "user",
-                        "message": prompt
+                        "content": prompt
                     },
                     {
                         "role": "user",
-                        "message": prepared_content
+                        "content": prepared_content
                     },
                 ],
                 response_format={
@@ -59,7 +61,7 @@ class Gemma2EventParser():
                 max_tokens=self.MAX_TOKENS
             )
         
-            events_plaintext.append(json.loads(chat_output["choices"][0]["text"]))
+            events_plaintext.append(json.loads(chat_output["choices"][0]["message"]["content"]))
 
         return events_plaintext
     

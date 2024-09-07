@@ -29,9 +29,9 @@ class Email:
                     )
     
 
-def parse_outlook_emails_from_file(filename: str) -> list[Email]:
+def parse_outlook_emails_from_file(filename: str, reader_email: str) -> list[Email]:
     emails: list[Email] = []
     with open(filename, "r", encoding="UTF-8") as f:
         emails_json = json.load(f)
-        emails = [Email.from_outlook_json(data) for data in emails_json["value"]]
+        emails = [Email.from_outlook_json(data, reader_email) for data in emails_json["value"]]
         return emails

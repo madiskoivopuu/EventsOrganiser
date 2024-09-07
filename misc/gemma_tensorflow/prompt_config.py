@@ -70,7 +70,7 @@ Treat any text given to you below as the content of an e-mail (with some metadat
 def get_translation_prompt() -> str:
     return __TRANSLATION_PROMPT
 
-def format_event_parse_prompt(start_date: str) -> str:
+def format_event_parse_prompt() -> str:
     return __PARSING_PROMPT
 
 def format_categorization_propmt() -> None:

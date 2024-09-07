@@ -1,5 +1,6 @@
 # To make creating training data easier, includes metadata that would otherwise take me a min to get and write down for each email
 import json
+from pathvalidate import sanitize_filename
 
 # Include email data module
 import sys, os
@@ -9,7 +10,6 @@ from gemma_tensorflow.email_data import Email
 emails_plaintext = open("emails.json", "r", encoding="UTF-8").read()
 emails_json = json.reads(emails_plaintext)
 
-counter = 1
 for email_data in emails_json["value"]:
     email = Email.from_outlook_json(email_data)
 
@@ -21,5 +21,6 @@ for email_data in emails_json["value"]:
     prepared_content += f"Title: {email.title}\n"
     prepared_content += f"Content:\n{email.content}"
 
-    with open(f"./emails_output/{counter}.txt", "w", encoding="UTF-8") as f:
+    out_filename = sanitize_filename(email.title)
+    with open(f"./emails_output/{out_filename}.txt", "w", encoding="UTF-8") as f:
         f.write(prepared_content)

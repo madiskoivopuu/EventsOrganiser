@@ -8,21 +8,29 @@ class Email:
     title: str
     send_date: datetime
     content: str
+    sender_email: str
+    recipient_emails: list[str]
+    reader_email: str
 
     @staticmethod
-    def from_outlook_json(email_data: dict):
+    def from_outlook_json(email_data: dict, reader_email: str):
         if(email_data["body"]["contentType"] != "text"):
             raise RuntimeError(f"email data for {email_data['id']} is not text")
         
+        recipients: list[str] = [recipient["emailAddress"]["address"] for recipient in email_data["toRecipients"]]
+
         return Email(id=email_data["id"],
                      title=email_data["subject"],
                      send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ"),
-                     content=email_data["body"]["content"]
-                     )
+                     content=email_data["body"]["content"],
+                     sender_email=email_data["sender"]["emailAddress"]["address"],
+                     recipient_emails=recipients,
+                     reader_email=reader_email
+                    )
     
 
 def parse_outlook_emails_from_file(filename: str) -> list[Email]:
-    emails = []
+    emails: list[Email] = []
     with open(filename, "r", encoding="UTF-8") as f:
         emails_json = json.load(f)
         emails = [Email.from_outlook_json(data) for data in emails_json["value"]]

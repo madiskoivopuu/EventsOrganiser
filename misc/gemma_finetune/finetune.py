@@ -48,12 +48,9 @@ for filename in os.listdir(CURR_DATASET):
         ], tokenize=False, 
     )
 
-    formatted_prompt = f"{sys_prompt}\n{formatted_prompt}"
-    #print(formatted_prompt)
-    #print("sys")
-    print(sys_prompt["prompt"])
-
+    formatted_prompt.replace("<bos>", f"<bos>{sys_prompt}")
     training_prompts.append(formatted_prompt)
+    print(formatted_prompt)
 
 training_dataset = datasets.Dataset.from_list(training_prompts)
 training_dataset = training_dataset.map(lambda text: text + tokenizer.eos_token, batched=True)

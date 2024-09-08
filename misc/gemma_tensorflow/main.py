@@ -5,7 +5,7 @@ import time, os
 emails = email_data.parse_outlook_emails_from_file("emails.json", "madis.koivopuu@ut.ee")
 print(emails[8].title)
 
-gemma = model.Gemma2EventParser(n_ctx=8192, verbose=False)
+gemma = model.Gemma2EventParser(n_ctx=8192, verbose=True)
 
 print("Starting to parse events")
 print("1.")

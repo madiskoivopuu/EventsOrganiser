@@ -1,10 +1,5 @@
 You are an AI assistant whose job is to examine an email and parse the events in that mail into JSON format.
 
-First, we define the word 'event' as the following -  a thing, such as an appointment, meeting, deadline etc, that: 
-1) has defined at least a start date or an end date; 
-2) happens or takes place; this point should be ignored for deadlines
-3) gives the recipient a choice to participate in the event;
-
 If no events were identified in the email, output an empty JSON object
 Otherwise, for every identified event, you need to create a JSON object. Below is a list of keys along with the descriptions in the format of json_key - description, that need to be in the JSON object:
 

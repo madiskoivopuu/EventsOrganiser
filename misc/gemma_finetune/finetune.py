@@ -20,35 +20,40 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 
 training_prompts = []
+sys_prompt = ""
+with open(f"{CURR_DATASET}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
+    sys_prompt = f.read()
 
-system_prompt = ""
 for filename in os.listdir(CURR_DATASET):
-    with open(f"{CURR_DATASET}/{filename}", "r", encoding="UTF-8") as f:
-        content = f.read()
-        if filename == "SYS_PROMPT.txt":
-            system_prompt = content
-            continue
+    if filename == "SYS_PROMPT.txt":
+        continue
 
-        llm_input, llm_output = content.split(INPUT_OUTPUT_SEPARATOR)
-        llm_input, llm_output = llm_input.rstrip(), llm_output.lstrip()
+    f = open(f"{CURR_DATASET}/{filename}", "r", encoding="UTF-8")
+    content = f.read()
+    f.close()
 
-        formatted_prompt = tokenizer.apply_chat_template(
-            [
-                {
-                    "role": "user", # TODO: would be nice if Gemma2 has a system prompt in the future
-                    "content": system_prompt
-                },
-                {
-                    "role": "user",
-                    "content": llm_input
-                },
-                {
-                    "role": "assistant",
-                    "content": llm_output
-                }
-            ], tokenize=False
-        )
-        training_prompts.append(formatted_prompt)
+    llm_input, llm_output = content.split(INPUT_OUTPUT_SEPARATOR)
+    llm_input, llm_output = llm_input.rstrip(), llm_output.lstrip()
+
+    formatted_prompt = tokenizer.apply_chat_template(
+        [
+            {
+                "role": "user",
+                "content": llm_input
+            },
+            {
+                "role": "assistant",
+                "content": llm_output
+            }
+        ], tokenize=False, 
+    )
+
+    formatted_prompt = f"{sys_prompt}\n{formatted_prompt}"
+    #print(formatted_prompt)
+    #print("sys")
+    print(sys_prompt["prompt"])
+
+    training_prompts.append(formatted_prompt)
 
 training_dataset = datasets.Dataset.from_list(training_prompts)
 training_dataset = training_dataset.map(lambda text: text + tokenizer.eos_token, batched=True)

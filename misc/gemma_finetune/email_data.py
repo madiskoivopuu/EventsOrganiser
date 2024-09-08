@@ -20,27 +20,19 @@ class Email:
             raise ValueError(f"email data for {email_data['id']} is {email_data['body']['contentType']}, but expected 'text'")
         
         recipients: list[str] = [recipient["emailAddress"]["address"] for recipient in email_data["toRecipients"]]
+        sender_email = None if email_data["isDraft"] else email_data["sender"]["emailAddress"]["address"]
+        from_email = None if email_data["isDraft"] else email_data["from"]["emailAddress"]["address"]
 
-        if(email_data["isDraft"]):
-            return Email(id=email_data["id"],
-                        title=email_data["subject"],
-                        send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ"),
-                        content=email_data["body"]["content"],
-                        sender_email=None,
-                        from_email=None,
-                        recipient_emails=recipients,
-                        reader_email=reader_email
-                        )
-        else:
-            return Email(id=email_data["id"],
-                        title=email_data["subject"],
-                        send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ"),
-                        content=email_data["body"]["content"],
-                        sender_email=email_data["sender"]["emailAddress"]["address"],
-                        from_email=email_data["from"]["emailAddress"]["address"],
-                        recipient_emails=recipients,
-                        reader_email=reader_email
-                        )
+        return Email(id=email_data["id"],
+                    title=email_data["subject"],
+                    send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ"),
+                    content=email_data["body"]["content"],
+                    sender_email=sender_email,
+                    from_email=from_email,
+                    recipient_emails=recipients,
+                    reader_email=reader_email,
+                    is_draft=email_data["isDraft"]
+                    )
     
 
 def parse_outlook_emails_from_file(filename: str, reader_email: str) -> list[Email]:

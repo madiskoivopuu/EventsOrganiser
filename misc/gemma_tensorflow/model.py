@@ -18,7 +18,7 @@ class Gemma2EventParser():
         )
 
     def translate_email(self, email_content: str) -> str:
-        prompt = prompt_config.get_translation_prompt()
+        prompt: str = prompt_config.get_translation_prompt()
         chat_output = self.model.create_chat_completion(
             messages = [
                 {
@@ -35,12 +35,12 @@ class Gemma2EventParser():
         return chat_output["choices"][0]["message"]["content"]
     
     def parse_events_from_emails(self, emails: list[Email]) -> list[str]:
-        events_plaintext = []
+        events_plaintext: list[dict] = []
         for email in emails:
             prompt = prompt_config.format_event_parse_prompt()
             
             # TODO: make a better function for this
-            prepared_content = f"Email reader: {email.reader_email}\n"
+            prepared_content: str = f"Email reader: {email.reader_email}\n"
             prepared_content += f"Email sender: {email.sender_email}\n"
             prepared_content += f"Email from: {email.from_email}\n"
             prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"

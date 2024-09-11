@@ -9,6 +9,32 @@ from peft import LoraConfig
 CURR_DATASET = "./training_data/event_parser"
 INPUT_OUTPUT_SEPARATOR = "!<<<OUTPUT>>>!" # for simplicity we use text files which contain input & output separated by this token (input above, output below)
 
+def read_prompts(dir):
+    prompts = []
+    for filename in os.listdir(dir):
+        f = open(f"{dir}/{filename}", "r", encoding="UTF-8")
+        content = f.read()
+        f.close()
+
+        llm_input, llm_output = content.split(INPUT_OUTPUT_SEPARATOR)
+        llm_input, llm_output = llm_input.rstrip(), llm_output.lstrip()
+
+        formatted_prompt = tokenizer.apply_chat_template(
+            [
+                {
+                    "role": "user",
+                    "content": llm_input
+                },
+                {
+                    "role": "assistant",
+                    "content": llm_output
+                }
+            ], tokenize=False, 
+        )
+
+        formatted_prompt.replace("<bos>", f"<bos>{sys_prompt}")
+        prompts.append({"prompt": formatted_prompt})
+
 bnb_conf = BitsAndBytesConfig(
     load_in_8bit=True,
     bnb_8bit_compute_dtype=torch.bfloat16
@@ -22,41 +48,17 @@ model = AutoModelForCausalLM.from_pretrained(
     token=os.environ["HF_TOKEN"]
 )
 
-training_prompts = []
 sys_prompt = ""
 with open(f"{CURR_DATASET}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
     sys_prompt = f.read()
 
-for filename in os.listdir(CURR_DATASET):
-    if filename == "SYS_PROMPT.txt":
-        continue
-
-    f = open(f"{CURR_DATASET}/{filename}", "r", encoding="UTF-8")
-    content = f.read()
-    f.close()
-
-    llm_input, llm_output = content.split(INPUT_OUTPUT_SEPARATOR)
-    llm_input, llm_output = llm_input.rstrip(), llm_output.lstrip()
-
-    formatted_prompt = tokenizer.apply_chat_template(
-        [
-            {
-                "role": "user",
-                "content": llm_input
-            },
-            {
-                "role": "assistant",
-                "content": llm_output
-            }
-        ], tokenize=False, 
-    )
-
-    formatted_prompt.replace("<bos>", f"<bos>{sys_prompt}")
-    training_prompts.append({"prompt": formatted_prompt})
-
-training_dataset = datasets.Dataset.from_list(training_prompts)
+training_dataset = datasets.Dataset.from_list(read_prompts(f"{CURR_DATASET}/train"))
 training_dataset = training_dataset.map(lambda data: tokenizer(data["prompt"] + tokenizer.eos_token, max_length=8192, truncation=True), batched=False)
 training_dataset = training_dataset.remove_columns(["prompt"])
+
+#val_dataset = datasets.Dataset.from_list(read_prompts(f"{CURR_DATASET}/val"))
+#val_dataset = val_dataset.map(lambda data: tokenizer(data["prompt"] + tokenizer.eos_token, max_length=8192, truncation=True), batched=False)
+#val_dataset = val_dataset.remove_columns(["prompt"])
 
 # prepare peft model & train
 

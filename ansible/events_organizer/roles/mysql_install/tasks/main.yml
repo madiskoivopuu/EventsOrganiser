@@ -1,0 +1,28 @@
+- name: Install/update mariadb
+  ansible.builtin.dnf:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+  - "mariadb"
+  - "mariadb-server"
+  notify:
+  - Restart mariadb
+
+- name: Install pymysql for MySQL hardening
+  ansible.builtin.pip:
+    name: pymysql
+    state: present
+
+- name: Start mariadb
+  ansible.builtin.systemd:
+    name: mariadb
+    state: started
+    enabled: true
+
+- name: Set .my.cnf with credentials
+  template:
+    src: 'my.cnf.j2'
+    dest: '/root/.my.cnf'
+    owner: root
+    group: mysql
+    mode: '0440'

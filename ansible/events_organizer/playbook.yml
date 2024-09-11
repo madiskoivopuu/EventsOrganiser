@@ -3,11 +3,17 @@
   become_user: root
   become: yes
 
+  collections:
+    - devsec.hardening
+
   vars:
     events_webserver_loc: "/srv/www/events_webserver"
     fqdn: "cs.ut.ee"
+    set_mysql_password: false
 
-  #roles:
+  roles:
+    - mysql_install
+    - devsec.hardening.mysql_hardening
     #- update_packages
     #- apache
     #- webserver_setup
@@ -17,6 +23,9 @@
   become_user: root
   become: yes
 
+  collections:
+    - devsec.hardening
+
   vars:
     llm_webserver_loc: /srv/www/llm_api_webserver
     fqdn: "cs.ut.ee"
@@ -25,4 +34,4 @@
     #- update_packages
     #- setup
     #- apache
-    - llm_server_setup
+    #- llm_server_setup

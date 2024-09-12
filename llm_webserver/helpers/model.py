@@ -5,10 +5,11 @@ from llama_cpp import Llama
 from helpers.email_data import Email
 
 class Gemma2EventParser():
-    MAX_GENERATED_TOKENS = 1024
+    MAX_GENERATED_TOKENS = 2048
 
     def __init__(self, **kwargs) -> None:
         self.model = Llama(
+            n_ctx=8192,
             model_path=app_config.MODEL_FILE, 
             chat_format="gemma",
             **kwargs

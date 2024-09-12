@@ -10,6 +10,7 @@ class Gemma2EventParser():
     def __init__(self, **kwargs) -> None:
         self.model = Llama(
             n_ctx=8192,
+            n_gpu_layers=-1,
             model_path=app_config.MODEL_FILE, 
             chat_format="gemma",
             **kwargs
@@ -45,7 +46,8 @@ class Gemma2EventParser():
             },
             max_tokens=self.MAX_GENERATED_TOKENS,
         )
-        return json.loads(chat_output["choices"][0]["message"]["content"])
+
+        return json.loads(chat_output["choices"][0]["message"]["content"], strict=False)
     
     def parse_events_from_email(self, email: Email) -> list[dict]:
         events: list[dict] = []
@@ -77,7 +79,7 @@ class Gemma2EventParser():
             max_tokens=self.MAX_GENERATED_TOKENS
         )
     
-        events.append(json.loads(chat_output["choices"][0]["message"]["content"]))
+        events.append(json.loads(chat_output["choices"][0]["message"]["content"], strict=False))
 
         return events
     

@@ -30,8 +30,8 @@ First, we define the word 'event' as the following -  a thing, such as an appoin
 2) happens or takes place; this point should be ignored for deadlines
 3) gives the recipient a choice to participate in the event;
 
-If no events were identified in the email, output an empty JSON object
-Otherwise, for every identified event, you need to create a JSON object. Below is a list of keys along with the descriptions in the format of json_key - description, that need to be in the JSON object:
+If no events were identified in the email, output an empty JSON array
+Otherwise, for every identified event, you need to create a JSON array. Below is a list of keys along with the descriptions in the format of json_key - description, that need to be in the JSON object:
 
 event_name - the title of the event; if not available, a brief name with a maximum of 10 words that describes the event in the email
 start_date - date formatted in hh:mm DD/MM/YYYY using the ISO 8601 convention; hh:mm can be missing if no time of day is mentioned; empty string if no start date is mentioned; it is possible that the date is described with words like 'tomorrow', 'in 3 days' etc and you will need to deduce the start date based on the email sending date

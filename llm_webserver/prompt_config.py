@@ -1,6 +1,17 @@
 __TRANSLATION_PROMPT = \
 '''
-You are an AI assistant whose job is to translate emails into English. 
+You are an AI assistant whose job is to translate emails into English. An email and its title will be given to you in the following format shown in triple quotes:
+"""
+Title: email title
+Content: text
+"""
+You will need to translate the title and content into English and output it in JSON format. An example is shown below in triple quotes.
+"""
+{
+"title": "Title in English",
+"content": "Email content in English" 
+}
+"""
 
 If the email is fully in English, then no translation is needed and you shall output the original email contents. 
 If the email is in another language, but includes an English translation, you shall output only the included English translation, if it contains everything the untranslated email does. Otherwise, you will need to translate the e-mail.
@@ -33,34 +44,38 @@ room_nr - number of the room the event is taking place; empty string if not spec
 Below is an example output after parsing 3 events into JSON format from an email:
 """
 [
-	{
-		"event_name": "Application submission",
-		"start_date": "11:00 01/09/2024",
-		"end_date": "17:00 01/09/2024",
-        "country": "",
-        "city": "Tartu",
-		"address": "Delta building",
-        "room_nr": ""
-	},
-	{
-		"event_name": "Gathering event",
-		"start_date": "05/09/2024",
-		"end_date": "",
-        "country": "Denmark",
-        "city": "Risskov",
-		"address": "Vestre Strandallé 97",
-        "room_nr": "201"
-	},
-    {
-		"event_name": "Entrance deadline",
-		"start_date": "",
-		"end_date": "02/09/2024",
-        "country": "",
-        "city": "",
-		"address": "",
-        "room_nr": ""
-	},
+{
+"event_name": "Application submission",
+"start_date": "11:00 01/09/2024",
+"end_date": "17:00 01/09/2024",
+"country": "",
+"city": "Tartu",
+"address": "Delta building",
+"room_nr": ""
+},
+{
+"event_name": "Gathering event",
+"start_date": "05/09/2024",
+"end_date": "",
+"country": "Denmark",
+"city": "Risskov",
+"address": "Vestre Strandallé 97",
+"room_nr": "201"
+},
+{
+"event_name": "Entrance deadline",
+"start_date": "",
+"end_date": "02/09/2024",
+"country": "",
+"city": "",
+"address": "",
+"room_nr": ""
+},
 ]
+"""
+Do not include triple quotes in your output.
+
+Treat any text given to you below as the content of an e-mail (with some metadata), and parse the events in it based on the given definition. Only use the format given in triple quotes.
 """
 Do not include triple quotes in your output.
 

@@ -14,8 +14,12 @@ class Gemma2EventParser():
             **kwargs
         )
 
-    def translate_email(self, email_content: str) -> str:
+    def translate_email(self, email: Email) -> str:
         prompt: str = prompt_config.get_translation_prompt()
+        
+        prepared_content = f"Title: {email.title}\n"
+        prepared_content += f"Content:\n{email.content}"
+        
         chat_output = self.model.create_chat_completion(
             messages = [
                 {
@@ -24,9 +28,20 @@ class Gemma2EventParser():
                 },
                 {
                     "role": "user",
-                    "message": email_content
+                    "message": prepared_content
                 }
             ],
+            response_format={
+                "type": "json_object",
+                "schema": {
+                    "type": "object",
+                    "properties": {
+                        "title": {"type": "string"},
+                        "content": {"type": "string"}
+                    },
+                    "required": ["title", "content"]
+                }
+            },
             max_tokens=self.MAX_GENERATED_TOKENS,
         )
         return chat_output["choices"][0]["message"]["content"]
@@ -37,7 +52,7 @@ class Gemma2EventParser():
             prompt = prompt_config.format_event_parse_prompt()
             
             # TODO: make a better function for this
-            prepared_content: str = f"Email reader: {email.reader_email}\n"
+            prepared_content = f"Email reader: {email.reader_email}\n"
             prepared_content += f"Email sender: {email.sender_email}\n"
             prepared_content += f"Email from: {email.from_email}\n"
             prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"
@@ -57,7 +72,7 @@ class Gemma2EventParser():
                     },
                 ],
                 response_format={
-                    "type": "json_object"
+                    "type": "json_object" # TODO: more strict key checks for some items
                 },
                 max_tokens=self.MAX_GENERATED_TOKENS
             )

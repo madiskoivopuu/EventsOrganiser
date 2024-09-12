@@ -1,3 +1,4 @@
+import pymysql.cursors
 import app_config
 import msal, pymysql
 
@@ -14,5 +15,6 @@ events_mysql = pymysql.connect(
     host="172.17.89.147",
     user=app_config.EVENTS_PARSER_MYSQL_USER,
     password=app_config.EVENTS_PARSER_MYSQL_PASSWORD,
-    database="events"
+    database="events",
+    cursorclass=pymysql.cursors.DictCursor
 )

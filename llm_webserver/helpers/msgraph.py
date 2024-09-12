@@ -15,7 +15,7 @@ def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100) -> di
     return {"status": "success", "data": response.json()}
 
 # Reads emails that were sent after or on the same day as the given date
-def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 0, top: int = 100) -> dict:
+def read_emails_after_date(access_token: str, reader_email: str, after_date: datetime, skip: int = 0, top: int = 100) -> dict:
     emails = []
 
     last_processed_email_date = datetime.now(timezone.utc)
@@ -27,7 +27,7 @@ def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 
             break
         
         for data in result["data"]["value"]:
-            email = Email.from_outlook_json(data)
+            email = Email.from_outlook_json(data, reader_email)
             last_processed_email_date = email.send_date
 
             if(email.send_date < after_date):

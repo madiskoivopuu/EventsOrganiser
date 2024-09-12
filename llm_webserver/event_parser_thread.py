@@ -12,11 +12,11 @@ EMAIL_SENT_AFTER_DATE = datetime.now(timezone.utc) + relativedelta(months=-6)
 gemma = Gemma2EventParser(n_threads=8, n_threads_batch=8)
 
 def get_last_parsed_email_date(acc_id: str, mail_type: str) -> datetime:
-    sql_cursor = apps.events_mysql.cursor(dictionary=True)
+    sql_cursor = apps.events_mysql.cursor()
     
     affected_rows = sql_cursor.execute("SELECT last_parsed_email_date FROM parsing_status WHERE mail_acc_id = %s AND mail_acc_type = %s", (acc_id, mail_type))
     if(affected_rows == 0):
-        sql_cursor.execute("INSERT INTO parsing_status (mail_acc_id, mail_acc_type, last_parsed_email_date) VALUES (%s, %s, %s)", (acc_id, mail_type, EMAIL_SENT_AFTER.strftime("%Y-%m-%d %H:%M:%S")))
+        sql_cursor.execute("INSERT INTO parsing_status (mail_acc_id, mail_acc_type, last_parsed_email_date) VALUES (%s, %s, %s)", (acc_id, mail_type, EMAIL_SENT_AFTER_DATE.strftime("%Y-%m-%d %H:%M:%S")))
         return EMAIL_SENT_AFTER_DATE
     
     result = sql_cursor.fetchone() 
@@ -24,7 +24,7 @@ def get_last_parsed_email_date(acc_id: str, mail_type: str) -> datetime:
     return datetime.strptime(result["last_parsed_email_date"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
 
 def update_last_parsed_email_date(acc_id: str, mail_type: str, email_date: datetime):
-    sql_cursor = apps.events_mysql.cursor(dictionary=True)
+    sql_cursor = apps.events_mysql.cursor()
     affected_rows = sql_cursor.execute("UPDATE parsing_status SET last_parsed_email_date = %s WHERE mail_acc_id = %s AND mail_acc_type = %s", (email_date.strftime("%Y-%m-%d %H:%M:%S"), acc_id, mail_type))
     return affected_rows != 0
 
@@ -64,7 +64,7 @@ def parse_loop():
             if(last_parsed_date < EMAIL_SENT_AFTER_DATE):
                 last_parsed_date = EMAIL_SENT_AFTER_DATE
 
-            result = msgraph.read_emails_after_date(token_data["access_token"], last_parsed_date)
+            result = msgraph.read_emails_after_date(token_data["access_token"], account["username"], last_parsed_date)
             if(result["status"] != "success"):
                 # TODO: log it properly
                 print("Failed to fetch emails for user. ", result)

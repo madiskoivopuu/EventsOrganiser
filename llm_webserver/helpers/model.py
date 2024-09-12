@@ -24,11 +24,11 @@ class Gemma2EventParser():
             messages = [
                 {
                     "role": "user",
-                    "message": prompt
+                    "content": prompt
                 },
                 {
                     "role": "user",
-                    "message": prepared_content
+                    "content": prepared_content
                 }
             ],
             response_format={

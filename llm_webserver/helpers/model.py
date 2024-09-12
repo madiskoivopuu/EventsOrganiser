@@ -44,7 +44,7 @@ class Gemma2EventParser():
             },
             max_tokens=self.MAX_GENERATED_TOKENS,
         )
-        return chat_output["choices"][0]["message"]["content"]
+        return json.loads(chat_output["choices"][0]["message"]["content"])
     
     def parse_events_from_email(self, email: Email) -> list[dict]:
         events: list[dict] = []

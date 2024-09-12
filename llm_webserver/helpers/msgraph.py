@@ -19,7 +19,7 @@ def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 
     emails = []
 
     last_processed_email_date = datetime.now()
-    while last_processed_email_date.date() >= after_date.date():
+    while last_processed_email_date >= after_date:
         result = read_user_emails_raw(access_token, skip=skip, top=100)
         if(result["status"] != "success"):
             return result
@@ -30,7 +30,7 @@ def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 
             email = Email.from_outlook_json(data)
             last_processed_email_date = email.send_date
 
-            if(email.send_date < after_date.date()):
+            if(email.send_date < after_date):
                 break
 
             emails.append(email)

@@ -1,4 +1,5 @@
 import flask
+import app_config
 from flask import Blueprint
 from helpers import apps
 
@@ -14,7 +15,7 @@ def login():
 
 @login_test_apis.route("/", methods=["GET"])
 def home():
-    flow = apps.ms_app.initiate_auth_code_flow(scopes=["Mail.ReadBasic", "Mail.Read"])
+    flow = apps.ms_app.initiate_auth_code_flow(scopes=app_config.SCOPES)
     # no error checks
     flask.session["auth_flow"] = flow
 

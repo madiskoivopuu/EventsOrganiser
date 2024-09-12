@@ -3,7 +3,7 @@ USE events;
 CREATE TABLE parsing_status (
 	mail_acc_id varchar(256) NOT NULL,
 	mail_acc_type enum('outlook', 'gmail') NOT NULL,
-	last_parsed_email_id varchar(256),
+	last_parsed_email_date DATETIME DEFAULT NULL,
 	PRIMARY KEY (mail_acc_id, mail_acc_type)
 );
 

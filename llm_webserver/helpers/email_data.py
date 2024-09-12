@@ -1,6 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
 import json
 
 @dataclass
@@ -26,7 +25,7 @@ class Email:
 
         return Email(id=email_data["id"],
                     title=email_data["subject"],
-                    send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=ZoneInfo('UTC')), # graph api returns dates in UTC format
+                    send_date=datetime.strptime(email_data["sentDateTime"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc), # graph api returns dates in UTC format
                     content=email_data["body"]["content"],
                     sender_email=sender_email,
                     from_email=from_email,

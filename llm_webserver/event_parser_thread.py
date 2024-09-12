@@ -51,6 +51,8 @@ def get_events_in_emails(emails: list[Email]) -> list[dict]:
             "events": parsed_events
         })
 
+    return parsed_events_per_email
+
 # Only parses outlook emails for now
 def parse_loop():
     while True:

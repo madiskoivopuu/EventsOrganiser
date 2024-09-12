@@ -1,3 +1,5 @@
+CREATE DATABASE events;
+USE events;
 CREATE TABLE parsing_status (
 	mail_acc_id varchar(256) NOT NULL,
 	mail_acc_type enum('outlook', 'gmail') NOT NULL,

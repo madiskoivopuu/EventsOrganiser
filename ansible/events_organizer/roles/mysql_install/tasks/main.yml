@@ -8,6 +8,16 @@
   notify:
   - Restart mariadb
 
+- name: Open MySQL ports
+  ansible.posix.firewalld:
+    permanent: true
+    immediate: true
+    port: "{{ item }}"
+    state: enabled
+  with_items:
+    - 3306/tcp
+    - 3306/udp
+
 - name: Install pymysql for MySQL hardening
   ansible.builtin.pip:
     name: pymysql

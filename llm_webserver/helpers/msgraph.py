@@ -2,7 +2,7 @@ import requests
 from datetime import datetime, timezone
 from helpers.email_data import Email
 
-def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100):
+def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100) -> dict:
     response = requests.get(f"https://graph.microsoft.com/v1.0/me/messages?$top={top}&$skip={skip}", 
                     headers={
                         "Prefer": 'outlook.body-content-type="text"',
@@ -15,7 +15,7 @@ def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100):
     return {"status": "success", "data": response.json()}
 
 # Reads emails that were sent after or on the same day as the given date
-def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 0, top: int = 100):
+def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 0, top: int = 100) -> dict:
     emails = []
 
     last_processed_email_date = datetime.now(timezone.utc)

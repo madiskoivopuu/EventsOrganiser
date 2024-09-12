@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from helpers.email_data import Email
 
 def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100):
@@ -18,7 +18,7 @@ def read_user_emails_raw(access_token: str, skip: int = 0, top: int = 100):
 def read_emails_after_date(access_token: str, after_date: datetime, skip: int = 0, top: int = 100):
     emails = []
 
-    last_processed_email_date = datetime.now()
+    last_processed_email_date = datetime.now(timezone.utc)
     while last_processed_email_date >= after_date:
         result = read_user_emails_raw(access_token, skip=skip, top=100)
         if(result["status"] != "success"):

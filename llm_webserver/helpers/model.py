@@ -46,40 +46,39 @@ class Gemma2EventParser():
         )
         return chat_output["choices"][0]["message"]["content"]
     
-    def parse_events_from_emails(self, emails: list[Email]) -> list[str]:
-        events_plaintext: list[dict] = []
-        for email in emails:
-            prompt = prompt_config.format_event_parse_prompt()
-            
-            # TODO: make a better function for this
-            prepared_content = f"Email reader: {email.reader_email}\n"
-            prepared_content += f"Email sender: {email.sender_email}\n"
-            prepared_content += f"Email from: {email.from_email}\n"
-            prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"
-            prepared_content += f"Send time: {email.send_date.strftime('%H:%M %d/%m/%Y')}\n"
-            prepared_content += f"Title: {email.title}\n"
-            prepared_content += f"Content:\n{email.content}"
-
-            chat_output = self.model.create_chat_completion(
-                messages = [
-                    {
-                        "role": "user",
-                        "content": prompt
-                    },
-                    {
-                        "role": "user",
-                        "content": prepared_content
-                    },
-                ],
-                response_format={
-                    "type": "json_object" # TODO: more strict key checks for some items
-                },
-                max_tokens=self.MAX_GENERATED_TOKENS
-            )
+    def parse_events_from_email(self, email: Email) -> list[dict]:
+        events: list[dict] = []
+        prompt = prompt_config.format_event_parse_prompt()
         
-            events_plaintext.append(json.loads(chat_output["choices"][0]["message"]["content"]))
+        # TODO: make a better function for this
+        prepared_content = f"Email reader: {email.reader_email}\n"
+        prepared_content += f"Email sender: {email.sender_email}\n"
+        prepared_content += f"Email from: {email.from_email}\n"
+        prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"
+        prepared_content += f"Send time: {email.send_date.strftime('%H:%M %d/%m/%Y')}\n"
+        prepared_content += f"Title: {email.title}\n"
+        prepared_content += f"Content:\n{email.content}"
 
-        return events_plaintext
+        chat_output = self.model.create_chat_completion(
+            messages = [
+                {
+                    "role": "user",
+                    "content": prompt
+                },
+                {
+                    "role": "user",
+                    "content": prepared_content
+                },
+            ],
+            response_format={
+                "type": "json_object" # TODO: more strict key checks for some items
+            },
+            max_tokens=self.MAX_GENERATED_TOKENS
+        )
+    
+        events.append(json.loads(chat_output["choices"][0]["message"]["content"]))
+
+        return events
     
     def generate_tags_for_email_events(self, event_name: str, email: Email) -> list[str]:
         raise NotImplementedError("")

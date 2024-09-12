@@ -1,0 +1,12 @@
+CREATE TABLE parsing_status (
+	mail_acc_id varchar(256) NOT NULL,
+	mail_acc_type enum('outlook', 'gmail') NOT NULL,
+	last_parsed_email_id varchar(256),
+	PRIMARY KEY (mail_acc_id, mail_acc_type)
+);
+
+CREATE USER 'events_parser'@'localhost' IDENTIFIED BY '---CHANGE THIS---';
+CREATE USER 'events_parser'@'remote-ip-addr' IDENTIFIED BY '---CHANGE THIS---'; -- for the remote server that handles fetching emails and parsing events
+GRANT SELECT, UPDATE, INSERT ON events.* TO 'events_parser'@'localhost';
+GRANT SELECT, UPDATE, INSERT ON events.* TO 'events_parser'@'remote-ip-addr';
+FLUSH PRIVILEGES;

@@ -17,15 +17,20 @@ def get_last_parsed_email_date(acc_id: str, mail_type: str) -> datetime:
     affected_rows = sql_cursor.execute("SELECT last_parsed_email_date FROM parsing_status WHERE mail_acc_id = %s AND mail_acc_type = %s", (acc_id, mail_type))
     if(affected_rows == 0):
         sql_cursor.execute("INSERT INTO parsing_status (mail_acc_id, mail_acc_type, last_parsed_email_date) VALUES (%s, %s, %s)", (acc_id, mail_type, EMAIL_SENT_AFTER_DATE.strftime("%Y-%m-%d %H:%M:%S")))
+        apps.events_mysql.commit()
+        sql_cursor.close()
         return EMAIL_SENT_AFTER_DATE
     
     result = sql_cursor.fetchone() 
+    sql_cursor.close()
     # last parsed email dates are in DATETIME field and UTC timezone, we need to retain that info
-    return datetime.strptime(result["last_parsed_email_date"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
+    return result["last_parsed_email_date"].replace(tzinfo=timezone.utc)
 
 def update_last_parsed_email_date(acc_id: str, mail_type: str, email_date: datetime):
     sql_cursor = apps.events_mysql.cursor()
     affected_rows = sql_cursor.execute("UPDATE parsing_status SET last_parsed_email_date = %s WHERE mail_acc_id = %s AND mail_acc_type = %s", (email_date.strftime("%Y-%m-%d %H:%M:%S"), acc_id, mail_type))
+    apps.events_mysql.commit()
+    sql_cursor.close()
     return affected_rows != 0
 
 def get_events_in_emails(emails: list[Email]) -> list[dict]:
@@ -70,7 +75,10 @@ def parse_loop():
                 print("Failed to fetch emails for user. ", result)
                 continue
 
-            events = get_events_in_emails(result["data"])
-            print(events)
+            update_last_parsed_email_date(account["home_account_id"], "outlook", result["data"][0].send_date)
+
+            data = get_events_in_emails(result["data"])
+            for event in data:
+                print(event["events"])
 
         time.sleep(5)

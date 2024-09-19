@@ -12,7 +12,8 @@
     set_mysql_password: false
 
   roles:
-    - mysql_install
+    #- mysql_install
+    - mongodb_install
     #- devsec.hardening.mysql_hardening
     #- update_packages
     #- apache

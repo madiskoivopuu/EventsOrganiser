@@ -15,4 +15,4 @@ if __name__ == "__main__":
     t = threading.Thread(target=event_parser_thread.parse_loop)
     t.start()
 
-    app.run()
+    app.run(host="0.0.0.0")

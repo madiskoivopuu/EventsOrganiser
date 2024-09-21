@@ -43,10 +43,7 @@ def home():
         return redirect(url_for('login'))
 
     return render_template(
-        "index.html", **apps.get_ms_app().log_in(
-            scopes=app_config.SCOPES,
-            redirect_uri=app_config.MICROSOFT_LOGIN_REDIRECT
-        )
+        "index.html"
     )
 
 if __name__ == "__main__":

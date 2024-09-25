@@ -21,7 +21,7 @@ class Gemma2EventParser():
         
         prepared_content = f"Title: {email.title}\n"
         prepared_content += f"Content:\n{email.content}"
-        
+
         chat_output = self.model.create_chat_completion(
             messages = [
                 {
@@ -78,7 +78,6 @@ class Gemma2EventParser():
             },
             max_tokens=self.MAX_GENERATED_TOKENS
         )
-    
         events.append(json.loads(chat_output["choices"][0]["message"]["content"], strict=False))
 
         return events

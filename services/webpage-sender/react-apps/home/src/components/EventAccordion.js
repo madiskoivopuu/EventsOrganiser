@@ -38,14 +38,14 @@ function EventAccordion({ event }) {
                         </Col>
                         <Col sm={12} md={4}>
                             <strong>Location</strong> <br />
-                            <span>Tartu, Delta Centre, r3010</span></Col>
+                            <span>{ [event.country, event.city, event.location, event.room ].filter(item => Boolean(item)).join(", ") }</span></Col>
                         <Col sm={12} md={4}>
                             <strong>Tags</strong><br />
-                            {event.tags.map((tag) => {
+                            {event.tags.map((tag) => 
                                 <Badge pill bg="primary">
                                     {tag}
                                 </Badge>
-                            })}
+                            )}
                         </Col>
                     </Row>
                 </Accordion.Body>

@@ -12,9 +12,29 @@ function App() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [events, setEvents] = useState([
     {
+      "name": "Meeting with Jaak Vilo",
+      "start_date": new Date("2024-09-27T07:00:00Z"),
+      "end_date": new Date("2024-09-27T10:00:00Z"),
+      "country": "",
+      "city": "Tartu",
+      "location": "Delta Study Building",
+      "room": "",
+      "tags": ["Presentation"]
+    },
+    {
+      "name": "ATI day",
+      "start_date": new Date("2024-09-27T07:00:00Z"),
+      "end_date": new Date("2024-09-27T17:00:00Z"),
+      "country": "",
+      "city": "Tartu",
+      "location": "Delta Study Building",
+      "room": "",
+      "tags": ["Presentation"]
+    },
+    {
       "name": "Three Minute Thesis competition for doctoral students",
       "start_date": new Date("2024-10-02T10:00:00Z"),
-      "end_date": new Date("2024-10-02T10:00:00Z"),
+      "end_date": new Date("2024-10-02T16:00:00Z"),
       "country": "",
       "city": "Tartu",
       "location": "University of Tartu Library",
@@ -27,11 +47,25 @@ function App() {
       "end_date": new Date("2025-02-20T16:00:00Z"),
       "country": "",
       "city": "Tartu",
-      "location": "University of Tartu Library",
-      "room": "",
+      "location": "Ujula 4a",
+      "room": "Main hall",
       "tags": ["Internships", "Company presentations"]
     }
   ]);
+  const [allTags, setAllTags] = useState([
+    "Computer Science",
+    "Lecture",
+    "Internships",
+    "Company presentations"
+  ])
+
+  const [searchOpts, setSearchOpts] = useState({
+    query: "",
+    additionalOptsEnabled: false,
+    startDate: null,
+    endDate: null,
+    tags: []
+  })
 
   const handleSearchOptsChanged = () => {
     // TODO
@@ -41,7 +75,7 @@ function App() {
     <Container>
       <Row>
         <Col sm={12} md={4} xl={3}>
-          <SearchBar searchFiltersChanged={handleSearchOptsChanged}/>
+          <SearchBar tags={allTags} searchFiltersChanged={handleSearchOptsChanged}/>
         </Col>
         <Col sm={12} md={8} xl={9}>
           <Nav variant="tabs" activeKey={activeTab} justify onSelect={(newKey) => setActiveTab(newKey)}>

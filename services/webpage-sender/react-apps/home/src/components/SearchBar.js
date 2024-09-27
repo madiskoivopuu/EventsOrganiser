@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
 
+import Stack from 'react-bootstrap/Stack';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
 import DatePicker from "react-datepicker";
 import Tags from "bootstrap5-tags/tags";
 
+
+import "./SearchBar.css";
 import "react-datepicker/dist/react-datepicker.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 function SearchBar({ searchFiltersChanged }) {
-    useEffect(() => { // runs select to tagslist conversion after render
-        Tags.init();
+    useEffect(() => { // runs select to tagslist conversion after each render
+        Tags.init("select[multiple]", {}, true);
     });
 
     const [useExtraOpts, setUseExtraOpts] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
 
     return (
         <Card>
@@ -44,7 +49,7 @@ function SearchBar({ searchFiltersChanged }) {
 
                     <Form.Group>
                         <Form.Label>Tags</Form.Label> <br />
-                        <Form.Select className="form-control" multiple data-allow-clear="true">
+                        <Form.Select className="form-control" multiple data-allow-clear="true" disabled={!useExtraOpts}>
                             <option disabled hidden value="">Choose a tag...</option>
                             <option value="1">First</option>
                             <option value="2">Second</option>

@@ -7,7 +7,6 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 
-
 function App() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [events, setEvents] = useState([
@@ -19,7 +18,7 @@ function App() {
       "city": "Tartu",
       "location": "Delta Study Building",
       "room": "",
-      "tags": ["Presentation"]
+      "tags": ["Meeting"]
     },
     {
       "name": "ATI day",
@@ -39,7 +38,7 @@ function App() {
       "city": "Tartu",
       "location": "University of Tartu Library",
       "room": "",
-      "tags": ["Presentation"]
+      "tags": ["Lecture"]
     },
     {
       "name": "Delta Career Day",
@@ -52,9 +51,12 @@ function App() {
       "tags": ["Internships", "Company presentations"]
     }
   ]);
+
   const [allTags, setAllTags] = useState([
     "Computer Science",
     "Lecture",
+    "Presentation",
+    "Meeting",
     "Internships",
     "Company presentations"
   ])
@@ -67,15 +69,21 @@ function App() {
     tags: []
   })
 
-  const handleSearchOptsChanged = () => {
-    // TODO
+  const handleSearchOptsChanged = (key, value) => {
+    setSearchOpts(prevOpts => (
+        {
+          ...prevOpts,
+          [key]: value
+        }
+      )
+    );
   };
 
   return (
     <Container>
       <Row>
         <Col sm={12} md={4} xl={3}>
-          <SearchBar tags={allTags} searchFiltersChanged={handleSearchOptsChanged}/>
+          <SearchBar tags={allTags} searchFiltersChanged={handleSearchOptsChanged} />
         </Col>
         <Col sm={12} md={8} xl={9}>
           <Nav variant="tabs" activeKey={activeTab} justify onSelect={(newKey) => setActiveTab(newKey)}>
@@ -90,7 +98,7 @@ function App() {
             </Nav.Item>
           </Nav>
 
-          <EventsLister events={events} eventType={activeTab}/>
+          <EventsLister events={events} eventType={activeTab} searchOptions={searchOpts}/>
         </Col>
       </Row>
     </Container>

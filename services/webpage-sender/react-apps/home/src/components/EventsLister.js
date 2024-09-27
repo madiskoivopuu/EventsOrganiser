@@ -6,7 +6,8 @@ import "./EventsLister.css"
 import { useMemo } from 'react';
 import EventAccordion from './EventAccordion';
 
-function filterAndGroupEvents(events, showEvtType) {
+// Filters events based on which tab is active.
+function filterEventsForTab(events, showEvtType) {
     const currDate = new Date();
 
     let filtered = [];
@@ -19,13 +20,17 @@ function filterAndGroupEvents(events, showEvtType) {
         filtered = events.filter((event) => currDate < event.start_date);
     }
 
-    // sort them based on the current tab
+    // sort them based on the current tab so that for the past tab, the most recent event is shown first and least recent as last
     filtered.sort((event1, event2) =>  event1.start_date - event2.start_date);
     if (showEvtType === "past")
         filtered.reverse();
 
-    // group those events together into their own month
-    let groupedByYM = filtered.reduce((currentGroups, event) => {
+    return filtered;
+};
+
+// Groups all events in the same month & year into one group
+function groupEventsByYM(events) {
+    let groupedByYM = events.reduce((currentGroups, event) => {
         let key = event.start_date.toLocaleString("en-US", { month: "long", year: "numeric" }) // { timeZone: 'UTC' }? all event dates are stored as UTC timestamps in database
         if (!currentGroups.hasOwnProperty(key))
             currentGroups[key] = []
@@ -35,26 +40,50 @@ function filterAndGroupEvents(events, showEvtType) {
     }, {});
 
     return groupedByYM;
-};
+}
+
+function applySearchQuery(events, searchOptions) {
+    if(searchOptions.query.length > 1)
+        events = events.filter((event) => event.name.toLowerCase().includes(searchOptions.query.toLowerCase()) );
+
+    if(searchOptions.additionalOptsEnabled) {
+        if(searchOptions.startDate !== null)
+            events = events.filter((event) => event.start_date >= searchOptions.startDate);
+
+        if(searchOptions.endDate !== null)
+            events = events.filter((event) => event.end_date <= searchOptions.endDate);
+
+        if(searchOptions.tags.length > 0)
+            events = events.filter((event) => searchOptions.tags.every(tag => event.tags.includes(tag)));
+    }
+
+    return events;
+}
 
 function EventsLister({ events, eventType, searchOptions }) {
-    /*const searchEvents = (events, searchOpts) {
-
-    }*/
-
-    const eventsForTab = filterAndGroupEvents(events, eventType);
-    if(Object.keys(eventsForTab).length == 0)
+    const eventsForTab = filterEventsForTab(events, eventType);
+    if(eventsForTab.length === 0)
         return (
             <div class="mt-4">
                 <p style={{textAlign: "center"}}>No events found</p>
             </div>
         );
 
+    const searchedEvents = applySearchQuery(eventsForTab, searchOptions);
+    if(searchedEvents.length === 0)
+        return (
+            <div class="mt-4">
+                <p style={{textAlign: "center"}}>No events found that match the search query</p>
+            </div>
+        );
+        
+    const groupedEventsForTab = groupEventsByYM(searchedEvents);
+
     return (
         <div class="mt-4">
             <Row>
                 <Stack gap={3}>
-                    {Object.entries(eventsForTab).map(([header, eventsForMonth]) => {
+                    {Object.entries(groupedEventsForTab).map(([header, eventsForMonth]) => {
                         return (
                             <Col xs={12}>
                                 <h3>{header}</h3>

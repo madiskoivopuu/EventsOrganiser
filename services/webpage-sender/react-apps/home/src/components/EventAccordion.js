@@ -42,7 +42,7 @@ function EventAccordion({ event }) {
                         <Col sm={12} md={4}>
                             <strong>Tags</strong><br />
                             {event.tags.map((tag) => 
-                                <Badge pill bg="primary">
+                                <Badge pill bg="primary" className="me-1">
                                     {tag}
                                 </Badge>
                             )}

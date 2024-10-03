@@ -11,7 +11,7 @@ import Select from 'react-select';
 import "react-datepicker/dist/react-datepicker.css";
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
-function SearchBar({ tags, searchFiltersChanged }) {
+function SearchBar({ tags, searchFiltersChanged, activeTabName }) {
     const [useExtraOpts, setUseExtraOpts] = useState(false);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
@@ -53,7 +53,7 @@ function SearchBar({ tags, searchFiltersChanged }) {
     return (
         <Card>
             <Card.Body>
-                <Card.Title>Filter listed events</Card.Title>
+                <Card.Title>Filter {activeTabName} events</Card.Title>
                 <hr />
 
                 <InputGroup className="mb-3">

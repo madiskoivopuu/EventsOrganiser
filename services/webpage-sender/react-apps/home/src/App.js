@@ -83,7 +83,7 @@ function App() {
     <Container>
       <Row>
         <Col sm={12} md={4} xl={3}>
-          <SearchBar tags={allTags} searchFiltersChanged={handleSearchOptsChanged} />
+          <SearchBar tags={allTags} activeTabName={activeTab} searchFiltersChanged={handleSearchOptsChanged} />
         </Col>
         <Col sm={12} md={8} xl={9}>
           <Nav variant="tabs" activeKey={activeTab} justify onSelect={(newKey) => setActiveTab(newKey)}>

@@ -45,7 +45,7 @@ function groupEventsByYM(events) {
 function applySearchQuery(events, searchOptions) {
     if(searchOptions.query.length > 1)
         events = events.filter((event) => event.name.toLowerCase().includes(searchOptions.query.toLowerCase()) );
-
+    
     if(searchOptions.additionalOptsEnabled) {
         if(searchOptions.startDate !== null)
             events = events.filter((event) => event.start_date >= searchOptions.startDate);
@@ -65,7 +65,7 @@ function EventsLister({ events, eventType, searchOptions }) {
     if(eventsForTab.length === 0)
         return (
             <div class="mt-4">
-                <p style={{textAlign: "center"}}>No events found</p>
+                <p style={{textAlign: "center"}}>No events to list</p>
             </div>
         );
 

@@ -57,9 +57,9 @@ function SearchBar({ tags, searchFiltersChanged, activeTabName }) {
                 <hr />
 
                 <InputGroup className="mb-3">
-                    <Form.Control type="search" placeholder="Event name or Description" />
-                    <InputGroup.Text onChange={(e) => searchFiltersChanged("query", e.target.value) }>
-                        <i class="bi bi-search"></i>
+                    <Form.Control type="search" placeholder="Event name" onChange={(e) => searchFiltersChanged("query", e.target.value) }/>
+                    <InputGroup.Text>
+                        <i className="bi bi-search"></i>
                     </InputGroup.Text>
                 </InputGroup>
 

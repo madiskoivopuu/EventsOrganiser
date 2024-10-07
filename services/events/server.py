@@ -60,7 +60,6 @@ async def get_events(
             status_code=403
         )
     
-    
     user_id = ms.get_user()["oid"]"""
     if(not tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
@@ -69,14 +68,15 @@ async def get_events(
     acc_type = 1 # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
                  # TODO: also fetch the ID of the account type from database
 
-    #for row in result:
-    #    print(row.tags)
-
-    #await db_session.commit()
-
+    query = select(tables.EventsTable).where(tables.EventsTable.mail_acc_id == user_id, tables.EventsTable.mail_acc_type == acc_type)
+    if(request_data.direction == "forward"):
+        query = query.where(tables.EventsTable.start_date >= request_data.from_time)
+    else:
+        query = query.where(tables.EventsTable.end_date < request_data.from_time)
+        
     return await paginate(
         db_session,
-        select(tables.EventsTable).where(tables.EventsTable.mail_acc_id == user_id, tables.EventsTable.mail_acc_type == acc_type)
+        query
     )
 
 @api.post("/api/events")

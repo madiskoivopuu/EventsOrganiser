@@ -1,32 +1,44 @@
-import sql
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
-from sqlalchemy.orm import declarative_base
+import db
+from datetime import datetime
+from typing import Optional
 
-Base = declarative_base()
+from sqlalchemy import Column, Table, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, relationship
 
-class Event(Base):
-    __tablename__ = "events"
+class Base(DeclarativeBase):
+    pass
 
-    id = Column(Integer, primary_key=True)
-    mail_acc_type = Column(Integer)
-    mail_acc_id = Column(String(256))
-    start_date = Column(DateTime(timezone=False), nullable=True) # Always stores UTC ISO8601 datetime
-    end_date = Column(DateTime(timezone=False), nullable=True) # Always stores UTC ISO8601 datetime
-    country = Column(String(64))
-    city = Column(String(64))
-    address = Column(String(64))
-    room = Column(String(64))
+tags_to_events = Table(
+    "tags_to_events",
+    Base.metadata,
+    Column("event_id", ForeignKey("events.id"), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+)
 
-class Tag(Base):
+class TagsTable(Base):
     __tablename__ = "tags"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(64))
+    id: Mapped[int]  = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(64))
 
-class TagsToEvents(Base):
-    __tablename__ = "tags_to_events"
+class EventsTable(Base):
+    __tablename__ = "events"
 
-    tag_id = Column(Integer, ForeignKey(Tag.__tablename__ + ".id"), primary_key=True)
-    event_id = Column(Integer, ForeignKey(Event.__tablename__ + ".id"), primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    mail_acc_type: Mapped[int]
+    mail_acc_id: Mapped[str] = mapped_column(String(256))
+    
+    event_name: Mapped[str] = mapped_column(String(128))
+    start_date: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
+    end_date: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
+    country: Mapped[str] = mapped_column(String(64))
+    city: Mapped[str] = mapped_column(String(64))
+    address: Mapped[str] = mapped_column(String(64))
+    room: Mapped[str] = mapped_column(String(64))
 
-Base.metadata.create_all(sql.engine)
+    tags: Mapped[list[TagsTable]] = relationship(secondary=tags_to_events, lazy="joined")
+
+async def create_tables() -> None:
+    async with db.engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)

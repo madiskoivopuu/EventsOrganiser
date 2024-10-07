@@ -11,6 +11,16 @@ function App() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [events, setEvents] = useState([
     {
+      "name": "Thesis discussion",
+      "start_date": new Date("2024-10-04T07:00:00Z"),
+      "end_date": new Date("2024-10-04T08:00:00Z"),
+      "country": "",
+      "city": "",
+      "location": "Skype",
+      "room": "",
+      "tags": ["Meeting"]
+    },
+    {
       "name": "Meeting with Jaak Vilo",
       "start_date": new Date("2024-09-27T07:00:00Z"),
       "end_date": new Date("2024-09-27T10:00:00Z"),

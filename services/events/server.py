@@ -8,12 +8,11 @@ from fastapi_pagination import Page, add_pagination, paginate
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 import pytz
+from pydantic import TypeAdapter
 
 import pymongo
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-
-from typing import Annotated
 
 import server_config
 import apps
@@ -47,26 +46,29 @@ except RuntimeError:
 def tz_aware(dt):
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
 
+"""
+Authenticated API endpoint for listing events before or after a given date.
+The results are paginated in lists up to 100 events.
+"""
 @api.get("/api/events")
 async def get_events(
     request_data: models.EventsRequest = Depends(),
     session: Session = Depends(session_manager.use_session),
     db_session: AsyncSession = Depends(db.start_session)
-) -> Page[models.EventsResponse]:
-    """ms = apps.get_ms_app(session)
+) -> Page[models.Event]:
+    ms = apps.get_ms_app(session)
     if(ms.get_user() == None):
         return JSONResponse(
             content={"status": "error", "message": "User is not authenticated"},
             status_code=403
         )
     
-    user_id = ms.get_user()["oid"]"""
-    if(not tz_aware(request_data.from_time)):
-        request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
-
-    user_id = "aabb"
+    user_id = ms.get_user()["oid"]
     acc_type = 1 # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
                  # TODO: also fetch the ID of the account type from database
+
+    if(not tz_aware(request_data.from_time)):
+        request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
 
     query = select(tables.EventsTable).where(tables.EventsTable.mail_acc_id == user_id, tables.EventsTable.mail_acc_type == acc_type)
     if(request_data.direction == "forward"):
@@ -79,14 +81,23 @@ async def get_events(
         query
     )
 
-@api.post("/api/events")
+"""
+Unauthenticated API endpoint for fetching all available tags used for categorising events
+"""
+@api.get("/api/events/tags")
+async def get_tags(
+    db_session: AsyncSession = Depends(db.start_session)
+) -> list[models.Tag]:
+    query = select(tables.TagsTable)
+    results = await db_session.execute(query)
+    return results.scalars().all()
+
+"""
+Internal API for adding events for a user.
+"""
+@api.post("/internal/api/events")
 async def add_event():
     pass
-
-@api.get("/api/events/tags")
-async def get_tags():
-    pass
-
 
 
 if __name__ == '__main__':

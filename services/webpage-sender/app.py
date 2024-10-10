@@ -41,6 +41,8 @@ def login():
 def home():
     if(apps.get_ms_app().get_user() == None):
         return redirect(url_for('login'))
+    
+    print(apps.get_ms_app().get_user())
 
     return render_template(
         "index.html"

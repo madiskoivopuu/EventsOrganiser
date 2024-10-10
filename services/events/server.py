@@ -1,6 +1,3 @@
-import asyncio
-from datetime import datetime
-
 from fastapi import Depends, FastAPI, Request, status, Query
 from fastapi.responses import JSONResponse
 from fastapi_server_session import SessionManager, MongoSessionInterface, Session
@@ -8,7 +5,7 @@ from fastapi_pagination import Page, add_pagination, paginate
 from fastapi_pagination.ext.sqlalchemy import paginate
 
 import pytz
-from pydantic import TypeAdapter
+from typing import Annotated
 
 import pymongo
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -35,27 +32,20 @@ session_manager = SessionManager(
 api = FastAPI(debug=True)
 add_pagination(api)
 
-# DEV mode - sometimes there is an event loop running, other times there isn't; looks like this has something to do with the hot reloader?
-try:
-    loop = asyncio.get_running_loop()
-    loop.create_task(tables.create_tables())
-except RuntimeError:
-    asyncio.run(tables.create_tables())
-
 # Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
 def tz_aware(dt):
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
 
-"""
-Authenticated API endpoint for listing events before or after a given date.
-The results are paginated in lists up to 100 events.
-"""
 @api.get("/api/events")
 async def get_events(
-    request_data: models.EventsRequest = Depends(),
+    request_data: models.EventsGetRequest = Depends(), # Required for the input parameters, so that FastAPI displays descriptions for query fields in Swagger
     session: Session = Depends(session_manager.use_session),
     db_session: AsyncSession = Depends(db.start_session)
-) -> Page[models.Event]:
+) -> Page[models.EventsGetResponse]:
+    """
+    Authenticated API endpoint for listing events before or after a given date.
+    The results are paginated in lists up to 100 events.
+    """
     ms = apps.get_ms_app(session)
     if(ms.get_user() == None):
         return JSONResponse(
@@ -81,23 +71,46 @@ async def get_events(
         query
     )
 
-"""
-Unauthenticated API endpoint for fetching all available tags used for categorising events
-"""
+
 @api.get("/api/events/tags")
 async def get_tags(
     db_session: AsyncSession = Depends(db.start_session)
 ) -> list[models.Tag]:
+    """
+    Unauthenticated API endpoint for fetching all available tags used for categorising events
+    """
     query = select(tables.TagsTable)
     results = await db_session.execute(query)
     return results.scalars().all()
 
-"""
-Internal API for adding events for a user.
-"""
-@api.post("/internal/api/events")
-async def add_event():
-    pass
+@api.post("/internal/api/events", status_code=201)
+async def add_event(
+    event_data: models.EventPostRequest,
+    db_session: AsyncSession = Depends(db.start_session)
+):
+    """
+    Internal API for adding events for a user.
+    """
+    event_model_sql = tables.EventsTable(
+        mail_acc_type=event_data.mail_acc_type,
+        mail_acc_id=event_data.mail_acc_id,
+        event_name=event_data.event_name,
+        start_date=event_data.start_date,
+        end_date=event_data.end_date,
+        country=event_data.country,
+        city=event_data.city,
+        address=event_data.address,
+        room=event_data.room
+    )
+
+    for tag in event_data.tags:
+        event_model_sql.tags.append(
+            tables.TagsTable(name=tag)
+        )
+
+    db_session.add(event_model_sql)
+    await db_session.commit()
+    return None
 
 
 if __name__ == '__main__':

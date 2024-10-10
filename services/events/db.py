@@ -11,7 +11,7 @@ url = URL.create(
     drivername="mysql+asyncmy",
     username=server_config.MYSQL_EVENTS_USER,
     password=server_config.MYSQL_EVENTS_PASSWORD,
-    host="172.17.89.147", # TODO: change to env var?
+    host=server_config.MYSQL_HOST,
     database="events",
     port=3306
 )

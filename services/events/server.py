@@ -32,10 +32,6 @@ session_manager = SessionManager(
 api = FastAPI(debug=True)
 add_pagination(api)
 
-# Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
-def tz_aware(dt):
-    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
-
 @api.get("/api/events")
 async def get_events(
     request_data: models.EventsGetRequest = Depends(), # Required for the input parameters, so that FastAPI displays descriptions for query fields in Swagger
@@ -58,7 +54,7 @@ async def get_events(
     acc_type = 1 # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
                  # TODO: also fetch the ID of the account type from database
 
-    if(not tz_aware(request_data.from_time)):
+    if(not models.tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
 
     request_data.from_time = request_data.from_time.astimezone(pytz.utc)

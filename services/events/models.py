@@ -1,13 +1,16 @@
 import pydantic
 from pydantic import BaseModel, Field, ConfigDict
+
 from typing import Literal, Optional
 from typing_extensions import Self
 from fastapi import Query, Body
 
 from datetime import datetime
+import pytz
 
-import tables
-from sqlalchemy.orm import registry
+# Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
+def tz_aware(dt):
+    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
 
 class EventsGetRequest(BaseModel):
     direction: Literal["forward", "backward"] = Field(Query(description="Tells the API endpoint whether to fetch events before or after a given date"))
@@ -34,6 +37,13 @@ class EventBase(BaseModel):
     def validate_multiple_fields(self) -> Self:
         if(self.start_date == None and self.end_date == None):
             raise ValueError("'start_date' and 'end_date' cannot be none at the same time")
+        
+        if(self.start_date != None and not tz_aware(self.start_date)):
+            self.start_date = self.start_date.replace(tzinfo=pytz.UTC)
+
+        if(self.end_date != None and not tz_aware(self.end_date)):
+            self.end_date = self.end_date.replace(tzinfo=pytz.UTC)
+
         return self
 
 class EventsGetResponse(EventBase):

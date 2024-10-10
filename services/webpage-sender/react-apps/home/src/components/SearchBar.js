@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 
-import Stack from 'react-bootstrap/Stack';
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -78,7 +77,7 @@ function SearchBar({ tags, searchFiltersChanged, activeTabName }) {
 
                     <Form.Group>
                         <Form.Label>Tags</Form.Label> <br />
-                        <Select className="testos" isMulti isDisabled={!useExtraOpts} options={optionsForSelect} onChange={onSelectedTagsChanged}>
+                        <Select isMulti isDisabled={!useExtraOpts} options={optionsForSelect} onChange={onSelectedTagsChanged} noOptionsMessage={() => "Failed to load tags"}>
                         </Select>
                     </Form.Group>
                 </fieldset>

@@ -9,6 +9,7 @@ app = flask.Flask(__name__)
 app.config.from_object(app_config)
 app.config["SESSION_MONGODB"] = apps.get_mongo_connection()
 app.config["SESSION_MONGODB_DB"] = app_config.SESSION_MONGODB_FLASK_DB
+app.config["SESSION_SERIALIZATION_FORMAT"] = "json"
 flask_session.Session(app)
 
 @app.route("/finishLogin", methods=["GET"])
@@ -42,8 +43,6 @@ def home():
     if(apps.get_ms_app().get_user() == None):
         return redirect(url_for('login'))
     
-    print(apps.get_ms_app().get_user())
-
     return render_template(
         "index.html"
     )

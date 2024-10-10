@@ -46,6 +46,7 @@ async def get_events(
     Authenticated API endpoint for listing events before or after a given date.
     The results are paginated in lists up to 100 events.
     """
+
     ms = apps.get_ms_app(session)
     if(ms.get_user() == None):
         return JSONResponse(
@@ -60,9 +61,11 @@ async def get_events(
     if(not tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
 
+    request_data.from_time = request_data.from_time.astimezone(pytz.utc)
+
     query = select(tables.EventsTable).where(tables.EventsTable.mail_acc_id == user_id, tables.EventsTable.mail_acc_type == acc_type)
     if(request_data.direction == "forward"):
-        query = query.where(tables.EventsTable.start_date >= request_data.from_time)
+        query = query.where(tables.EventsTable.start_date >= request_data.from_time) # NOTE: direct date comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since datetimes in the database are UTC)
     else:
         query = query.where(tables.EventsTable.end_date < request_data.from_time)
         
@@ -91,6 +94,7 @@ async def add_event(
     """
     Internal API for adding events for a user.
     """
+
     event_model_sql = tables.EventsTable(
         mail_acc_type=event_data.mail_acc_type,
         mail_acc_id=event_data.mail_acc_id,

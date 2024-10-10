@@ -3,25 +3,31 @@ import Col from 'react-bootstrap/Col';
 import Accordion from 'react-bootstrap/Accordion';
 import Badge from 'react-bootstrap/Badge';
 
-function EventAccordion({ event }) {
-
-    const timeDisplayFormat = event.start_date.getDate() == event.end_date.getDate()
-        ?
-        <h4>{event.start_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>
-        :
-        (
+function getTimeDisplayFormat(start_date, end_date) {
+    if(start_date === null)
+        return <h4>{end_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>;
+    else if(end_date === null)
+        return <h4>{start_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>;
+    else if(start_date.getDate() === end_date.getDate())
+        return <h4>{start_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>;
+    else
+        return (
             <>
-                <h4>{event.start_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>
+                <h4>{start_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>
                 <h6>|</h6>
-                <h4>{event.end_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>
+                <h4>{end_date.toLocaleString("en-US", {month: "short", day: "numeric"})}</h4>
             </>
-        )
+        );
+}
+
+function EventAccordion({ event }) {
+    const timeDisplayFormat = getTimeDisplayFormat(event.start_date, event.end_date);
 
     return (
-        <Accordion defaultActiveKey="-1">
+        <Accordion defaultActiveKey="-1" className="mt-1">
             <Accordion.Item>
                 <Accordion.Header>
-                    <time class="time-display">
+                    <time className="time-display">
                         {timeDisplayFormat}
                     </time>
                     <h2>{event.name}</h2>
@@ -38,7 +44,7 @@ function EventAccordion({ event }) {
                         </Col>
                         <Col sm={12} md={4}>
                             <strong>Location</strong> <br />
-                            <span>{ [event.country, event.city, event.location, event.room ].filter(item => Boolean(item)).join(", ") }</span></Col>
+                            <span>{ [event.country, event.city, event.address, event.room ].filter(item => Boolean(item)).join(", ") }</span></Col>
                         <Col sm={12} md={4}>
                             <strong>Tags</strong><br />
                             {event.tags.map((tag) => 

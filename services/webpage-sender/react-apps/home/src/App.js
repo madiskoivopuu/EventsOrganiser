@@ -10,67 +10,9 @@ import Nav from 'react-bootstrap/Nav';
 function App() {
   const [activeTab, setActiveTab] = useState("ongoing");
   const [events, setEvents] = useState([
-    {
-      "name": "Thesis discussion",
-      "start_date": new Date("2024-10-04T07:00:00Z"),
-      "end_date": new Date("2024-10-04T08:00:00Z"),
-      "country": "",
-      "city": "",
-      "location": "Skype",
-      "room": "",
-      "tags": ["Meeting"]
-    },
-    {
-      "name": "Meeting with Jaak Vilo",
-      "start_date": new Date("2024-09-27T07:00:00Z"),
-      "end_date": new Date("2024-09-27T10:00:00Z"),
-      "country": "",
-      "city": "Tartu",
-      "location": "Delta Study Building",
-      "room": "",
-      "tags": ["Meeting"]
-    },
-    {
-      "name": "ATI day",
-      "start_date": new Date("2024-09-27T07:00:00Z"),
-      "end_date": new Date("2024-09-27T17:00:00Z"),
-      "country": "",
-      "city": "Tartu",
-      "location": "Delta Study Building",
-      "room": "",
-      "tags": ["Presentation"]
-    },
-    {
-      "name": "Three Minute Thesis competition for doctoral students",
-      "start_date": new Date("2024-10-02T10:00:00Z"),
-      "end_date": new Date("2024-10-02T16:00:00Z"),
-      "country": "",
-      "city": "Tartu",
-      "location": "University of Tartu Library",
-      "room": "",
-      "tags": ["Lecture"]
-    },
-    {
-      "name": "Delta Career Day",
-      "start_date": new Date("2025-02-19T11:00:00Z"),
-      "end_date": new Date("2025-02-20T16:00:00Z"),
-      "country": "",
-      "city": "Tartu",
-      "location": "Ujula 4a",
-      "room": "Main hall",
-      "tags": ["Internships", "Company presentations"]
-    }
+
   ]);
-
-  const [allTags, setAllTags] = useState([
-    "Computer Science",
-    "Lecture",
-    "Presentation",
-    "Meeting",
-    "Internships",
-    "Company presentations"
-  ])
-
+  const [allTags, setAllTags] = useState([]);
   const [searchOpts, setSearchOpts] = useState({
     query: "",
     additionalOptsEnabled: false,
@@ -89,13 +31,28 @@ function App() {
     );
   };
 
+  useEffect(() => {
+    fetch("http://localhost:5000/api/events/tags")
+    .then(resp => resp.json())
+    .then(resp => setAllTags(resp))
+    .catch(err => console.log(err));
+
+    var anchorDate = new Date(new Date().toDateString()); // removes time from the date obj
+    var queryString = new URLSearchParams({from_time: anchorDate.toISOString(), direction: "forward"}).toString();
+    fetch("http://localhost:5000/api/events" + queryString, {
+      credentials: "same-origin"
+    })
+    .then(resp => resp.json())
+    .then()
+  }, []);
+
   return (
     <Container>
       <Row>
-        <Col sm={12} md={4} xl={3}>
+        <Col sm={12} md={4} xl={3} className="mt-3">
           <SearchBar tags={allTags} activeTabName={activeTab} searchFiltersChanged={handleSearchOptsChanged} />
         </Col>
-        <Col sm={12} md={8} xl={9}>
+        <Col sm={12} md={8} xl={9} className="mt-3">
           <Nav variant="tabs" activeKey={activeTab} justify onSelect={(newKey) => setActiveTab(newKey)}>
             <Nav.Item>
               <Nav.Link eventKey="past">Past</Nav.Link>
@@ -109,6 +66,9 @@ function App() {
           </Nav>
 
           <EventsLister events={events} eventType={activeTab} searchOptions={searchOpts}/>
+
+
+
         </Col>
       </Row>
     </Container>

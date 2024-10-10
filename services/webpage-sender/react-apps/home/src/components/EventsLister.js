@@ -64,7 +64,7 @@ function EventsLister({ events, eventType, searchOptions }) {
     const eventsForTab = filterEventsForTab(events, eventType);
     if(eventsForTab.length === 0)
         return (
-            <div class="mt-4">
+            <div className="mt-4">
                 <p style={{textAlign: "center"}}>No events to list</p>
             </div>
         );
@@ -72,7 +72,7 @@ function EventsLister({ events, eventType, searchOptions }) {
     const searchedEvents = applySearchQuery(eventsForTab, searchOptions);
     if(searchedEvents.length === 0)
         return (
-            <div class="mt-4">
+            <div className="mt-4">
                 <p style={{textAlign: "center"}}>No events found that match the search query</p>
             </div>
         );
@@ -80,7 +80,7 @@ function EventsLister({ events, eventType, searchOptions }) {
     const groupedEventsForTab = groupEventsByYM(searchedEvents);
 
     return (
-        <div class="mt-4">
+        <div className="mt-4" style={{overflowY: "auto", overflowX: "hidden", maxHeight: "80vh"}}>
             <Row>
                 <Stack gap={3}>
                     {Object.entries(groupedEventsForTab).map(([header, eventsForMonth]) => {

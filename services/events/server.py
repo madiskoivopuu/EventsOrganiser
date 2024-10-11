@@ -1,11 +1,10 @@
 from fastapi import Depends, FastAPI, Request, status, Query
-from fastapi.responses import JSONResponse
 from fastapi_server_session import SessionManager, MongoSessionInterface, Session
-from fastapi_pagination import Page, add_pagination, paginate
+from fastapi_pagination import Page, add_pagination, paginate'
+from fastapi.responses import JSONResponse
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-import pytz
-from typing import Annotated
+import os, pytz
 
 import pymongo
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,8 +28,17 @@ session_manager = SessionManager(
     )
 )
 
+
+
 api = FastAPI(debug=True)
 add_pagination(api)
+
+if(os.getenv("DEV_MODE") == "1"):
+    from fastapi.middleware.cors import CORSMiddleware
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=['*']
+    )
 
 @api.get("/api/events")
 async def get_events(
@@ -56,12 +64,11 @@ async def get_events(
 
     if(not models.tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
-
-    request_data.from_time = request_data.from_time.astimezone(pytz.utc)
-
+    request_data.from_time = request_data.from_time.astimezone(pytz.utc) # NOTE: MySQL DATETIME comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since DATETIMEs in the database are stored as UTC)
+ 
     query = select(tables.EventsTable).where(tables.EventsTable.mail_acc_id == user_id, tables.EventsTable.mail_acc_type == acc_type)
     if(request_data.direction == "forward"):
-        query = query.where(tables.EventsTable.start_date >= request_data.from_time) # NOTE: direct date comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since datetimes in the database are UTC)
+        query = query.where(tables.EventsTable.start_date >= request_data.from_time)
     else:
         query = query.where(tables.EventsTable.end_date < request_data.from_time)
         

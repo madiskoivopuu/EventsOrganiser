@@ -30,7 +30,7 @@ function EventAccordion({ event }) {
                     <time className="time-display">
                         {timeDisplayFormat}
                     </time>
-                    <h2>{event.name}</h2>
+                    <h2>{event.event_name}</h2>
                 </Accordion.Header>
                 <Accordion.Body>
                     <Row>
@@ -48,8 +48,8 @@ function EventAccordion({ event }) {
                         <Col sm={12} md={4}>
                             <strong>Tags</strong><br />
                             {event.tags.map((tag) => 
-                                <Badge pill bg="primary" className="me-1">
-                                    {tag}
+                                <Badge key={tag.id} pill bg="primary" className="me-1">
+                                    {tag.name}
                                 </Badge>
                             )}
                         </Col>

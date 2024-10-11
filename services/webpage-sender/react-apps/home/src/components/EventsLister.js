@@ -8,9 +8,8 @@ import EventAccordion from './EventAccordion';
 
 // Filters events based on which tab is active.
 function filterEventsForTab(events, showEvtType) {
-    const currDate = new Date();
-
     let filtered = [];
+    const currDate = new Date();
 
     if (showEvtType === "past") {
         filtered = events.filter((event) => event.end_date < currDate);
@@ -44,7 +43,7 @@ function groupEventsByYM(events) {
 
 function applySearchQuery(events, searchOptions) {
     if(searchOptions.query.length > 1)
-        events = events.filter((event) => event.name.toLowerCase().includes(searchOptions.query.toLowerCase()) );
+        events = events.filter((event) => event.event_name.toLowerCase().includes(searchOptions.query.toLowerCase()) );
     
     if(searchOptions.additionalOptsEnabled) {
         if(searchOptions.startDate !== null)
@@ -85,11 +84,11 @@ function EventsLister({ events, eventType, searchOptions }) {
                 <Stack gap={3}>
                     {Object.entries(groupedEventsForTab).map(([header, eventsForMonth]) => {
                         return (
-                            <Col xs={12}>
+                            <Col key={header} xs={12}>
                                 <h3>{header}</h3>
                                 <hr />
 
-                                {eventsForMonth.map((event) => <EventAccordion event={event} />)}
+                                {eventsForMonth.map((event) => <EventAccordion key={event.id} event={event} />)}
                             </Col>
                         );
                     })}

@@ -1,6 +1,6 @@
 from fastapi import Depends, FastAPI, Request, status, Query
 from fastapi_server_session import SessionManager, MongoSessionInterface, Session
-from fastapi_pagination import Page, add_pagination, paginate'
+from fastapi_pagination import Page, add_pagination, paginate
 from fastapi.responses import JSONResponse
 from fastapi_pagination.ext.sqlalchemy import paginate
 

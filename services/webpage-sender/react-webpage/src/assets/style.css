@@ -1,0 +1,40 @@
+:root {
+    font-family: "Plus Jakarta Sans", serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+[data-theme="light"] {
+    --color-input-placeholder: #475569;
+    --color-input-border-focused: #A5B4FC;
+    --color-input-outline-focused: #d3d0f8;
+
+    --color-text: #1E293B;
+
+    --color-border: #E2E8F0;
+
+    --color-icons: #475569;
+}
+
+input {
+    padding: 0.5rem;
+    line-height: 1.25rem;
+
+    border-style: solid;
+    border-color: var(--color-border);
+    border-width: 1px;
+}
+
+input:focus {
+    outline: 0.25rem solid var(--color-input-outline-focused);
+    border-color: var(--color-input-border-focused);
+}
+
+input::placeholder {
+    color: var(-color-input-text);
+}
+
+input.search-bar {
+    border-radius: 10rem;
+    font-size: 1rem;
+}

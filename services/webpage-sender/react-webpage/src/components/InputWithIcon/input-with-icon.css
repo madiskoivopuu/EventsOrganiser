@@ -1,0 +1,16 @@
+.input-with-icon {
+    position: absolute;
+    display: flex;
+    align-items:center;
+}
+
+.input-with-icon > input {
+    padding-right: 2rem;
+}
+
+.icon {
+    color: var(--color-icons);
+    position: relative;
+
+    right: 1.7rem;
+}

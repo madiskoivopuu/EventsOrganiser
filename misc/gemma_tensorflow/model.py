@@ -44,7 +44,7 @@ class Gemma2EventParser():
             prepared_content += f"Email sender: {email.sender_email}\n"
             prepared_content += f"Email from: {email.from_email}\n"
             prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"
-            prepared_content += f"Send time: {email.send_date.strftime('%H:%M %d/%m/%Y')}\n"
+            prepared_content += f"Send time: {email.send_date.isoformat()}\n"
             prepared_content += f"Title: {email.title}\n"
             prepared_content += f"Content:\n{email.content}"
 

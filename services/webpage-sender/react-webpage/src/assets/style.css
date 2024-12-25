@@ -16,6 +16,11 @@
     --color-icons: #475569;
 }
 
+body {
+    margin: 0px;
+    background-color: #EDEDED;
+}
+
 input {
     border-style: solid;
     border-color: var(--color-border);

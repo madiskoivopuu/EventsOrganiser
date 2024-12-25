@@ -1,19 +1,15 @@
-import { ReactNode } from "react";
+import { ReactNode, ComponentProps } from "react";
 
 import "./input-with-icon.css";
 
-type ElementProps = {
-    children: ReactNode,
-    className: string,
-    placeholder?: string,
-    type: string,
-    onClick?: () => void
+interface ElementProps extends ComponentProps<"input"> {
+    children: ReactNode
 }
 
-function InputWithIcon({ children, className, placeholder, type, onClick }: ElementProps) {
+function InputWithIcon({ children, ...props }: ElementProps) {
     return (
         <div className="input-with-icon">
-            <input className={className} type={type} placeholder={placeholder} onClick={onClick} />
+            <input {...props} />
             {children}
         </div>
     );

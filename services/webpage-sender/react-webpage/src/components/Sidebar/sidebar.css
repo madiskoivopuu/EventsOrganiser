@@ -1,0 +1,23 @@
+.sidebar {
+    background-color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    float: left;
+
+    width: 15rem;
+    min-height: 100vh;
+    top: 0;
+    left: 0;
+}
+
+.sidebar-content {
+    border-bottom: 1px solid #E2E8F0;
+
+    flex-grow: 1;
+}
+
+.sidebar-footer {
+    padding-top: 0.5rem;
+}

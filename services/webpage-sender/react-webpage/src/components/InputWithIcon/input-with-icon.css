@@ -1,16 +1,17 @@
 .input-with-icon {
-    position: absolute;
-    display: flex;
-    align-items:center;
-}
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
+    position: relative;
+
+}
 .input-with-icon > input {
     padding-right: 2rem;
 }
 
 .icon {
     color: var(--color-icons);
-    position: relative;
-
-    right: 1.7rem;
+    position: absolute;
+    right: 1rem;
 }

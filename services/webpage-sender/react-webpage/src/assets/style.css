@@ -17,21 +17,25 @@
 }
 
 input {
-    padding: 0.5rem;
-    line-height: 1.25rem;
-
     border-style: solid;
     border-color: var(--color-border);
     border-width: 1px;
+    border-radius: 10rem;
+
+    font-size: 1rem;
+
+    line-height: 1.25rem;
+    padding: 0.5rem;
 }
 
 input:focus {
-    outline: 0.25rem solid var(--color-input-outline-focused);
     border-color: var(--color-input-border-focused);
+
+    outline: 0.25rem solid var(--color-input-outline-focused);
 }
 
 input::placeholder {
-    color: var(-color-input-text);
+    color: var(--color-input-placeholder);
 }
 
 input.search-bar {

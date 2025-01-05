@@ -21,14 +21,22 @@ a.sidebar-link {
     }
 }
 
-a.nostyle:link {
-    text-decoration: inherit;
-    color: inherit;
-    cursor: auto;
+.sidebar-btn-icon {
+    color: #000;
+    margin-right: 0.5rem;
+    flex: none;
 }
 
-a.nostyle:visited {
+a.logout-btn {
     text-decoration: inherit;
     color: inherit;
-    cursor: auto;
+
+    color: #D92828;
+
+    display: inline-flex;
+    align-items: center;
+
+    &:hover {
+        color: #880000;
+    }
 }

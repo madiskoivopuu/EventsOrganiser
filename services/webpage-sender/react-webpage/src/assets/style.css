@@ -17,8 +17,23 @@
 }
 
 body {
+    height: 100%;
+
     margin: 0px;
     background-color: #EDEDED;
+}
+
+#root {
+    display: grid;
+    grid-template-columns: auto 1fr; /* sidebar | rest of the content on PC */
+
+    height: 100%;
+}
+
+@media (max-width: 1024px) {
+    #root {
+        grid-template-columns: 1fr;
+    }
 }
 
 input {

@@ -1,0 +1,42 @@
+.event-name {
+    margin-left: 0.5rem;
+
+    display: flex;
+    align-items: center;
+    
+    flex-grow: 1;
+
+    text-wrap: wrap;
+    word-break: break-all;
+}
+
+summary.event-accordion-header {
+    background-color: #F3F3F3;
+    border-bottom: 1px solid #E2E8F0;
+
+    display: flex;
+    align-items: stretch center;
+    align-content: center;
+
+    &::marker {
+        content: "";
+    }
+}
+
+details.event-accordion {
+    background-color: #E5E5EA;
+}
+
+details[open] .dd-icon-container {
+    transform: rotate(180deg);
+}
+
+.dd-icon {
+    &-container {
+        display: flex;
+        align-items: center;
+    }
+
+    flex: none;
+    margin: 1rem;
+}

@@ -11,13 +11,19 @@ import { EventDetails } from '@/interfaces/global_interfaces';
 const event: EventDetails = {
 	id: 1,
 	event_name: "TEST event",
-	start_date: "2024-12-31T21:00:00Z",
+	start_date: null,
 	end_date: "2025-01-01T07:00:00Z",
 	country: "Estonia",
 	city: "Tartu",
 	address: "Raekoja plats",
 	room: "",
-	tags: []
+	tags: [
+		{id: 1, name: "Wowe1"},
+		{id: 1, name: "Wowe2"},
+		{id: 1, name: "Wowe3"},
+		{id: 1, name: "Wowe4"},
+		{id: 1, name: "Wowe5"},
+	]
 }
 
 function App() {

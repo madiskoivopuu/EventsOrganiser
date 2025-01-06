@@ -18,6 +18,8 @@ summary.event-accordion-header {
     align-items: stretch center;
     align-content: center;
 
+    cursor: pointer;
+
     &::marker {
         content: "";
     }
@@ -40,3 +42,36 @@ details[open] .dd-icon-container {
     flex: none;
     margin: 1rem;
 }
+
+.event-accordion-body {
+    display: flex;
+
+    flex-flow: row wrap;
+}
+
+.event-detailed-info {
+    margin: 0.5rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.event-details {
+    display: flex;
+}
+
+.event-buttons {
+    &-container {
+        flex-grow: 1;
+
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+}
+

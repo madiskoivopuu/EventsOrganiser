@@ -11,12 +11,9 @@ import { EventDetails } from '@/interfaces/global_interfaces';
 const event: EventDetails = {
 	id: 1,
 	event_name: "TEST event",
-	start_date: null,
-	end_date: "2025-01-01T07:00:00Z",
-	country: "Estonia",
-	city: "Tartu",
-	address: "Raekoja plats",
-	room: "",
+	start_date: "2025-01-01T07:00:00Z",
+	end_date: "2025-01-01T22:00:00Z",
+	address: "Estonia, Tartu, Raekoja plats",
 	tags: [
 		{id: 1, name: "Wowe1"},
 		{id: 1, name: "Wowe2"},
@@ -41,8 +38,8 @@ function App() {
 
 			<DatePicker 
 				formatWeekDay={name => name.substring(0, 1)} 
-				 customInput={
-					<InputWithIcon className="search-bar" type="text" placeholder="Event name">
+				customInput={
+					<InputWithIcon className="search-bar" type="text" placeholder="DD/MM/YYYY">
 						<IoIosSearch className="icon" />
 					</InputWithIcon>
 				} 

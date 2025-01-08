@@ -13,9 +13,8 @@
 summary.event-accordion-header {
     background-color: #F3F3F3;
     border-bottom: 1px solid #E2E8F0;
-
+    
     display: flex;
-    align-items: stretch center;
     align-content: center;
 
     cursor: pointer;
@@ -29,7 +28,13 @@ details.event-accordion {
     background-color: #E5E5EA;
 }
 
-details[open] .dd-icon-container {
+.dd-icon-container {
+    flex-grow: 1;
+
+    justify-content: flex-end;
+}
+
+details[open] .dd-icon {
     transform: rotate(180deg);
 }
 
@@ -44,9 +49,9 @@ details[open] .dd-icon-container {
 }
 
 .event-accordion-body {
-    display: flex;
+    padding: 0.25rem;
 
-    flex-flow: row wrap;
+    display: flex;
 }
 
 .event-detailed-info {
@@ -59,6 +64,8 @@ details[open] .dd-icon-container {
 
 .event-details {
     display: flex;
+
+    flex-flow: row wrap;
 }
 
 .event-buttons {

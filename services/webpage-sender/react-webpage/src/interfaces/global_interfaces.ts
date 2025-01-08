@@ -3,10 +3,7 @@ export interface EventDetails {
     event_name: string,
     start_date: string | null,
     end_date: string | null,
-    country: string,
-    city: string,
     address: string,
-    room: string,
     tags: EventTag[]
 }
 

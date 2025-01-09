@@ -154,7 +154,6 @@ function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
     const modalRef = useRef<HTMLDialogElement | null>(null);
 
     const setKeyOfEditableEvent = <K extends keyof EditableEventDetails>(key: K, value: EditableEventDetails[K]) => {
-        console.log(key, value);
         setEditableEvent(prev => ({
                 ...prev,
                 [key]: value

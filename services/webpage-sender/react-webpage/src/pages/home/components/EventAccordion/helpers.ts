@@ -35,9 +35,9 @@ export interface EditableEventDetails {
     event_name: string,
     address: string,
     start_date: Date | null,
-    start_time: string | null,
+    start_time: string,
     end_date: Date | null,
-    end_time: string | null,
+    end_time: string,
     tags: EventTag[]
 };
 
@@ -53,13 +53,23 @@ export const createEditableEventObject = (event: EventDetails): EditableEventDet
     };
 }
 
-export const editableEventToEventDetails = (event: EditableEventDetails): EventDetails => {
+export const editableEventToEventDetails = (origEvent: EventDetails, event: EditableEventDetails): EventDetails => {
+    event.start_date?.setHours(Number(event.start_time?.split(":")[0]), Number(event.start_time?.split(":")[1]));
+    event.end_date?.setHours(Number(event.end_time?.split(":")[0]), Number(event.end_time?.split(":")[1]));
 
+    return {
+        id: origEvent.id,
+        event_name: event.event_name,
+        start_date: event.start_date ? event.start_date.toISOString() : null,
+        end_date: event.end_date ? event.end_date.toISOString() : null,
+        address: event.address,
+        tags: event.tags
+    };
 }
 
-export const format8601TimestampToTime = (utcDateTime: string | null): string | null => {
+export const format8601TimestampToTime = (utcDateTime: string | null): string => {
     if(!utcDateTime)
-        return null;
+        return "";
 
     return new Date(utcDateTime).toLocaleString("default", { hour: "2-digit", minute: "2-digit" })
 }

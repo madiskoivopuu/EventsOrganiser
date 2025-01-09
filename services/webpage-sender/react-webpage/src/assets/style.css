@@ -45,9 +45,11 @@ input {
 
     font-size: 1rem;
 
-    margin: 0.25rem;
+    margin: 0.5rem;
     line-height: 1.25rem;
     padding: 0.5rem;
+
+    width: 100%;
 }
 
 input:focus {
@@ -104,4 +106,39 @@ button.plain {
 dialog {
     border: 0;
     border-radius: 15px;
+}
+
+ul.tabs {
+    padding: 0;
+}
+
+li.tab-item {
+    display: inline;
+    color: #475569;
+    border-bottom: 2px solid #CBD5E1;
+
+    font-weight: 600;
+    padding: 0.5rem;
+
+    cursor: pointer;
+}
+
+li.tab-item.active {
+    border-color: #4F46E5;
+}
+
+.container {
+    width: 100%;
+    padding-right: var(--bs-gutter-x, .75rem);
+    padding-left: var(--bs-gutter-x, .75rem);
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.card {
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    background-color: white;
+
+    padding: 1rem;
 }

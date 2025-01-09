@@ -1,3 +1,1 @@
-import EventAccordion from "./EventAccordion";
-
-export default EventAccordion;
+export {default as EventAccordion} from "./EventAccordion";

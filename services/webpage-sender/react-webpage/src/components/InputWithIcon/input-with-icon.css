@@ -1,5 +1,5 @@
 .input-with-icon {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
 
@@ -8,6 +8,8 @@
 }
 .input-with-icon > input {
     padding-right: 2rem;
+
+    width: 100%;
 }
 
 .icon {

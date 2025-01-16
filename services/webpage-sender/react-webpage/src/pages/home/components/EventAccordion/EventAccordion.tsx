@@ -5,11 +5,12 @@ import DatePicker from "react-datepicker";
 
 import { InputWithIcon } from '@/components';
 import { EventDetails } from "@/interfaces/global_interfaces";
-import { EventType, EditableEventDetails } from "./helpers";
+import { EventType, EditableEventDetails } from "./interfaces";
 import * as helpers from "./helpers";
 
 import "./event-accordion.scss";
 import "./date.scss";
+import { useEventsStore } from "@/hooks";
 
 interface TimeFragmentProps {
     header: string,
@@ -54,8 +55,6 @@ function DateFragment({ threeDots, date }: DateFragmentProps) {
 
 interface ElementProps {
     event: EventDetails,
-    deleteEvent?: (event: EventDetails) => void,
-    updateEvent?: (newEvent: EventDetails) => void,
 };
 
 interface EditableElementProps {
@@ -68,7 +67,6 @@ function EventDateDisplay({ event }: ElementProps) {
         console.error("Invalid event start & end date for: ", event);
         return null;
     }
-
 
     let startDateElement: JSX.Element | null = null; //event.start_date ? <DateFragment date={event.start_date} /> : null;
     let endDateElement: JSX.Element | null = null; //event.end_date ? <DateFragment date={event.end_date} /> : null;
@@ -117,6 +115,8 @@ function EditableEventHeaderDisplay({ event, setKeyOfEditableEvent }: EditableEl
 			/>
             <h3 style={{margin: "0.5rem"}}>to</h3>
             <DatePicker 
+                required
+
                 selected={event.end_date}
                 onChange={newDate => setKeyOfEditableEvent("end_date", newDate)}
 
@@ -148,10 +148,12 @@ function EventHeaderDisplay({ event }: ElementProps) {
     )
 }
 
-function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
+function EventAccordion({ event }: ElementProps) {
     const [editableEvent, setEditableEvent] = useState<EditableEventDetails>(helpers.createEditableEventObject(event));
     const [isBeingEdited, setIsBeingEdited] = useState<boolean>(false);
     const modalRef = useRef<HTMLDialogElement | null>(null);
+
+    const { addOrUpdate, deleteEvents } = useEventsStore();
 
     const setKeyOfEditableEvent = <K extends keyof EditableEventDetails>(key: K, value: EditableEventDetails[K]) => {
         setEditableEvent(prev => ({
@@ -164,19 +166,16 @@ function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
     const saveEventChanges = () => {
         // TODO: request to server
 
-        setIsBeingEdited(true);
-
-        // TODO: parent callback
-        // updateEvent(newEvent)
+        setIsBeingEdited(false);
+        let updatedEvent = helpers.editableEventToEventDetails(event, editableEvent);
+        addOrUpdate([updatedEvent]);
     }
 
     const deleteEventChanges = () => {
         // TODO: request to server
 
         modalRef.current?.close();
-
-        // TODO: parent callback
-        // deleteEvent(event)
+        deleteEvents([event]);
     }
 
     let formErrors = helpers.validateEditableEvent(editableEvent);
@@ -202,7 +201,9 @@ function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
         <>
             <details className="event-accordion">
                 <summary className="event-accordion-header">
-                    {isBeingEdited ? <EditableEventHeaderDisplay event={editableEvent} setKeyOfEditableEvent={setKeyOfEditableEvent}/> : <EventHeaderDisplay event={event} /> }
+                    {isBeingEdited 
+                        ? <EditableEventHeaderDisplay event={editableEvent} setKeyOfEditableEvent={setKeyOfEditableEvent}/> 
+                        : <EventHeaderDisplay event={event} /> }
         
                     <div className="dd-icon-container">
                         <IoIosArrowDown className="dd-icon" />
@@ -213,15 +214,21 @@ function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
                     <div className="event-details">
                         <EventDetailFragment 
                             header={"Start time"} 
-                            text={isBeingEdited ? <input type="time" value={editableEvent.start_time || ""} onChange={(e) => setKeyOfEditableEvent("start_time", e.target.value)} /> : helpers.format8601TimestampToTime(event.start_date)} 
+                            text={isBeingEdited 
+                                    ? <input type="time" value={editableEvent.start_time || ""} onChange={(e) => setKeyOfEditableEvent("start_time", e.target.value)} /> 
+                                    : helpers.format8601TimestampToTime(event.start_date)} 
                         />
                         <EventDetailFragment 
                             header={"End time"} 
-                            text={isBeingEdited ? <input type="time" value={editableEvent.end_time || ""} onChange={(e) => setKeyOfEditableEvent("end_time", e.target.value)} /> : helpers.format8601TimestampToTime(event.end_date)}
+                            text={isBeingEdited 
+                                ? <input type="time" value={editableEvent.end_time || ""} onChange={(e) => setKeyOfEditableEvent("end_time", e.target.value)} required /> 
+                                : helpers.format8601TimestampToTime(event.end_date)}
                         />
                         <EventDetailFragment 
                             header={"Venue"} 
-                            text={isBeingEdited ? <input type="text" value={editableEvent.address} onChange={(e) => setKeyOfEditableEvent("address", e.target.value)}/> : event.address} 
+                            text={isBeingEdited 
+                                ? <input type="text" value={editableEvent.address} onChange={(e) => setKeyOfEditableEvent("address", e.target.value)}/> 
+                                : event.address} 
                         />
                         <EventDetailFragment 
                             header={"Event categories"} 
@@ -234,7 +241,9 @@ function EventAccordion({ event, updateEvent, deleteEvent }: ElementProps) {
                         </div>
                     </div>
                 </div>
-                {isBeingEdited ? <div style={{padding: "0.25rem"}}>{errorText}</div> : <></>}
+                {isBeingEdited 
+                    ? <div style={{padding: "0.25rem", display: "flex", flexDirection: "column"}}>{errorText}</div> 
+                    : <></> }
             </details>
 
             <dialog ref={modalRef}>

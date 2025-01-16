@@ -1,16 +1,10 @@
-import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
+import { EventDetails } from "@/interfaces/global_interfaces";
+import { EventType, EditableEventDetails } from "./interfaces";
 
 export const formatTags = (event: EventDetails) => {
     let tagNames: string[] = event.tags.map(tag => tag.name);
     return tagNames.join(", ");
 }
-
-export enum EventType {
-    INVALID,
-    DEADLINE,
-    SINGLEDAY,
-    MULTIDAY
-};
 
 export const getEventType = (event: EventDetails): EventType => {
     if(!event.start_date && !event.end_date)
@@ -18,9 +12,6 @@ export const getEventType = (event: EventDetails): EventType => {
 
     if(!event.start_date && event.end_date) 
         return EventType.DEADLINE;
-
-    if(event.start_date && !event.end_date)
-        return EventType.SINGLEDAY;
 
     // extra check to see if start and end date are within the same day
     let startDateObj: Date = new Date(event.start_date!);
@@ -30,16 +21,6 @@ export const getEventType = (event: EventDetails): EventType => {
     else
         return EventType.MULTIDAY;
 }
-
-export interface EditableEventDetails {
-    event_name: string,
-    address: string,
-    start_date: Date | null,
-    start_time: string,
-    end_date: Date | null,
-    end_time: string,
-    tags: EventTag[]
-};
 
 export const createEditableEventObject = (event: EventDetails): EditableEventDetails => {
     return {
@@ -61,7 +42,7 @@ export const editableEventToEventDetails = (origEvent: EventDetails, event: Edit
         id: origEvent.id,
         event_name: event.event_name,
         start_date: event.start_date ? event.start_date.toISOString() : null,
-        end_date: event.end_date ? event.end_date.toISOString() : null,
+        end_date: event.end_date!.toISOString(),
         address: event.address,
         tags: event.tags
     };
@@ -80,8 +61,8 @@ export const exactlyOneNull = (a: any, b: any): boolean => {
 
 export const validateEditableEvent = (event: EditableEventDetails): string[] => {
     let errors: string[] = [];
-    if(!event.start_date && !event.start_time && !event.end_date && !event.end_time)
-        errors.push("The event must have either a start date or an end date");
+    if(!event.end_date && !event.end_time)
+        errors.push("The event must have a start date");
 
     if(exactlyOneNull(event.start_date, event.start_time))
         errors.push("Both start time and start date must be chosen");

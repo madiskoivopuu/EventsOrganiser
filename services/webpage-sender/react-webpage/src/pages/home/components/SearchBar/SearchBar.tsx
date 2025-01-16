@@ -1,9 +1,8 @@
 import { IoIosSearch } from "react-icons/io";
 import { IoCalendarClearOutline } from "react-icons/io5";
 import DatePicker from "react-datepicker";
-import Select from "react-select";
 
-import { InputWithIcon } from "@/components";
+import { InputWithIcon, StyledSelect } from "@/components";
 import { EventTag } from "@/interfaces/global_interfaces";
 import { useEffect, useState } from "react";
 
@@ -24,10 +23,6 @@ const pStyle = {margin: "0rem", marginTop: "0.5rem", marginLeft: "0.35rem"};
 function SearchBar({ selectableTags, searchCallback }: SearchBarProps) {
     const [searchOptions, setSearchOptions] = useState<SearchOptions>({ });
 
-    useEffect(() => {
-        searchCallback(searchOptions)
-    }, [searchOptions])
-
     const updateSearchOptKey = <K extends keyof SearchOptions>(key: K, value: SearchOptions[K]) => {
         setSearchOptions(prev => ({
                 ...prev,
@@ -35,9 +30,13 @@ function SearchBar({ selectableTags, searchCallback }: SearchBarProps) {
             })
         );
     }
+
+    useEffect(() => {
+        searchCallback(searchOptions);
+    }, [searchOptions]);
     
     return (
-        <aside style={{padding: "0.5rem"}}>
+        <aside style={{padding: "0.5rem", display: "flex", flexDirection: "column"}}>
             <InputWithIcon type="text" placeholder="Event name..." value={searchOptions.eventName} onChange={(e) => updateSearchOptKey("eventName", e.target.value)}>
                 <IoIosSearch className="icon" />
             </InputWithIcon>
@@ -71,7 +70,7 @@ function SearchBar({ selectableTags, searchCallback }: SearchBarProps) {
             />
 
             <p style={pStyle}><b>Event categories</b></p>
-            <Select
+            <StyledSelect
                 options={selectableTags}
                 isMulti
                 isSearchable

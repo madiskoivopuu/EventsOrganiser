@@ -1,12 +1,12 @@
 .events-card {
     width: 80%;
-    height: 40rem;
+    min-height: 40rem;
 
     display: grid;
     grid-template-columns: 2fr 6fr;
 }
 
-@container card (width < 300px) {
+@media screen and (max-width: 400px) {
     .events-card {
         display: grid;
         grid-template-columns: 1fr;

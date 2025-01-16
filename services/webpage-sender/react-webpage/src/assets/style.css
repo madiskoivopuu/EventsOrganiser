@@ -1,10 +1,9 @@
 [data-theme="light"] {
     --color-input-placeholder: #475569;
+    --color-input-border-hovered: #94a3b8;
     --color-input-border-focused: #A5B4FC;
     --color-input-outline-focused: #d3d0f8;
     --color-input-border-invalid: #f43d58;
-    --color-input-outline-invalid: #fabfbf;
-    
 
     --color-text: #1E293B;
 
@@ -48,8 +47,10 @@ input {
     margin: 0.5rem;
     line-height: 1.25rem;
     padding: 0.5rem;
+}
 
-    width: 100%;
+input:hover {
+    border-color: var(--color-input-border-hovered);
 }
 
 input:focus {
@@ -60,8 +61,6 @@ input:focus {
 
 input:invalid {
     border-color: var(--color-input-border-invalid);
-
-    outline: 0.25rem solid var(--color-input-outline-invalid);
 }
 
 input::placeholder {
@@ -128,7 +127,6 @@ li.tab-item.active {
 }
 
 .container {
-    width: 100%;
     padding-right: var(--bs-gutter-x, .75rem);
     padding-left: var(--bs-gutter-x, .75rem);
     margin-right: auto;

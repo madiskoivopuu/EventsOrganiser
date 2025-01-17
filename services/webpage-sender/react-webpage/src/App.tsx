@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
+import { Route, Routes } from 'react-router';
 
-import "./assets/datepicker/react-datepicker.scss";
-
-import { Sidebar, InputWithIcon } from './components';
+import { Sidebar } from './components';
 import HomePage from './pages/home';
 import { EventTag } from './interfaces/global_interfaces';
+
+import "./assets/datepicker/react-datepicker.scss";
 
 const __tags: EventTag[] = [
 	{
@@ -26,7 +27,10 @@ function App() {
 				<Sidebar />
 			</nav>
 			<main>
-				<HomePage allTags={allPossibleTags} />
+				<Routes>
+					<Route path="/" element={<HomePage allTags={allPossibleTags} />} />
+					<Route path="/" element={<>TODO:</>} />
+				</Routes>
 			</main>
 		</>
 	)

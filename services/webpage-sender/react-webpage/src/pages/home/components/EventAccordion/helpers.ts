@@ -62,13 +62,16 @@ export const exactlyOneNull = (a: any, b: any): boolean => {
 export const validateEditableEvent = (event: EditableEventDetails): string[] => {
     let errors: string[] = [];
     if(!event.end_date && !event.end_time)
-        errors.push("The event must have a start date");
+        errors.push("The event must have an end date");
 
     if(exactlyOneNull(event.start_date, event.start_time))
         errors.push("Both start time and start date must be chosen");
 
     if(exactlyOneNull(event.end_date, event.end_time))
         errors.push("Both end time and end date must be chosen");
+
+    if(event.end_date && event.start_date && event.end_date < event.start_date)
+        errors.push("End date must be after start date"); 
 
     return errors;
 }

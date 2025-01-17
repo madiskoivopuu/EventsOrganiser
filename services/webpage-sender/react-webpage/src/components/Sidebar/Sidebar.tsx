@@ -1,10 +1,9 @@
 import { useState } from 'react';
-
 import { LuCalendarDays } from "react-icons/lu";
 import { IoMenu, IoSettingsOutline } from "react-icons/io5";
 import { MdLogout } from "react-icons/md";
-
 import useFitText from "use-fit-text";
+import { NavLink } from "react-router";
 
 import "./sidebar.scss"
 import "./sidebar-nav.scss";
@@ -32,13 +31,15 @@ function Sidebar() {
 					</div>
 
 					<div className="sidebar-content">
-						<a href="#" className="sidebar-link"> 
-							<LuCalendarDays className="sidebar-btn-icon"/> <span>Events</span>
-						</a>
+						<NavLink to="/" className="sidebar-link"> 
+							<LuCalendarDays className="sidebar-btn-icon"/>
+							<span>Events</span>
+						</NavLink>
 
-						<a href="#" className="sidebar-link link-active"> 
-							<IoSettingsOutline className="sidebar-btn-icon"/> <span>Settings</span>
-						</a>
+						<NavLink to="/settings" className="sidebar-link"> 
+							<IoSettingsOutline className="sidebar-btn-icon"/>
+							<span>Settings</span>
+						</NavLink>
 					</div>
 
 					<div className="sidebar-footer" style={{padding: "1rem"}}>

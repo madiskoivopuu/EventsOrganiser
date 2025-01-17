@@ -1,5 +1,6 @@
-import { EventDetails } from "@/interfaces/global_interfaces";
+import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
 import { EventAccordion } from "../EventAccordion";
+import { ComponentProps } from "react";
 
 interface Dictionary<T> {
     [Key: string]: T
@@ -33,11 +34,12 @@ const sortEvents = (events: EventDetails[]): EventDetails[] => {
     })
 }
 
-interface EventsListProps {
-    events: EventDetails[]
+interface EventsListProps extends ComponentProps<"div"> {
+    events: EventDetails[],
+    allTags: EventTag[]
 };
 
-function EventsList({ events }: EventsListProps) {
+function EventsList({ events, allTags, ...props }: EventsListProps) {
     events = sortEvents(events);
     var groupedEvents = groupEventsByYearAndMonth(events);
 
@@ -45,15 +47,15 @@ function EventsList({ events }: EventsListProps) {
         return (
             <>
                 <h1>{header}</h1>
-                {events.map(event => <EventAccordion key={event.id} event={event} />)}
+                {events.map(event => <EventAccordion key={event.id} event={event} allTags={allTags} />)}
             </>
         );
     });
 
     return (
-        <>
+        <div {...props}>
             {headerAndEvents}
-        </>
+        </div>
     )
 }
 

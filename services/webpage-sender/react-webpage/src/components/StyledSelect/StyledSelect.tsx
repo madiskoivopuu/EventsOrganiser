@@ -1,4 +1,4 @@
-import Select, { ControlProps, CSSObjectWithLabel, Props, GroupBase, ContainerProps } from "react-select";
+import Select, { ControlProps, CSSObjectWithLabel, Props, GroupBase, ContainerProps, MenuProps } from "react-select";
 
 function CustomSelect<Option, IsMulti extends boolean = boolean, Group extends GroupBase<Option> = GroupBase<Option>>({ ...props }: Props<Option, IsMulti, Group>) {
     const styles = {

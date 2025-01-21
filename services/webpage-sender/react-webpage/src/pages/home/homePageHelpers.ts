@@ -1,4 +1,4 @@
-import { EventDetails } from "@/interfaces/global_interfaces";
+import { EventDetails, ActiveTab } from "@/interfaces/global_interfaces";
 import { SearchOptions } from "./components";
 
 export const __events: EventDetails[] = [
@@ -81,12 +81,6 @@ export const __events: EventDetails[] = [
         ]
     },
 ]
-
-export enum ActiveTab {
-    PAST,
-    ONGOING,
-    UPCOMING,
-}
 
 export const filterEventsForTab = (events: EventDetails[], showEvtType: ActiveTab) => {
     let filtered: EventDetails[] = [];

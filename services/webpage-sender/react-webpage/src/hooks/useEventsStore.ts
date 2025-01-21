@@ -1,6 +1,12 @@
 import { EventDetails } from "@/interfaces/global_interfaces";
 import { create } from "zustand";
 
+interface EventsState {
+    events: EventDetails[],
+    addOrUpdate: (events: EventDetails[]) => void,
+    deleteEvents: (events: EventDetails[]) => void
+}
+
 function addOrUpdateEvents(prevEvents: EventDetails[], newEvents: EventDetails[]) {
     let idToEvent = new Map(prevEvents.map(event => [event.id, event]));
 
@@ -15,14 +21,9 @@ function deleteEvents(prevEvents: EventDetails[], removeEvents: EventDetails[]) 
     return prevEvents.filter(event => !removableEventIds.has(event.id));
 }
 
-interface EventsState {
-    events: EventDetails[],
-    addOrUpdate: (events: EventDetails[]) => void,
-    deleteEvents: (events: EventDetails[]) => void
-}
-
 const useEventsStore = create<EventsState>((set) => ({
     events: [],
+
     addOrUpdate: (newEvents: EventDetails[]) => {
         set((state) => ({
                 events: addOrUpdateEvents(state.events, newEvents)

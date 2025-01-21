@@ -1,5 +1,5 @@
-import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
-import { EventAccordion, EventsList } from "./components";
+import { EventDetails, EventTag, ActiveTab } from "@/interfaces/global_interfaces";
+import { EventsList } from "./components";
 import { useEffect, useState } from "react";
 import { useEventsStore } from '@/hooks';
 
@@ -7,7 +7,6 @@ import "./home-page.css";
 import { SearchBar } from "./components/SearchBar";
 import { SearchOptions } from "./components/SearchBar/SearchBar";
 import * as helpers from "./homePageHelpers";
-import { ActiveTab } from "./homePageHelpers"; 
 
 interface HomePageProps {
 	allTags: EventTag[],

@@ -11,3 +11,9 @@ export interface EventTag {
     id: number,
     name: string
 }
+
+export enum ActiveTab {
+    PAST,
+    ONGOING,
+    UPCOMING,
+}

@@ -1,5 +1,5 @@
-[webserver]
-172.17.89.147
+[controller]
+172.17.90.7
 
-[llm_server]
-172.17.88.198
+[workers]
+172.17.90.203

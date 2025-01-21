@@ -1,4 +1,4 @@
-- hosts: webserver
+- hosts: controller
   user: centos
   become_user: root
   become: yes
@@ -10,17 +10,18 @@
     events_webserver_loc: "/srv/www/events_webserver"
     fqdn: "cs.ut.ee"
     set_mysql_password: false
+  vars_files:
+    - vault.yml
 
   roles:
-    - knative
-    #- mysql_install
-    #- mongodb_install
-    #- devsec.hardening.mysql_hardening
+    #- setup
     #- update_packages
     #- apache
-    #- webserver_setup
+    - mysql_install
+    #- name: devsec.hardening.mysql_hardening
+    #  mysql_user_home: "/root/.my.cnf"
 
-- hosts: llm_server
+- hosts: workers
   user: centos
   become_user: root
   become: yes
@@ -33,7 +34,5 @@
     fqdn: "cs.ut.ee"
 
   roles:
-    #- update_packages
-    #- setup
-    #- apache
-    #- llm_server_setup
+    - setup
+    - update_packages

@@ -17,9 +17,10 @@
     #- setup
     #- update_packages
     #- apache
-    - mysql_install
+    #- mysql_install
     #- name: devsec.hardening.mysql_hardening
     #  mysql_user_home: "/root/.my.cnf"
+    - rabbitmq_centos_install
 
 - hosts: workers
   user: centos

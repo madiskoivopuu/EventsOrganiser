@@ -1,0 +1,62 @@
+# Implements the tutorial for RedHat distros: https://www.rabbitmq.com/docs/install-rpm#package-dependencies
+
+- name: Install RabbitMQ and Cloudsmith signing keys
+  ansible.builtin.rpm_key:
+    state: present
+    key: "{{ item }}"
+  with_items:
+    - "https://github.com/rabbitmq/signing-keys/releases/download/3.0/rabbitmq-release-signing-key.asc"
+    - "https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-erlang.E495BB49CC4BBE5B.key"
+    - "https://github.com/rabbitmq/signing-keys/releases/download/3.0/cloudsmith.rabbitmq-server.9F4587F226208342.key"
+
+- name: Copy rabbitmq.repo to /etc/yum.repos.d/rabbitmq.repo
+  ansible.builtin.copy:
+    src: rabbitmq.repo
+    dest: /etc/yum.repos.d/rabbitmq.repo
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Update dnf cache
+  ansible.builtin.dnf:
+    update_cache: true
+
+- name: Install logrotate
+  ansible.builtin.dnf:
+    state: present
+    name: "{{ item }}"
+  with_items:
+    - "erlang"
+    - "rabbitmq-server"
+
+- name: Start rabbitmq-server
+  ansible.builtin.systemd:
+    name: rabbitmq-server
+    state: started
+    enabled: true
+
+
+- name: Open RabbitMQ default port
+  ansible.posix.firewalld:
+    permanent: true
+    immediate: true
+    port: "{{ item }}"
+    state: enabled
+  with_items:
+    - 5672/tcp
+    - 5672/udp
+
+- name: Ensure that the vhost /emails exists.
+  community.rabbitmq.rabbitmq_vhost:
+    name: /emails
+    state: present
+
+- name: Add a new user to RabbitMQ for emails/events parsing
+  community.rabbitmq.rabbitmq_user:
+    user: "events-parser"
+    password: "{{ events_parser_rabbitmq_password | mandatory }}"
+    permissions:
+      - vhost: /emails
+        read_priv: .*
+        write_priv: .*
+    state: present

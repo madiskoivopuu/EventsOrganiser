@@ -1,5 +1,5 @@
-- name: Restart mariadb
+- name: Restart mysql
   ansible.builtin.systemd:
-    name: mariadb
+    name: mysqld
     state: restarted
     enabled: true

@@ -1,12 +1,12 @@
-- name: Install/update mariadb
+- name: Install/update MySQL
   ansible.builtin.dnf:
     name: '{{ item }}'
     state: latest
   with_items:
-  - "mariadb"
-  - "mariadb-server"
+  - "mysql"
+  - "mysql-server"
   notify:
-  - Restart mariadb
+  - Restart mysql
 
 - name: Open MySQL ports
   ansible.posix.firewalld:
@@ -23,9 +23,9 @@
     name: pymysql
     state: present
 
-- name: Start mariadb
+- name: Start mysqld
   ansible.builtin.systemd:
-    name: mariadb
+    name: mysqld
     state: started
     enabled: true
 

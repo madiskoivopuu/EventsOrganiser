@@ -55,7 +55,7 @@ async def get_events(
     if(ms.get_user() == None):
         return JSONResponse(
             content={"status": "error", "message": "User is not authenticated"},
-            status_code=403
+            status_code=401
         )
     
     user_id = ms.get_user()["oid"]

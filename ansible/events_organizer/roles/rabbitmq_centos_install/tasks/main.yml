@@ -59,4 +59,5 @@
       - vhost: /emails
         read_priv: .*
         write_priv: .*
+        configure_priv: ^$
     state: present

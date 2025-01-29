@@ -46,9 +46,9 @@
     - 5672/tcp
     - 5672/udp
 
-- name: Ensure that the vhost /emails exists.
+- name: Ensure that the vhost /events-parser exists.
   community.rabbitmq.rabbitmq_vhost:
-    name: /emails
+    name: /events-parser
     state: present
 
 - name: Add a new user to RabbitMQ for emails/events parsing
@@ -56,8 +56,17 @@
     user: "events-parser"
     password: "{{ events_parser_rabbitmq_password | mandatory }}"
     permissions:
-      - vhost: /emails
+      - vhost: /events-parser
         read_priv: .*
         write_priv: .*
-        configure_priv: ^$
+        configure_priv: .*
     state: present
+
+# needs management user..
+#- name: Create queue email_parsing_queue for the virtual host /events-parser
+#  community.rabbitmq.rabbitmq_queue:
+#    vhost: /events-parser
+#    name: email_parsing_queue
+#    durable: true
+#    login_user: events-parser
+#    login_password: "{{ events_parser_rabbitmq_password | mandatory }}"

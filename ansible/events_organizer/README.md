@@ -8,9 +8,9 @@ A few community modules need to be installed before the Ansible playbook:
 `ansible-galaxy collection install devsec.hardening`
 `ansible-galaxy collection install community.rabbitmq`
 
-Some roles will also need additional variables to be set (passwords/secrets etc) so that they can work. You can do that with Ansible Vault or some other means.
-The list of required variables for each role is the following
+Some roles will also need additional variables to be set (passwords/secrets etc) so that they can work. You can do that with Ansible Vault, creating it in the same directory as the playbook, or through some other means.
 
+The list of required variables for each role is the following:
 * mysql_install
     1. mysql_root_password
 * rabbitmq_centos_install

@@ -29,6 +29,7 @@ class ParserThread(threading.Thread):
 
         self.callback = callback
         self.email_queue = queue
+        self.current_work_delivery_tag = None
         self.llm = Llama3Model(llm_model_path)
 
     def run(self):
@@ -36,6 +37,8 @@ class ParserThread(threading.Thread):
             data: ParseRequest = self.email_queue.get()
             if(data == None):
                 return
+
+            self.current_work_delivery_tag = data.delivery_tag
             
             # TODO: add some proper error handling in case
 
@@ -45,8 +48,8 @@ class ParserThread(threading.Thread):
 
             callback_with_args = functools.partial(self.callback, data.channel, data.delivery_tag, events)
             data.connection.add_callback_threadsafe(callback_with_args)
+            self.current_work_delivery_tag = None
 
     def parse_and_validate(self, email: Email) -> list[dict]:
-        # TODO: add actual validation...
         events = self.llm.parse_events_from_email(email)
         return events

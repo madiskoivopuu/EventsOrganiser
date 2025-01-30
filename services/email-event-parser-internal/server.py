@@ -4,6 +4,8 @@ import parser
 import pika, pika.spec, pika.channel
 from queue import Queue
 
+THREAD_CHECK_DELAY_SEC = 10
+
 class EmailQueueServer():
     def __init__(self):
         self.queue = Queue()
@@ -18,25 +20,33 @@ class EmailQueueServer():
         self.parser_thread = parser.ParserThread(self.queue, server_config.LLM_PATH, self.email_parsed_callback)
 
     def check_parser_thread_status(self):
-        """Make sure that the parser thread has not crashed, before sending the email over
-        
+        """Periodically recheck that the required parser thread hasn't crashed
+           Restarts the thread and NACK's the previous work item if there is an issue
         """
         if(not self.parser_thread.is_alive()):
             # TODO: some logging to mention that the thread is starting up again
-            # maybe not the best idea to restart the thread each time?
+            
+            if(self.parser_thread.current_work_delivery_tag and self.mq_channel.is_open):
+                self.mq_channel.basic_nack(self.parser_thread.current_work_delivery_tag)
+
             self.parser_thread = parser.ParserThread(self.queue, server_config.LLM_PATH, self.email_parsed_callback)
             self.parser_thread.start()
 
-    def email_parsed_callback(self, channel: pika.spec.Basic.Deliver, 
-                            delivery_tag: pika.spec.BasicProperties):
-        pass
+        self.mq_connection.call_later(THREAD_CHECK_DELAY_SEC, self.check_parser_thread_status)
+
+    def email_parsed_callback(self, channel: pika.channel.Channel, 
+                            delivery_tag: pika.spec.BasicProperties,
+                            events: list[dict]):
+        print(events)
+
+        # TODO: add new events back to message queue for reading?
+
+        channel.basic_ack(delivery_tag)
 
     def on_new_email(self, channel: pika.channel.Channel, 
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
-        self.check_parser_thread_status()
-
         request = parser.ParseRequest(
             self.mq_connection,
             channel,
@@ -48,9 +58,11 @@ class EmailQueueServer():
     def run(self):
         self.mq_channel.queue_declare(server_config.RABBITMQ_QUEUE, durable=True)
         self.mq_channel.basic_consume(server_config.RABBITMQ_QUEUE, self.on_new_email)
+        self.mq_channel.basic_qos(prefetch_count=1)
 
         try:
             self.parser_thread.start()
+            self.mq_connection.call_later(THREAD_CHECK_DELAY_SEC, self.check_parser_thread_status)
             self.mq_channel.start_consuming()
         finally:
             self.mq_channel.stop_consuming()

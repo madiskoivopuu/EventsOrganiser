@@ -1,5 +1,6 @@
 import pydantic
 from pydantic import BaseModel, Field, ConfigDict
+from enum import Enum
 
 from typing import Literal, Optional
 from typing_extensions import Self
@@ -11,6 +12,10 @@ import pytz
 # Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
 def tz_aware(dt):
     return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+
+class AccountType(Enum):
+    OUTLOOK = "outlook"
+    #GMAIL = "gmail"
 
 class EventsGetRequest(BaseModel):
     direction: Literal["forward", "backward"] = Field(Query(description="Tells the API endpoint whether to fetch events before or after a given date"))
@@ -50,7 +55,10 @@ class EventsGetResponse(EventBase):
     id: int = Field(Body(description="Event identifier in database"))
     tags: list[Tag] = Field(Body())
 
-class EventPostRequest(EventBase):
+"""class EventPostRequest(EventBase):
     mail_acc_type: int = Field(Body())
     mail_acc_id: str = Field(Body())
-    tags: list[str] = Field(Body())
+    tags: list[str] = Field(Body())"""
+
+class GenerateCalendarLinkResponse(BaseModel):
+    link: str = Field(Body(description="Calendar link's full URL"))

@@ -1,36 +1,21 @@
-from fastapi import Depends, FastAPI, Request, status, Query
-from fastapi_server_session import SessionManager, MongoSessionInterface, Session
+from fastapi import Depends, FastAPI, Request, Response, HTTPException
 from fastapi_pagination import Page, add_pagination, paginate
 from fastapi.responses import JSONResponse
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-import os, pytz
+import os, pytz, uuid
 
-import pymongo
+import icalendar
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from datetime import timezone
 
 import server_config
-import apps
 import db as db, tables
 import models
 
-session_manager = SessionManager(
-    interface=MongoSessionInterface(
-        pymongo.MongoClient(
-            server_config.SESSION_MONGODB_HOST,
-            username=server_config.SESSION_MONGODB_USER,
-            password=server_config.SESSION_MONGODB_PASSWORD,
-            authSource=server_config.SESSION_MONGODB_DB
-        ),
-        db=server_config.SESSION_MONGODB_DB,
-        collection="session",
-    )
-)
-
-
-
-api = FastAPI(debug=True)
+api = FastAPI(debug=(os.getenv("DEV_MODE") == "1"))
 add_pagination(api)
 
 if(os.getenv("DEV_MODE") == "1"):
@@ -43,24 +28,17 @@ if(os.getenv("DEV_MODE") == "1"):
 @api.get("/api/events")
 async def get_events(
     request_data: models.EventsGetRequest = Depends(), # Required for the input parameters, so that FastAPI displays descriptions for query fields in Swagger
-    session: Session = Depends(session_manager.use_session),
+    # session = ??
     db_session: AsyncSession = Depends(db.start_session)
 ) -> Page[models.EventsGetResponse]:
     """
     Authenticated API endpoint for listing events before or after a given date.
     The results are paginated in lists up to 100 events.
     """
-
-    ms = apps.get_ms_app(session)
-    if(ms.get_user() == None):
-        return JSONResponse(
-            content={"status": "error", "message": "User is not authenticated"},
-            status_code=401
-        )
     
-    user_id = ms.get_user()["oid"]
-    acc_type = 1 # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
-                 # TODO: also fetch the ID of the account type from database
+    user_id = "aabb"
+    acc_type = models.AccountType.OUTLOOK # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
+                                            # TODO: also fetch the ID of the account type from database
 
     if(not models.tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
@@ -89,7 +67,78 @@ async def get_tags(
     results = await db_session.execute(query)
     return results.scalars().all()
 
-@api.post("/internal/api/events", status_code=201)
+@api.post("/api/events/calendar/regenerate")
+async def generate_link(
+    request: Request,
+    db_session: AsyncSession = Depends(db.start_session),
+    # session = ??
+) -> models.GenerateCalendarLinkResponse:
+    """
+    Authenticated API endpoint for creating or regenerating a calendar link
+    """
+    user_id = "aabb"
+    acc_type = models.AccountType.OUTLOOK
+
+    calendar_identifier = uuid.uuid4()
+
+    query = select(tables.CalendarLinksTable).where(tables.CalendarLinksTable.user_id == user_id, tables.CalendarLinksTable.user_acc_type == acc_type)
+    query_result = await db_session.execute(query)
+
+    prev_link_obj = query_result.scalar_one_or_none()
+    if(prev_link_obj != None):
+        prev_link_obj.calendar_identifier = calendar_identifier
+    else:
+        row = tables.CalendarLinksTable(
+            user_id=user_id,
+            user_acc_type=acc_type,
+            calendar_identifier=calendar_identifier
+        )
+        db_session.add(row)
+
+    await db_session.flush()
+    await db_session.commit()
+
+    calendar_link = str(request.url).replace(str(request.url.path), "") + "/api/events/calendar/" + str(calendar_identifier)
+
+    return models.GenerateCalendarLinkResponse(
+        link=calendar_link
+    )
+
+@api.get("/api/events/calendar/{calendar_id}")
+async def get_calendar_file(
+    calendar_id: uuid.UUID,
+    db_session: AsyncSession = Depends(db.start_session),
+):
+    """Unauthenticated API endpoint for converting found events to iCal format"""
+    
+    calendar_query = select(tables.CalendarLinksTable) \
+            .where(tables.CalendarLinksTable.calendar_identifier == calendar_id)
+    query_result = await db_session.execute(calendar_query)
+    calendar_user = query_result.scalar_one_or_none()
+    if(calendar_user == None):
+        raise HTTPException(status_code=404, detail="Calendar not found")
+    
+    query = select(tables.EventsTable) \
+            .where(tables.EventsTable.user_id == calendar_user.user_id, tables.EventsTable.user_acc_type == calendar_user.user_acc_type) \
+            .limit(100) # TODO: remove lol
+            #.options(selectinload(tables.EventsTable.tags)) \
+            #.execution_options(yield_per=server_config.YIELD_EVENTS_PER_TIME)
+    query_result = await db_session.execute(query)
+
+    calendar: icalendar.Calendar = icalendar.Calendar()
+    for event in query_result.unique().scalars().yield_per(10):
+        # TODO: separate function for this, would fix other todos aswell
+        calendar_event = icalendar.Event()
+        calendar_event.add("NAME", event.event_name)
+        calendar_event.add("DTSTART", event.start_date_utc.replace(tzinfo=timezone.utc))
+        calendar_event.add("DTEND", event.end_date_utc.replace(tzinfo=timezone.utc))
+        calendar_event.add("LOCATION", ", ".join([event.country, event.city, event.address, event.room])) # TODO: handle empty string cases
+        #TODO: tags, categorisation
+        calendar.add_component(calendar_event)
+
+    return Response(calendar.to_ical(), media_type="text/calendar")
+
+'''@api.post("/internal/api/events", status_code=201)
 async def add_event(
     event_data: models.EventPostRequest,
     db_session: AsyncSession = Depends(db.start_session)
@@ -117,7 +166,7 @@ async def add_event(
 
     db_session.add(event_model_sql)
     await db_session.commit()
-    return None
+    return None'''
 
 
 if __name__ == '__main__':

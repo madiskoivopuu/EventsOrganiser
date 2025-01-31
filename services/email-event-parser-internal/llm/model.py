@@ -5,7 +5,7 @@ from llama_cpp import Llama
 from helpers.email_data import Email
 
 class Llama3Model():
-    MAX_GENERATED_TOKENS = 4096
+    MAX_GENERATED_TOKENS = 8192
 
     def __init__(self, model_location, **kwargs) -> None:
         self.model = Llama(

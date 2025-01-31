@@ -19,7 +19,10 @@ class ParseRequest:
 
 @dataclass
 class ParseResponse:
-    pass
+    events: list[dict]
+    user_id: str
+    account_type: str
+    mail_link: str
 
 # This should still work fine with pika andmost LLM libraries, since 
 # most of them release the GIL when it comes time to run the LLM with a prompt
@@ -46,7 +49,13 @@ class ParserThread(threading.Thread):
             email: Email = mq_email_parser.parse(msg_with_email)
             events = self.parse_and_validate(email)
 
-            callback_with_args = functools.partial(self.callback, data.channel, data.delivery_tag, events)
+            callback_with_args = functools.partial(self.callback, data.channel, data.delivery_tag, ParseResponse(
+                events=events["events"], # TODO: figure out why it's a dictionary not a list
+                user_id=msg_with_email["user_id"],
+                account_type=msg_with_email["account_type"],
+                mail_link=email.mail_link
+            ))
+
             data.connection.add_callback_threadsafe(callback_with_args)
             self.current_work_delivery_tag = None
 

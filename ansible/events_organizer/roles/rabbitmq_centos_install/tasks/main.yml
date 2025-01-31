@@ -55,6 +55,7 @@
   community.rabbitmq.rabbitmq_user:
     user: "events-parser"
     password: "{{ events_parser_rabbitmq_password | mandatory }}"
+    tags: management
     permissions:
       - vhost: /events-parser
         read_priv: .*
@@ -62,11 +63,18 @@
         configure_priv: .*
     state: present
 
-# needs management user..
-#- name: Create queue email_parsing_queue for the virtual host /events-parser
-#  community.rabbitmq.rabbitmq_queue:
-#    vhost: /events-parser
-#    name: email_parsing_queue
-#    durable: true
-#    login_user: events-parser
-#    login_password: "{{ events_parser_rabbitmq_password | mandatory }}"
+- name: Create queue email_parsing_queue for the virtual host /events-parser
+  community.rabbitmq.rabbitmq_queue:
+    vhost: /events-parser
+    name: email_parsing_queue
+    durable: true
+    login_user: events-parser
+    login_password: "{{ events_parser_rabbitmq_password | mandatory }}"
+
+- name: Create queue parsed_events for the virtual host /events-parser
+  community.rabbitmq.rabbitmq_queue:
+    vhost: /events-parser
+    name: parsed_events_queue
+    durable: true
+    login_user: events-parser
+    login_password: "{{ events_parser_rabbitmq_password | mandatory }}"

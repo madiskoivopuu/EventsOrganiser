@@ -6,12 +6,13 @@ import json
 class Email:
     id: str
     title: str
-    send_date: datetime
     content: str
+    send_date: datetime
     sender_email: str # Usually the same, but can be something different from the original sender, if that person is using a mailing list
     from_email: str # Original sender's email
     recipient_emails: list[str]
     reader_email: str
+    mail_link: str
     is_draft: bool
 
     @staticmethod
@@ -31,6 +32,7 @@ class Email:
                     from_email=from_email,
                     recipient_emails=recipients,
                     reader_email=reader_email,
+                    mail_link=email_data["webLink"],
                     is_draft=email_data["isDraft"]
                     )
     

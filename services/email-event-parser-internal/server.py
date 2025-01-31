@@ -1,7 +1,9 @@
 import server_config
 import parser
+from parser import ParseResponse
 
-import pika, pika.spec, pika.channel
+import pika, pika.spec, pika.channel, json
+import dataclasses
 from queue import Queue
 
 THREAD_CHECK_DELAY_SEC = 10
@@ -36,10 +38,12 @@ class EmailQueueServer():
 
     def email_parsed_callback(self, channel: pika.channel.Channel, 
                             delivery_tag: pika.spec.BasicProperties,
-                            events: list[dict]):
-        print(events)
-
-        # TODO: add new events back to message queue for reading?
+                            response: ParseResponse):
+        self.mq_channel.basic_publish(
+            exchange="",
+            routing_key=server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE,
+            body=json.dumps(dataclasses.asdict(response))
+        )
 
         channel.basic_ack(delivery_tag)
 
@@ -56,8 +60,10 @@ class EmailQueueServer():
         self.queue.put(request)
 
     def run(self):
-        self.mq_channel.queue_declare(server_config.RABBITMQ_QUEUE, durable=True)
-        self.mq_channel.basic_consume(server_config.RABBITMQ_QUEUE, self.on_new_email)
+        self.mq_channel.queue_declare(server_config.RABBITMQ_EMAILS_QUEUE, durable=True)
+        self.mq_channel.queue_declare(server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE, durable=True)
+
+        self.mq_channel.basic_consume(server_config.RABBITMQ_EMAILS_QUEUE, self.on_new_email)
         self.mq_channel.basic_qos(prefetch_count=1)
 
         try:

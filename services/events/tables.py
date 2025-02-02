@@ -39,10 +39,7 @@ class EventsTable(Base):
     event_name: Mapped[str] = mapped_column(String(128))
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
     end_date_utc: Mapped[datetime] # Always stores UTC ISO-8601 datetime
-    country: Mapped[str] = mapped_column(String(64))
-    city: Mapped[str] = mapped_column(String(64))
-    address: Mapped[str] = mapped_column(String(64))
-    room: Mapped[str] = mapped_column(String(64))
+    address: Mapped[str] = mapped_column(String(256))
 
     tags: Mapped[list[TagsTable]] = relationship(secondary=tags_to_events, lazy="joined")
 

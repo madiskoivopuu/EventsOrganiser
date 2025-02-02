@@ -8,7 +8,7 @@ from asyncio import current_task
 import server_config
 
 url = URL.create(
-    drivername="mysql+asyncmy",
+    drivername="mysql+aiomysql",
     username=server_config.MYSQL_EVENTS_USER,
     password=server_config.MYSQL_EVENTS_PASSWORD,
     host=server_config.MYSQL_HOST,

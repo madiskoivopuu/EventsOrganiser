@@ -1,6 +1,9 @@
 import json
+
+import llama_cpp.llama_grammar
 from . import prompt_config
 from llama_cpp import Llama
+import llama_cpp
 
 from helpers.email_data import Email
 
@@ -45,9 +48,13 @@ class Llama3Model():
                     "content": prepared_content
                 },
             ],
-            response_format=prompt_config.get_parse_prompt_format_rules(),
-            max_tokens=self.MAX_GENERATED_TOKENS
+            grammar=prompt_config.get_parse_output_grammar(),
+            max_tokens=self.MAX_GENERATED_TOKENS,
+            temperature=0.6
         )
-        events = json.loads(chat_output["choices"][0]["message"]["content"], strict=False)
+        try:
+            events = json.loads(chat_output["choices"][0]["message"]["content"], strict=False)
+        except json.decoder.JSONDecodeError:
+            raise ValueError(f'Error decoding AI generated string {chat_output["choices"][0]["message"]["content"]}')
 
         return events

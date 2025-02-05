@@ -50,7 +50,7 @@ class ParserThread(threading.Thread):
             events = self.parse_and_validate(email)
 
             callback_with_args = functools.partial(self.callback, data.channel, data.delivery_tag, ParseResponse(
-                events=events["events"], # TODO: figure out why it's a dictionary not a list
+                events=events,
                 user_id=msg_with_email["user_id"],
                 account_type=msg_with_email["account_type"],
                 mail_link=email.mail_link

@@ -11,10 +11,9 @@ from sqlalchemy import select, delete, update
 from sqlalchemy.orm import selectinload
 from datetime import timezone
 
-import server_config
+from events.common import tables, models
 import helpers
-import db as db, tables
-import models
+import db
 
 api = FastAPI(debug=(os.getenv("DEV_MODE") == "1"))
 add_pagination(api)
@@ -45,7 +44,11 @@ async def get_events(
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
     request_data.from_time = request_data.from_time.astimezone(pytz.utc) # NOTE: MySQL DATETIME comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since DATETIMEs in the database are stored as UTC)
  
-    query = select(tables.EventsTable).where(tables.EventsTable.user_id == user_id, tables.EventsTable.user_acc_type == acc_type)
+    query = select(tables.EventsTable) \
+            .where(
+                tables.EventsTable.user_id == user_id, 
+                tables.EventsTable.user_acc_type == acc_type
+            )
     if(request_data.direction == "forward"):
         query = query.where(tables.EventsTable.start_date_utc >= request_data.from_time)
     else:
@@ -70,9 +73,11 @@ async def update_event(
     acc_type = models.AccountType.OUTLOOK
 
     query = select(tables.EventsTable) \
-            .where(tables.EventsTable.id == id,
-                   tables.EventsTable.user_id == user_id,
-                   tables.EventsTable.user_acc_type == acc_type)
+            .where(
+                tables.EventsTable.id == id,
+                tables.EventsTable.user_id == user_id,
+                tables.EventsTable.user_acc_type == acc_type
+            )
     
     query_result = await db_session.execute(query)
     event: tables.EventsTable = query_result.unique().scalar_one_or_none()
@@ -99,14 +104,19 @@ async def delete_event(
     id: int,
     db_session: AsyncSession = Depends(db.start_session)
 ):
+    """
+    Authenticated API endpoint for deleting an event
+    """
     # TODO: replace with auth
     user_id = "aabb"
     acc_type = models.AccountType.OUTLOOK
 
     query = delete(tables.EventsTable) \
-            .where(tables.EventsTable.id == id,
-                   tables.EventsTable.user_id == user_id,
-                   tables.EventsTable.user_acc_type == acc_type)
+            .where(
+                tables.EventsTable.id == id,
+                tables.EventsTable.user_id == user_id,
+                tables.EventsTable.user_acc_type == acc_type
+            )
     
     query_result = await db_session.execute(query)
     await db_session.commit()
@@ -142,7 +152,10 @@ async def get_link(
     acc_type = models.AccountType.OUTLOOK
 
     query = select(tables.CalendarLinksTable) \
-            .where(tables.CalendarLinksTable.user_id == user_id, tables.CalendarLinksTable.user_acc_type == acc_type)
+            .where(
+                tables.CalendarLinksTable.user_id == user_id, 
+                tables.CalendarLinksTable.user_acc_type == acc_type
+            )
     query_result = await db_session.execute(query)
 
     link_row = query_result.scalar_one_or_none()
@@ -169,7 +182,10 @@ async def generate_link(
     calendar_identifier = uuid.uuid4()
 
     query = select(tables.CalendarLinksTable) \
-            .where(tables.CalendarLinksTable.user_id == user_id, tables.CalendarLinksTable.user_acc_type == acc_type)
+            .where(
+                tables.CalendarLinksTable.user_id == user_id, 
+                tables.CalendarLinksTable.user_acc_type == acc_type
+            )
     query_result = await db_session.execute(query)
 
     link_row = query_result.scalar_one_or_none()
@@ -235,9 +251,11 @@ async def delete_calendar_link(
     acc_type = models.AccountType.OUTLOOK
 
     query = delete(tables.CalendarLinksTable) \
-            .where(tables.CalendarLinksTable.user_id == user_id, 
-                   tables.CalendarLinksTable.user_acc_type == acc_type, 
-                   tables.CalendarLinksTable.calendar_identifier == calendar_id)
+            .where(
+                tables.CalendarLinksTable.user_id == user_id, 
+                tables.CalendarLinksTable.user_acc_type == acc_type, 
+                tables.CalendarLinksTable.calendar_identifier == calendar_id
+            )
     query_result = await db_session.execute(query)
     await db_session.commit()
 

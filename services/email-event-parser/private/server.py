@@ -36,9 +36,12 @@ class EmailQueueServer():
 
         self.mq_connection.call_later(THREAD_CHECK_DELAY_SEC, self.check_parser_thread_status)
 
-    def email_parsed_callback(self, channel: pika.channel.Channel, 
-                            delivery_tag: pika.spec.BasicProperties,
-                            response: ParseResponse):
+    def email_parsed_callback(
+            self, 
+            channel: pika.channel.Channel, 
+            delivery_tag: pika.spec.BasicProperties,
+            response: ParseResponse):
+        
         self.mq_channel.basic_publish(
             exchange="",
             routing_key=server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE,
@@ -51,6 +54,7 @@ class EmailQueueServer():
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
+        
         request = parser.ParseRequest(
             self.mq_connection,
             channel,
@@ -61,7 +65,14 @@ class EmailQueueServer():
 
     def run(self):
         self.mq_channel.queue_declare(server_config.RABBITMQ_EMAILS_QUEUE, durable=True)
-        self.mq_channel.queue_declare(server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE, durable=True)
+        self.mq_channel.queue_declare(
+            server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE, 
+            durable=True,
+            arguments={
+                'x-dead-letter-exchange': 'dlx', # Specify the DLQ exchange
+                'x-dead-letter-routing-key': 'dead_events'      # Routing key for dead messages
+            }
+        )
 
         self.mq_channel.basic_consume(server_config.RABBITMQ_EMAILS_QUEUE, self.on_new_email)
         self.mq_channel.basic_qos(prefetch_count=1)

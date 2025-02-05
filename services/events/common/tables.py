@@ -1,17 +1,31 @@
-import asyncio, db, os, uuid
+import uuid
+from zoneinfo import ZoneInfo
 from datetime import datetime
 
 from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint
+import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship
-from sqlalchemy.types import Uuid
 
 from typing import Optional
 
-import models
+from . import models
+
+
+class TimezoneSQLType(types.TypeDecorator):
+    impl = types.VARCHAR
+
+    def process_bind_param(self, value: ZoneInfo, dialect) -> str:
+        return value.key
+    
+    def process_result_value(self, value: str, dialect) -> ZoneInfo:
+        return ZoneInfo(value)
+
 
 class Base(DeclarativeBase):
-    pass
+    type_annotation_map = {
+        ZoneInfo: TimezoneSQLType
+    }
 
 tags_to_events = Table(
     "tags_to_events",
@@ -40,23 +54,30 @@ class EventsTable(Base):
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
     end_date_utc: Mapped[datetime] # Always stores UTC ISO-8601 datetime
     address: Mapped[str] = mapped_column(String(256))
+    email_link: Mapped[str] = mapped_column(String(256))
 
     tags: Mapped[list[TagsTable]] = relationship(secondary=tags_to_events, lazy="joined")
 
 class CalendarLinksTable(Base):
     __tablename__ = "calendar_links"
+
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
     user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     calendar_identifier: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4)
 
-async def create_tables() -> None:
-    async with db.engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+class TimezoneTable(Base):
+    __tablename__ = "timezones"
 
-# sometimes there is an event loop running, other times there isn't; looks like this has something to do with the hot reloader?
-if(os.getenv("DEV_MODE") == "1"):
-    try:
-        loop = asyncio.get_running_loop()
-        loop.create_task(create_tables())
-    except RuntimeError:
-        asyncio.run(create_tables())
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    timezone: Mapped[ZoneInfo] = mapped_column(TimezoneSQLType(64), nullable=False)
+
+    _related_settings: Mapped["EventSettingsTable"] = relationship(back_populates="timezone")
+
+class EventSettingsTable(Base):
+    __tablename__ = "event_settings"
+
+    user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
+    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
+    
+    timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
+    timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings")

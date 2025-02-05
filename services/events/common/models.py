@@ -1,18 +1,22 @@
 import pydantic
 from pydantic import BaseModel, Field, ConfigDict
-from pydantic.fields import PydanticUndefined  
 from enum import Enum
 
 from typing import Literal, Optional
 from typing_extensions import Self
 from fastapi import Query, Body
 
-from datetime import datetime
+from datetime import datetime, tzinfo
 import pytz
 
 # Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
-def tz_aware(dt):
-    return dt.tzinfo is not None and dt.tzinfo.utcoffset(dt) is not None
+def tz_aware(dt) -> tzinfo | None:
+    if(dt is not None and 
+       dt.tzinfo is not None and 
+       dt.tzinfo.utcoffset(dt) is not None):
+        return dt.tzinfo
+    else:
+        return None
 
 class AccountType(Enum):
     OUTLOOK = "outlook"

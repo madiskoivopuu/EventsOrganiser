@@ -7,9 +7,7 @@ import identity.web
 from helpers import apps
 app = flask.Flask(__name__)
 app.config.from_object(app_config)
-app.config["SESSION_MONGODB"] = apps.get_mongo_connection()
-app.config["SESSION_MONGODB_DB"] = app_config.SESSION_MONGODB_FLASK_DB
-app.config["SESSION_SERIALIZATION_FORMAT"] = "json"
+app.config["SESSION_TYPE"] = "filesystem"
 flask_session.Session(app)
 
 @app.route("/finishLogin", methods=["GET"])
@@ -31,11 +29,13 @@ def login():
     if(apps.get_ms_app().get_user() != None):
         return redirect(url_for('index'))
 
-    return render_template(
-        "login.html", **apps.get_ms_app().log_in(
+    flow = apps.get_ms_app().log_in(
             scopes=app_config.SCOPES,
             redirect_uri=app_config.MICROSOFT_LOGIN_REDIRECT
         )
+        
+    return render_template(
+        "login.html", **flow
     )
 
 @app.route("/", methods=["GET"])

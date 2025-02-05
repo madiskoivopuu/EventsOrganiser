@@ -1,0 +1,5 @@
+aiomysql
+fastapi[standard]==0.115.0
+msal
+pydantic==2.9.2
+pyjwt==2.10.1

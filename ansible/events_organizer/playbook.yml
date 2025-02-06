@@ -20,7 +20,8 @@
     #- mysql_install
     #- name: devsec.hardening.mysql_hardening
     #  mysql_user_home: "/root/.my.cnf"
-    - rabbitmq_centos_install
+    #- rabbitmq_centos_install
+    - redis_centos_install
 
 - hosts: workers
   user: centos

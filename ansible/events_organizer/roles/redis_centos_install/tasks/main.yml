@@ -1,0 +1,20 @@
+- name: Install redis
+  ansible.builtin.dnf:
+    state: present
+    name: redis
+
+- name: Open Redis default port
+  ansible.posix.firewalld:
+    permanent: true
+    immediate: true
+    port: "{{ item }}"
+    state: enabled
+  with_items:
+    - 6379/tcp
+    - 6379/udp
+
+- name: Start redis server
+  ansible.builtin.systemd:
+    name: redis
+    state: started
+    enabled: true

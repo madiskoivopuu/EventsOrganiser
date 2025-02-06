@@ -1,4 +1,3 @@
-import llama_cpp.llama_grammar
 from llama_cpp import LlamaGrammar
 import json
 
@@ -69,6 +68,12 @@ def format_event_parse_prompt() -> str:
     return __PARSING_PROMPT % ", ".join(__TAGS)
 
 def get_parse_output_grammar() -> LlamaGrammar:
+    def _tag_to_schema(tag: str) -> dict:
+        return {
+            "type": "string",
+            "pattern": f"^{tag}$"
+        }
+
     date_regex = "[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])"
     time_regex = "([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
     timezone_regex = "(Z|(\\+|-)([01][0-9]|2[0-3]):[0-5][0-9])"
@@ -104,7 +109,7 @@ def get_parse_output_grammar() -> LlamaGrammar:
                 },
                 "tags": {
                     "type": "array",
-                    #"items": __TAGS
+                    "items": map(_tag_to_schema, __TAGS)
                 },
             },
             "required": ["event_name", "start_date", "end_date", "country", "city", "address", "room", "tags"]

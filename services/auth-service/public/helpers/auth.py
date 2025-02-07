@@ -38,6 +38,8 @@ def create_jwt_from_microsoft(id_token_data: dict, secret: str, expiration: time
     data["account_type"] = "outlook"
     # metadata
     data["sub"] = id_token_data["email"]
+
+    # TODO: maybe check that the given expiration time does not surpass id_token's
     data["exp"] = datetime.now(timezone.utc) + expiration
 
     return jwt.encode(

@@ -7,7 +7,10 @@ from asyncio import current_task
 import os
 
 import server_config
-from events.common.tables import Base
+
+import sys
+sys.path.append('..')
+from common.tables import Base
 
 url = URL.create(
     drivername="mysql+aiomysql",
@@ -26,7 +29,7 @@ async def create_tables() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-# sometimes there is an event loop running, other times there isn't; looks like this has something to do with the hot reloader?
+# sometimes an event loop already exists, depending on how you run the program
 if(os.getenv("DEV_MODE") == "1"):
     try:
         loop = asyncio.get_running_loop()

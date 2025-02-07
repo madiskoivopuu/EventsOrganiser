@@ -18,10 +18,6 @@ def tz_aware(dt) -> tzinfo | None:
     else:
         return None
 
-class AccountType(Enum):
-    OUTLOOK = "outlook"
-    #GMAIL = "gmail"
-
 class Tag(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

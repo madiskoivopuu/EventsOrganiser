@@ -11,7 +11,12 @@ from sqlalchemy import select, delete, update
 from sqlalchemy.orm import selectinload
 from datetime import timezone
 
-from events.common import tables, models
+import sys
+sys.path.append('..')
+from common import tables, models
+
+import auth
+from auth import UserData
 import helpers
 import db
 
@@ -28,17 +33,13 @@ if(os.getenv("DEV_MODE") == "1"):
 @api.get("/api/events")
 async def get_events(
     request_data: models.EventsGetRequest = Depends(), # Required for the input parameters, so that FastAPI displays descriptions for query fields in Swagger
-    # session = ??
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ) -> Page[models.EventsGetResponse]:
     """
     Authenticated API endpoint for listing events before or after a given date.
     The results are paginated in lists up to 100 events.
     """
-    
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK # TODO: in the future this data will be kept in session, since we do not allow multiple email accounts grouped into a single account on events organiser
-                                            # TODO: also fetch the ID of the account type from database
 
     if(not models.tz_aware(request_data.from_time)):
         request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
@@ -46,8 +47,8 @@ async def get_events(
  
     query = select(tables.EventsTable) \
             .where(
-                tables.EventsTable.user_id == user_id, 
-                tables.EventsTable.user_acc_type == acc_type
+                tables.EventsTable.user_id == user.account_id, 
+                tables.EventsTable.user_acc_type == user.account_type
             )
     if(request_data.direction == "forward"):
         query = query.where(tables.EventsTable.start_date_utc >= request_data.from_time)
@@ -63,20 +64,18 @@ async def get_events(
 async def update_event(
     id: int,
     new_data: models.EventsUpdateRequest,
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ):
     """
     Authenticated API endpoint for updating event data
     """
-    # TODO: replace with auth
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK
 
     query = select(tables.EventsTable) \
             .where(
                 tables.EventsTable.id == id,
-                tables.EventsTable.user_id == user_id,
-                tables.EventsTable.user_acc_type == acc_type
+                tables.EventsTable.user_id == user.account_id,
+                tables.EventsTable.user_acc_type == user.account_type
             )
     
     query_result = await db_session.execute(query)
@@ -102,20 +101,18 @@ async def update_event(
 @api.delete("/api/events/{id}", status_code=204)
 async def delete_event(
     id: int,
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ):
     """
     Authenticated API endpoint for deleting an event
     """
-    # TODO: replace with auth
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK
 
     query = delete(tables.EventsTable) \
             .where(
                 tables.EventsTable.id == id,
-                tables.EventsTable.user_id == user_id,
-                tables.EventsTable.user_acc_type == acc_type
+                tables.EventsTable.user_id == user.account_id,
+                tables.EventsTable.user_acc_type == user.account_type
             )
     
     query_result = await db_session.execute(query)
@@ -142,19 +139,17 @@ async def get_tags(
 @api.get("/api/events/calendar/link")
 async def get_link(
     request: Request,
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session),
 ) -> models.CalendarLinkResponse:
     """
     Authenticated API endpoint for fetching the calendar link
     """
-    # TODO: replace with auth
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK
 
     query = select(tables.CalendarLinksTable) \
             .where(
-                tables.CalendarLinksTable.user_id == user_id, 
-                tables.CalendarLinksTable.user_acc_type == acc_type
+                tables.CalendarLinksTable.user_id == user.account_id, 
+                tables.CalendarLinksTable.user_acc_type == user.account_type
             )
     query_result = await db_session.execute(query)
 
@@ -169,22 +164,19 @@ async def get_link(
 @api.post("/api/events/calendar/link")
 async def generate_link(
     request: Request,
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session),
-    # session = ??
 ) -> models.CalendarLinkResponse:
     """
     Authenticated API endpoint for creating or regenerating a calendar link
     """
-    # TODO: replace with auth
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK
 
     calendar_identifier = uuid.uuid4()
 
     query = select(tables.CalendarLinksTable) \
             .where(
-                tables.CalendarLinksTable.user_id == user_id, 
-                tables.CalendarLinksTable.user_acc_type == acc_type
+                tables.CalendarLinksTable.user_id == user.account_id, 
+                tables.CalendarLinksTable.user_acc_type == user.account_type
             )
     query_result = await db_session.execute(query)
 
@@ -193,8 +185,8 @@ async def generate_link(
         link_row.calendar_identifier = calendar_identifier
     else:
         row = tables.CalendarLinksTable(
-            user_id=user_id,
-            user_acc_type=acc_type,
+            user_id=user.account_id,
+            user_acc_type=user.account_type,
             calendar_identifier=calendar_identifier
         )
         db_session.add(row)
@@ -240,20 +232,17 @@ async def get_calendar_file(
 @api.delete("/api/events/calendar/{calendar_id}", status_code=204)
 async def delete_calendar_link(
     calendar_id: uuid.UUID,
+    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session),
 ):
     """
     Authenticated API endpoint for deleting a calendar link for the user
     """
 
-    # TODO: replace with auth
-    user_id = "aabb"
-    acc_type = models.AccountType.OUTLOOK
-
     query = delete(tables.CalendarLinksTable) \
             .where(
-                tables.CalendarLinksTable.user_id == user_id, 
-                tables.CalendarLinksTable.user_acc_type == acc_type, 
+                tables.CalendarLinksTable.user_id == user.account_id, 
+                tables.CalendarLinksTable.user_acc_type == user.account_type, 
                 tables.CalendarLinksTable.calendar_identifier == calendar_id
             )
     query_result = await db_session.execute(query)

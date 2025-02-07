@@ -122,7 +122,7 @@ def add_events_to_db(new_events: NewEvents) -> None:
         query = select(tables.EventSettingsTable) \
                 .where(
                     tables.EventSettingsTable.user_id == new_events.user_id,
-                    tables.EventSettingsTable.user_acc_type == models.AccountType(new_events.account_type)
+                    tables.EventSettingsTable.user_acc_type == new_events.account_type
                 )
         
         try:
@@ -138,7 +138,7 @@ def add_events_to_db(new_events: NewEvents) -> None:
                 continue
 
             event_row.user_id = new_events.user_id
-            event_row.user_acc_type = models.AccountType(new_events.account_type)
+            event_row.user_acc_type = new_events.account_type
             event_row.email_link = new_events.mail_link
             db_session.add(event_row)
 

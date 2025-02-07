@@ -47,7 +47,7 @@ class EventsTable(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
+    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
     user_id: Mapped[str] = mapped_column(String(256))
     
     event_name: Mapped[str] = mapped_column(String(128))
@@ -62,7 +62,7 @@ class CalendarLinksTable(Base):
     __tablename__ = "calendar_links"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
-    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
+    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
     calendar_identifier: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4)
 
 class TimezoneTable(Base):
@@ -77,7 +77,7 @@ class EventSettingsTable(Base):
     __tablename__ = "event_settings"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
-    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
+    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
     
     timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
     timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings")

@@ -47,7 +47,7 @@ class LoginListenerMQ:
 
         self.mq_channel.exchange_declare(exchange="notifications", exchange_type="topic")
         self.mq_channel.queue_declare(queue="outlook_user_logins")
-        self.mq_channel.queue_bind(exchange="notifications", queue="outlook_user_logins", routing_key="notification.user_logged_in.outlook")
+        self.mq_channel.queue_bind(exchange="notifications", queue="outlook_user_logins", routing_key="notification.outlook.user_login")
 
         self.mq_channel.basic_consume(queue="outlook_user_logins", on_message_callback=self._on_user_login)
 

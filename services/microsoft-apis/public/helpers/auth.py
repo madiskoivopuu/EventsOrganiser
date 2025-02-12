@@ -38,7 +38,11 @@ async def authenticate_user(
             leeway=timedelta(seconds=10)
         )
 
-        return UserData.model_validate(decoded_data)
+        user = UserData.model_validate(decoded_data)
+        if(user.account_type != "outlook"):
+            raise HTTPException(status_code=403, detail="Account is not a Microsoft account")
+
+        return user
     except jwt.exceptions.ExpiredSignatureError:
         response.delete_cookie(server_config.JWT_SESSION_COOKIE_NAME)
         raise HTTPException(status_code=401, detail="Token expired")

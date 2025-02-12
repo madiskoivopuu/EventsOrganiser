@@ -9,8 +9,6 @@ from sqlalchemy.orm import DeclarativeBase, relationship
 
 from typing import Optional
 
-from . import models
-
 
 class TimezoneSQLType(types.TypeDecorator):
     impl = types.VARCHAR
@@ -61,7 +59,7 @@ class EventsTable(Base):
 class CalendarLinksTable(Base):
     __tablename__ = "calendar_links"
 
-    user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
+    user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
     user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
     calendar_identifier: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4)
 

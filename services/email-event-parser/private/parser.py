@@ -5,6 +5,7 @@ from helpers import mq_email_parser
 from dataclasses import dataclass
 from collections.abc import Callable
 from queue import Queue
+from zoneinfo import ZoneInfo
 import functools
 import threading, json
 import pika.spec
@@ -23,6 +24,7 @@ class ParseResponse:
     user_id: str
     account_type: str
     mail_link: str
+    events_timezone: ZoneInfo
 
 # This should still work fine with pika andmost LLM libraries, since 
 # most of them release the GIL when it comes time to run the LLM with a prompt
@@ -53,6 +55,7 @@ class ParserThread(threading.Thread):
                 events=events,
                 user_id=msg_with_email["user_id"],
                 account_type=msg_with_email["account_type"],
+                events_timezone=msg_with_email["events_timezone"],
                 mail_link=email.mail_link
             ))
 

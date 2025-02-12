@@ -10,7 +10,7 @@ from datetime import datetime, tzinfo
 import pytz
 
 # Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
-def tz_aware(dt) -> tzinfo | None:
+def tz_aware(dt: datetime) -> tzinfo | None:
     if(dt is not None and 
        dt.tzinfo is not None and 
        dt.tzinfo.utcoffset(dt) is not None):

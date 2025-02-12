@@ -1,0 +1,20 @@
+import os, dotenv
+dotenv.load_dotenv() # only for local testing, the docker container will already have environment variables set for it
+
+MICROSOFT_APP_CLIENT_ID = os.getenv("MICROSOFT_APP_CLIENT_ID")
+MICROSOFT_APP_SECRET = os.getenv("MICROSOFT_APP_SECRET")
+MICROSOFT_SCOPES=["api://e7531514-8913-47a8-8cd2-b80dcef955b7/emails"]
+MICROSOFT_CALLBACK_SECRET = os.getenv("MICROSOFT_CALLBACK_SECRET")
+
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_DB_USER = os.getenv("MYSQL_DB_USER")
+MYSQL_DB_PASSWORD = os.getenv("MYSQL_DB_PASSWORD")
+
+RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
+RABBITMQ_VIRTUALHOST = os.getenv("RABBITMQ_VIRTUALHOST")
+RABBITMQ_USERNAME = os.getenv("RABBITMQ_USERNAME")
+RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
+RABBITMQ_EMAILS_QUEUE = os.getenv("RABBITMQ_EMAILS_QUEUE")
+
+JWT_SECRET=os.getenv("JWT_SECRET")
+JWT_SESSION_COOKIE_NAME=os.getenv("JWT_SESSION_COOKIE_NAME")

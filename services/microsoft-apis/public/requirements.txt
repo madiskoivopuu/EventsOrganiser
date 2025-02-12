@@ -1,0 +1,9 @@
+aiohttp
+aiomysql
+fastapi[standard]==0.115.0
+msal
+pydantic==2.9.2
+sqlalchemy==2.0.36
+pyjwt
+
+msgraph-sdk

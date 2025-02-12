@@ -45,6 +45,7 @@ class NewEvents(BaseModel):
     user_id: str
     account_type: str
     mail_link: str
+    events_timezone: ZoneInfo
     events: list[ParsedEvent]
 
 def fix_and_combine_location(parsed_event: ParsedEvent) -> str:
@@ -119,22 +120,11 @@ def validate_and_create_event_row(db_session: Session, parsed_event: ParsedEvent
 
 def add_events_to_db(new_events: NewEvents) -> None:
     with db.start_session() as db_session:
-        query = select(tables.EventSettingsTable) \
-                .where(
-                    tables.EventSettingsTable.user_id == new_events.user_id,
-                    tables.EventSettingsTable.user_acc_type == new_events.account_type
-                )
-        
-        try:
-            user_settings = db_session.execute(query).scalar_one()
-        except sqlalchemy.exc.NoResultFound:
-            raise ValueError(f"User {new_events.user_id} does not have default settings specified, it should not be possible to parse events for this user")
-
         for parsed_event in new_events.events:
             try:
-                event_row = validate_and_create_event_row(db_session, parsed_event, user_settings.timezone.timezone)
+                event_row = validate_and_create_event_row(db_session, parsed_event, new_events.events_timezone)
             except ValueError:
-                __logger.warn("Unexpected ValueError when validating event data, event dropped", exc_info=True)
+                __logger.warning("Unexpected ValueError when validating event data, event dropped", exc_info=True)
                 continue
 
             event_row.user_id = new_events.user_id

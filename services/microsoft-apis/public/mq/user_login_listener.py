@@ -1,0 +1,101 @@
+import asyncio, json
+import sqlalchemy.exc
+from sqlalchemy import select
+from zoneinfo import ZoneInfo
+
+import pika, pika.channel, pika.spec
+from pika.adapters.asyncio_connection import AsyncioConnection
+
+import sys
+sys.path.append('..')
+from common import tables
+
+import db
+import logging
+
+class LoginListenerMQ:
+    def __init__(self, host: str, virtual_host: str, username: str, password: str):
+        self._ioloop = asyncio.get_running_loop()
+        self.mq_connection = AsyncioConnection(
+            parameters=pika.ConnectionParameters(
+                host=host, 
+                port=5672, 
+                virtual_host=virtual_host, 
+                credentials=pika.PlainCredentials(username, password)
+            ),
+            custom_ioloop=self._ioloop,
+            on_open_callback=self._conn_open_callback,
+            on_open_error_callback=self._conn_failed_callback
+        )
+        self.mq_channel = None
+
+        self.__logger = logging.getLogger(__name__)
+
+    def close_conn(self):
+        if(self.mq_connection.is_open):
+            self.mq_connection.close()    
+
+    def _conn_open_callback(self, conn: AsyncioConnection):
+        conn.channel(on_open_callback=self._channel_open_callback)
+
+    def _conn_failed_callback(self, conn: AsyncioConnection, err: BaseException):
+        # TODO: error handling
+        print("CONN ERROR")
+
+    def _channel_open_callback(self, channel: pika.channel.Channel):
+        self.mq_channel = channel
+
+        self.mq_channel.exchange_declare(exchange="notifications", exchange_type="topic")
+        self.mq_channel.queue_declare(queue="outlook_user_logins")
+        self.mq_channel.queue_bind(exchange="notifications", queue="outlook_user_logins", routing_key="notification.user_logged_in.outlook")
+
+        self.mq_channel.basic_consume(queue="outlook_user_logins", on_message_callback=self._on_user_login)
+
+    def _on_user_login(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        self._ioloop.create_task(self.create_settings(channel, method, properties, body))
+        self._ioloop.create_task(self.create_user_info(channel, method, properties, body))
+
+    async def create_settings(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError:
+            self.__logger.error("Unable to decode new user notification due to a programmer JSON formatting error", exc_info=True)
+            channel.basic_reject(method.delivery_tag, requeue=False)
+
+        async with db.async_session() as db_session:
+            q = select(tables.SettingsTable) \
+                .where(tables.SettingsTable.user_id == data["account_id"])
+            user_settings = await db_session.execute(q).scalar_one_or_none()
+            if(user_settings != None): # user already has settings...
+                return
+
+
+            settings_row = tables.SettingsTable()
+            settings_row.user_id = data["account_id"]
+            settings_row.events_default_timezone = ZoneInfo(data["account_type"])
+
+            db_session.add(settings_row)
+
+            try:
+                await db_session.commit()
+            except sqlalchemy.exc.IntegrityError as e:
+                await db_session.rollback()
+                if("duplicate" in e._message().lower()):
+                    self.__logger.warning("RabbitMQ new user notification received, even though settings already exist (not overwritten by this notification)")
+                else:
+                    self.__logger.warning("Unknown IntegrityError when trying to create new settings for user", exc_info=True)
+                    channel.basic_reject(method.delivery_tag, requeue=False)
+
+            channel.basic_ack(method.delivery_tag)
+
+    async def merge_user_info(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        pass

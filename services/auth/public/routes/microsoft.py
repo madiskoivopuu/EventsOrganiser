@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, Response, HTTPException, Depends
 from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
 from redis import asyncio as aioredis
 from datetime import timedelta
+from zoneinfo import ZoneInfo
 import msal
 import aiohttp
 import certifi, ssl
@@ -39,15 +40,17 @@ async def get_ms_signing_keys() -> dict:
         
 @microsoft_router.post("/")
 async def get_login_link(
+    #timezone: ZoneInfo,
     request: Request,
     session: Session = Depends(session_manager.get_or_start_session)
 ) -> str:
     
     flow = ms_app.initiate_auth_code_flow(
         scopes=server_config.MICROSOFT_SCOPES,
-        redirect_uri=get_redirect_uri(request)
+        redirect_uri=get_redirect_uri(request),
     )
     session["ms_flow"] = flow
+    #session["specified_timezone"] = timezone # used for first login to properly create settings...
 
     return flow["auth_uri"]
 
@@ -65,6 +68,8 @@ async def finish_login(
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
         raise HTTPException(status_code=400, detail=f"Problem authenticating with Microsoft account: {error_str}")
 
+    print(auth_flow)
+
     signing_keys = await get_ms_signing_keys()
     decoded_token, err_msg = auth.decode_jwt_token(auth_flow["id_token"], signing_keys, server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
@@ -73,4 +78,7 @@ async def finish_login(
 
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)
     auth.set_jwt_cookie(server_config.JWT_SESSION_COOKIE_NAME, token_data, response)
+
+    # TODO: user logged in noti
+
     return

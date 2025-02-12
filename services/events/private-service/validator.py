@@ -45,7 +45,7 @@ class NewEvents(BaseModel):
     user_id: str
     account_type: str
     mail_link: str
-    events_timezone: ZoneInfo
+    user_timezone: ZoneInfo
     events: list[ParsedEvent]
 
 def fix_and_combine_location(parsed_event: ParsedEvent) -> str:

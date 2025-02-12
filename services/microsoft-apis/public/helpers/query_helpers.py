@@ -21,6 +21,22 @@ async def get_or_create_timezone(db_session: AsyncSession, tz: ZoneInfo) -> tabl
         timezone.timezone = tz
         return timezone
     
+async def get_settings(db_session: AsyncSession, user_id: str) -> tables.SettingsTable:
+    """
+    Fetches settings for a user
+
+    :raises:
+
+    :return: Table row with user settings
+    """
+
+    q = select(tables.SettingsTable) \
+        .where(
+            tables.SettingsTable.user_id == user_id
+        )
+
+    return (await db_session.execute(q)).scalar_one()
+
 async def update_token_db(user: auth.UserData, db_session: AsyncSession) -> tables.UserInfoTable:
     """
     Updates user data row in MySQL with a new access token, if needed. 

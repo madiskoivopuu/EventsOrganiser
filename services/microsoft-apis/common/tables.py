@@ -26,10 +26,11 @@ class UserInfoTable(Base):
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
     
-    most_recent_fetched_email: Mapped[datetime] = mapped_column(nullable=True)
+    user_email: Mapped[str] = mapped_column(String(256))
     access_token: Mapped[str] = mapped_column(String(4096), nullable=True)
     access_token_expires: Mapped[datetime] = mapped_column(nullable=True)
     refresh_token: Mapped[str] = mapped_column(String(2048), nullable=True)
+    most_recent_fetched_email: Mapped[datetime] = mapped_column(nullable=True)
 
 class TimezoneTable(Base):
     __tablename__ = "timezones"

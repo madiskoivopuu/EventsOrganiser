@@ -52,7 +52,7 @@ class MailSenderMQ:
         self,
         user_id: str,
         user_email: str,
-        events_timezone: ZoneInfo,
+        user_timezone: ZoneInfo,
         email: dict[str]
     ):
         self.mq_channel.basic_publish(
@@ -61,7 +61,7 @@ class MailSenderMQ:
             body=json.dumps({
                 "user_id": user_id,
                 "account_type": "outlook",
-                "events_timezone": str(events_timezone),
+                "user_timezone": str(user_timezone),
                 "email_data": email,
                 "reader_email": user_email
             })

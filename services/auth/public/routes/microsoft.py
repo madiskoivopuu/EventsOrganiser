@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, HTTPException, Depends
 from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
 from redis import asyncio as aioredis
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import msal
 import aiohttp
@@ -12,6 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 import server_config
 from helpers import auth
+from mq.notification_sender import NotificationSenderMQ
 
 __logger = logging.getLogger(__name__)
 microsoft_router = APIRouter(
@@ -27,6 +28,12 @@ ms_app = msal.ConfidentialClientApplication(
     client_id=server_config.MICROSOFT_APP_CLIENT_ID,
     client_credential=server_config.MICROSOFT_APP_SECRET
 )
+notifications_mq = NotificationSenderMQ(
+    host=server_config.RABBITMQ_HOST,
+    virtual_host=server_config.RABBITMQ_VIRTUALHOST,
+    username=server_config.RABBITMQ_USERNAME,
+    password=server_config.RABBITMQ_PASSWORD
+)
 
 def get_redirect_uri(request: Request):
     host = str(request.url).replace(str(request.url.path), "")
@@ -40,7 +47,7 @@ async def get_ms_signing_keys() -> dict:
         
 @microsoft_router.post("/")
 async def get_login_link(
-    #timezone: ZoneInfo,
+    timezone: ZoneInfo,
     request: Request,
     session: Session = Depends(session_manager.get_or_start_session)
 ) -> str:
@@ -50,7 +57,7 @@ async def get_login_link(
         redirect_uri=get_redirect_uri(request),
     )
     session["ms_flow"] = flow
-    #session["specified_timezone"] = timezone # used for first login to properly create settings...
+    session["user_timezone"] = str(timezone) # used for first login to properly create settings...
 
     return flow["auth_uri"]
 
@@ -68,8 +75,6 @@ async def finish_login(
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
         raise HTTPException(status_code=400, detail=f"Problem authenticating with Microsoft account: {error_str}")
 
-    print(auth_flow)
-
     signing_keys = await get_ms_signing_keys()
     decoded_token, err_msg = auth.decode_jwt_token(auth_flow["id_token"], signing_keys, server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
@@ -79,6 +84,12 @@ async def finish_login(
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)
     auth.set_jwt_cookie(server_config.JWT_SESSION_COOKIE_NAME, token_data, response)
 
-    # TODO: user logged in noti
+    await notifications_mq.notify_of_ms_login(
+        decoded_token["oid"],
+        datetime.now(timezone.utc) + timedelta(seconds=auth_flow["expires_in"]),
+        ZoneInfo(session["user_timezone"]),
+        auth_flow["access_token"],
+        auth_flow["refresh_token"]
+    )
 
     return

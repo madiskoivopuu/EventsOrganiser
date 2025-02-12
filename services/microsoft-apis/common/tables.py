@@ -39,6 +39,12 @@ class TimezoneTable(Base):
 
     _related_settings: Mapped["SettingsTable"] = relationship(back_populates="timezone")
 
+class UserEmailSubscriptionTable(Base):
+    __tablename__ = "email_subscriptions"
+
+    user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
+    subscription_id: Mapped[str] = mapped_column(String(256))
+
 class SettingsTable(Base):
     __tablename__ = "settings"
 

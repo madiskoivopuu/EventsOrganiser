@@ -2,6 +2,7 @@ import asyncio, json
 import sqlalchemy.exc
 from sqlalchemy import select
 from zoneinfo import ZoneInfo
+from datetime import datetime
 
 import pika, pika.channel, pika.spec
 from pika.adapters.asyncio_connection import AsyncioConnection
@@ -55,10 +56,9 @@ class LoginListenerMQ:
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
-        self._ioloop.create_task(self.create_settings(channel, method, properties, body))
-        self._ioloop.create_task(self.create_user_info(channel, method, properties, body))
+        self._ioloop.create_task(self.process_login(channel, method, properties, body))
 
-    async def create_settings(self, channel: pika.channel.Channel, 
+    async def process_login(self, channel: pika.channel.Channel, 
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
@@ -68,17 +68,27 @@ class LoginListenerMQ:
             self.__logger.error("Unable to decode new user notification due to a programmer JSON formatting error", exc_info=True)
             channel.basic_reject(method.delivery_tag, requeue=False)
 
+        results = await asyncio.gather(
+            self.merge_user_info(data),
+            self.create_settings(data)
+        )
+        
+        if(all(results) == True):
+            channel.basic_ack(method.delivery_tag)
+        else:
+            channel.basic_reject(method.delivery_tag, requeue=False)
+
+    async def create_settings(self, data: dict) -> bool:
         async with db.async_session() as db_session:
             q = select(tables.SettingsTable) \
                 .where(tables.SettingsTable.user_id == data["account_id"])
             user_settings = await db_session.execute(q).scalar_one_or_none()
             if(user_settings != None): # user already has settings...
-                return
-
+                return True
 
             settings_row = tables.SettingsTable()
             settings_row.user_id = data["account_id"]
-            settings_row.events_default_timezone = ZoneInfo(data["account_type"])
+            settings_row.events_default_timezone = ZoneInfo(data["user_timezone"])
 
             db_session.add(settings_row)
 
@@ -87,15 +97,26 @@ class LoginListenerMQ:
             except sqlalchemy.exc.IntegrityError as e:
                 await db_session.rollback()
                 if("duplicate" in e._message().lower()):
-                    self.__logger.warning("RabbitMQ new user notification received, even though settings already exist (not overwritten by this notification)")
+                    self.__logger.warning(f"Settings for user {data['account_id']} already exist somehow (not overwritten by this notification)")
                 else:
                     self.__logger.warning("Unknown IntegrityError when trying to create new settings for user", exc_info=True)
-                    channel.basic_reject(method.delivery_tag, requeue=False)
+                    return False
 
-            channel.basic_ack(method.delivery_tag)
+        return True
 
-    async def merge_user_info(self, channel: pika.channel.Channel, 
-                    method: pika.spec.Basic.Deliver, 
-                    properties: pika.spec.BasicProperties, 
-                    body: bytes):
-        pass
+    async def merge_user_info(self, data: dict):
+        """
+        Creates or updates existing user info
+        """
+
+        async with db.async_session() as db_session:
+            user_info = tables.UserInfoTable()
+            user_info.user_id = data["account_id"]
+            user_info.access_token = data["access_token"]
+            user_info.access_token_expires = datetime.fromisoformat(data["access_token_expiration"]) 
+            user_info.refresh_token = data["refresh_token"]
+
+            db_session.merge(user_info)
+            await db_session.commit()
+
+        return True

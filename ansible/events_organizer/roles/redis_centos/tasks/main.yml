@@ -18,3 +18,11 @@
     name: redis
     state: started
     enabled: true
+
+- name: Change redis password
+  ansible.builtin.lineinfile:
+    path: "{{ redis_config }}"
+    regexp: "#?\\s*requirepass"
+    line: "requirepass {{redis_password | mandatory}}"
+  notify:
+    - Restart redis

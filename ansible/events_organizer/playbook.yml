@@ -3,13 +3,9 @@
   become_user: root
   become: yes
 
-  collections:
-    - devsec.hardening
-
   vars:
-    events_webserver_loc: "/srv/www/events_webserver"
-    fqdn: "cs.ut.ee"
-    set_mysql_password: false
+    mysql_socket: "/var/lib/mysql/mysql.sock"
+    redis_config: "/etc/redis/redis.conf"
   vars_files:
     - vault.yml
 
@@ -17,19 +13,15 @@
     #- setup
     #- update_packages
     #- apache
-    #- mysql_install
-    #- name: devsec.hardening.mysql_hardening
-    #  mysql_user_home: "/root/.my.cnf"
-    #- rabbitmq_centos_install
-    - redis_centos_install
+    #- kubernetes_centos
+    #- mysql
+    #- rabbitmq_centos
+    - redis_centos
 
 - hosts: workers
   user: centos
   become_user: root
   become: yes
-
-  collections:
-    - devsec.hardening
 
   vars:
     llm_webserver_loc: /srv/www/llm_api_webserver
@@ -38,3 +30,4 @@
   roles:
     - setup
     - update_packages
+    - kubernetes_centos

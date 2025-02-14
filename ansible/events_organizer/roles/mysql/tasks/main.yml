@@ -1,0 +1,73 @@
+- name: Install Python package "PyMySQL[rsa]" necessary for Ansible role 
+  ansible.builtin.pip:
+    name: "PyMySQL[rsa]"
+    state: latest
+
+- name: Install/update MySQL
+  ansible.builtin.dnf:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+  - "mysql"
+  - "mysql-server"
+  notify:
+  - Restart mysql
+
+- name: Open MySQL ports
+  ansible.posix.firewalld:
+    permanent: true
+    immediate: true
+    port: "{{ item }}"
+    state: enabled
+  with_items:
+    - 3306/tcp
+    - 3306/udp
+
+- name: Start mysqld
+  ansible.builtin.systemd:
+    name: mysqld
+    state: started
+    enabled: true
+
+- name: Set root user password
+  community.mysql.mysql_user:
+    name: root
+    password: "{{ mysql_root_password | mandatory }}"
+    update_password: always
+
+- name: Set .my.cnf with root user credentials
+  template:
+    src: 'my.cnf.j2'
+    dest: '/root/.my.cnf'
+    owner: root
+    group: mysql
+    mode: '0440'
+
+- name: Create necessary databases for Events Organiser
+  community.mysql.mysql_db:
+    name: "{{ item }}"
+  with_items:
+    - "microsoft"
+    - "events"
+
+- name: Create MySQL user "events"
+  community.mysql.mysql_user:
+    name: events
+    host: "10.0.0.0/255.0.0.0"
+    password: "{{ mysql_user_events_password | mandatory }}"
+    priv: "events.*:ALL"
+  with_items:
+    - "localhost"
+    - "10.0.0.0/255.0.0.0"
+    - "88.196.111.110" # add your own IP here, if you want to access the DB outside of the cluster
+
+- name: Create MySQL user "microsoft"
+  community.mysql.mysql_user:
+    name: microsoft
+    host: "10.0.0.0/255.0.0.0"
+    password: "{{ mysql_user_microsoft_password | mandatory }}"
+    priv: "microsoft.*:ALL"
+  with_items:
+    - "localhost"
+    - "10.0.0.0/255.0.0.0"
+    - "88.196.111.110" # add your own IP here, if you want to access the DB outside of the cluster

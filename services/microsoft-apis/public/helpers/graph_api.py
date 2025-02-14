@@ -5,6 +5,9 @@ from datetime import datetime, timezone, timedelta
 class TokenUpdateError(Exception):
     pass
 
+import certifi, ssl
+sslcontext = ssl.create_default_context(cafile=certifi.where())
+
 async def update_token_if_needed(
         access_token: str, 
         expires_at: datetime,
@@ -12,6 +15,7 @@ async def update_token_if_needed(
         client_id: str,
         client_secret: str,
         scopes: list[str],
+        tenant: str = "common",
         if_expires_in_less_than: timedelta = timedelta(minutes=5)) -> tuple[str, datetime] | None:
     """
     Exchanges a refresh token for a new Microsoft access token, if the current one is about to expire
@@ -23,7 +27,7 @@ async def update_token_if_needed(
     if(expires_at - datetime.now(timezone.utc) < if_expires_in_less_than):
         async with aiohttp.ClientSession("https://login.microsoftonline.com") as session:
             async with session.post(
-                "/{tenant}/oauth2/v2.0/token",
+                f"/{tenant}/oauth2/v2.0/token",
                 headers={
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
@@ -74,7 +78,7 @@ async def get_messages(access_token: str, select: list | None, skip: int = 0, to
                 headers={
                     "Authorization": f"Bearer {access_token}",
                     "Prefer": 'outlook.body-content-type="text"'
-                }) as resp:
+                }, ssl=sslcontext) as resp:
             resp_json = await resp.json()
 
             return {
@@ -128,7 +132,7 @@ async def read_emails_after_date(
         after_date = datetime.now(timezone.utc) - timedelta(days=31)
 
     while True:
-        result = get_messages(access_token, select=select, skip=skip, top=top)
+        result = await get_messages(access_token, select=select, skip=skip, top=top)
         if(len(result["json_data"]["data"]["value"]) == 0): # no more emails to read from user
             break
         

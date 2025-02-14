@@ -12,6 +12,7 @@ from typing import Optional
 
 class TimezoneSQLType(types.TypeDecorator):
     impl = types.VARCHAR
+    cache_ok = True
 
     def process_bind_param(self, value: ZoneInfo, dialect) -> str:
         return value.key

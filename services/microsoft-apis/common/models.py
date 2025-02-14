@@ -9,10 +9,12 @@ from fastapi import Query, Body
 from zoneinfo import ZoneInfo
 
 class SettingsPostRequest(BaseModel):
-    auto_fetch_emails: bool
-    events_default_timezone: ZoneInfo
+    auto_fetch_emails: bool = Field(description="Enable server to get automatic notifications of new emails for a user")
+    timezone: ZoneInfo = Field(description="IANA timezone identifier")
 
 class SettingsGetResponse(SettingsPostRequest):
+    model_config = ConfigDict(from_attributes=True)
+
     pass
 
 class FetchNewEmailsGetResponse(BaseModel):

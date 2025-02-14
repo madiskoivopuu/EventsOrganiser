@@ -46,23 +46,24 @@ class MailSenderMQ:
     def _channel_open_callback(self, channel: pika.channel.Channel):
         self.mq_channel = channel
 
-        self.mq_channel.queue_declare(queue=self.queue_name)
+        self.mq_channel.queue_declare(queue=self.queue_name, durable=True)
 
-    async def send_new_email_to_parse(
+    async def send_new_emails_to_parse(
         self,
         user_id: str,
         user_email: str,
         user_timezone: ZoneInfo,
-        email: dict[str]
+        emails: list[dict[str]]
     ):
-        self.mq_channel.basic_publish(
-            exchange="",
-            routing_key=self.queue_name,
-            body=json.dumps({
-                "user_id": user_id,
-                "account_type": "outlook",
-                "user_timezone": str(user_timezone),
-                "email_data": email,
-                "reader_email": user_email
-            })
-        )
+        for email in emails:
+            self.mq_channel.basic_publish(
+                exchange="",
+                routing_key=self.queue_name,
+                body=json.dumps({
+                    "user_id": user_id,
+                    "account_type": "outlook",
+                    "user_timezone": str(user_timezone),
+                    "email_data": email,
+                    "reader_email": user_email
+                })
+            )

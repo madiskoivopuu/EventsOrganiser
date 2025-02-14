@@ -40,7 +40,7 @@ class NotificationSenderMQ:
 
         self.mq_channel.exchange_declare(exchange="notifications", exchange_type="topic")
 
-    async def notify_of_ms_login(self, account_id: str, access_token_expiration: datetime,
+    async def notify_of_ms_login(self, account_id: str, access_token_expiration: datetime, email: str,
                                  user_timezone: ZoneInfo, access_token: str, refresh_token: str):
         if(self.mq_channel == None):
             raise ConnectionError("MQ Channel has not yet been opened")
@@ -50,6 +50,7 @@ class NotificationSenderMQ:
             routing_key="notification.outlook.user_login",
             body=json.dumps({
                 "account_id": account_id,
+                "email": email,
                 "user_timezone": str(user_timezone),
                 "access_token": access_token,
                 "access_token_expiration": access_token_expiration.isoformat(),

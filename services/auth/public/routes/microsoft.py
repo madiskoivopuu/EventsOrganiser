@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Request, Response, HTTPException, Depends
+from fastapi import APIRouter, Request, Response, HTTPException, Depends, FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
 from redis import asyncio as aioredis
+from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+from contextlib import asynccontextmanager
 import msal
 import aiohttp
 import certifi, ssl
@@ -15,9 +18,7 @@ from helpers import auth
 from mq.notification_sender import NotificationSenderMQ
 
 __logger = logging.getLogger(__name__)
-microsoft_router = APIRouter(
-    prefix="/api/auth/microsoft"
-)
+
 session_manager = SessionManager(
     default_sess_duration=timedelta(minutes=10),
     interface=AsyncRedisSessionInterface(
@@ -28,11 +29,25 @@ ms_app = msal.ConfidentialClientApplication(
     client_id=server_config.MICROSOFT_APP_CLIENT_ID,
     client_credential=server_config.MICROSOFT_APP_SECRET
 )
-notifications_mq = NotificationSenderMQ(
-    host=server_config.RABBITMQ_HOST,
-    virtual_host=server_config.RABBITMQ_VIRTUALHOST,
-    username=server_config.RABBITMQ_USERNAME,
-    password=server_config.RABBITMQ_PASSWORD
+notifications_mq = None
+
+@asynccontextmanager
+async def router_lifespan(app: FastAPI):
+    global notifications_mq
+    notifications_mq = NotificationSenderMQ(
+        host=server_config.RABBITMQ_HOST,
+        virtual_host=server_config.RABBITMQ_VIRTUALHOST,
+        username=server_config.RABBITMQ_USERNAME,
+        password=server_config.RABBITMQ_PASSWORD
+    )
+
+    yield
+
+    notifications_mq.close_conn()
+
+microsoft_router = APIRouter(
+    prefix="/api/auth/microsoft",
+    lifespan=router_lifespan
 )
 
 def get_redirect_uri(request: Request):
@@ -45,9 +60,12 @@ async def get_ms_signing_keys() -> dict:
             resp_json = await response.json()
             return resp_json
         
+class LoginLinkPostRequest(BaseModel):
+    timezone: ZoneInfo
+
 @microsoft_router.post("/")
 async def get_login_link(
-    timezone: ZoneInfo,
+    data: LoginLinkPostRequest,
     request: Request,
     session: Session = Depends(session_manager.get_or_start_session)
 ) -> str:
@@ -57,11 +75,11 @@ async def get_login_link(
         redirect_uri=get_redirect_uri(request),
     )
     session["ms_flow"] = flow
-    session["user_timezone"] = str(timezone) # used for first login to properly create settings...
+    session["user_timezone"] = str(data.timezone) # used for first login to properly create settings...
 
     return flow["auth_uri"]
 
-@microsoft_router.get("/login_callback")
+@microsoft_router.get("/login_callback", status_code=204)
 async def finish_login(
     request: Request,
     response: Response,
@@ -87,9 +105,12 @@ async def finish_login(
     await notifications_mq.notify_of_ms_login(
         decoded_token["oid"],
         datetime.now(timezone.utc) + timedelta(seconds=auth_flow["expires_in"]),
+        decoded_token["email"],
         ZoneInfo(session["user_timezone"]),
         auth_flow["access_token"],
         auth_flow["refresh_token"]
     )
 
-    return
+    ms_app.acquire_token_by_refresh_token()
+
+    return RedirectResponse("/", status_code=303)

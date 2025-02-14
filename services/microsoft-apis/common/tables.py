@@ -14,6 +14,7 @@ class Base(DeclarativeBase):
 
 class _TimezoneSQLType(types.TypeDecorator):
     impl = types.VARCHAR
+    cache_ok = True
 
     def process_bind_param(self, value: ZoneInfo, dialect) -> str:
         return value.key
@@ -38,7 +39,7 @@ class TimezoneTable(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     timezone: Mapped[ZoneInfo] = mapped_column(_TimezoneSQLType(64), nullable=False, unique=True)
 
-    _related_settings: Mapped["SettingsTable"] = relationship(back_populates="timezone")
+    _related_settings: Mapped["SettingsTable"] = relationship(back_populates="timezone", lazy="joined")
 
 class UserEmailSubscriptionTable(Base):
     __tablename__ = "email_subscriptions"
@@ -52,5 +53,5 @@ class SettingsTable(Base):
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
 
     auto_fetch_emails: Mapped[bool] = mapped_column(default=False)
-    events_default_timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
-    events_default_timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings")
+    timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
+    timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings", lazy="joined")

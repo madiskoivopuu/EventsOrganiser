@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from mq.user_login_listener import LoginListenerMQ
 
 import os, server_config
-from routes import settings_router
+from routes import settings_router, emails_router
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
@@ -25,3 +25,4 @@ api = FastAPI(
 )
 
 api.include_router(settings_router)
+api.include_router(emails_router)

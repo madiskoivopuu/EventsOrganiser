@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request, Response, HTTPException, Depends
+from fastapi import APIRouter, FastAPI, Response, HTTPException, Depends
 from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
 from redis import asyncio as aioredis
 from datetime import datetime, timezone
+from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
@@ -22,15 +23,25 @@ from mq.mail_sender import MailSenderMQ
 from helpers import query_helpers, graph_api
 
 __logger = logging.getLogger(__name__)
+mail_sender_mq = None
+
+@asynccontextmanager
+async def router_lifespan(app: FastAPI):
+    global mail_sender_mq
+    mail_sender_mq = MailSenderMQ(
+        host=server_config.RABBITMQ_HOST,
+        virtual_host=server_config.RABBITMQ_VIRTUALHOST,
+        username=server_config.RABBITMQ_USERNAME,
+        password=server_config.RABBITMQ_PASSWORD,
+        queue_name=server_config.RABBITMQ_EMAILS_QUEUE
+    )
+
+    yield
+
+    mail_sender_mq.close_conn()
+
 emails_router = APIRouter(
     prefix="/api/microsoft"
-)
-
-mail_sender_mq = MailSenderMQ(
-    host=server_config.RABBITMQ_HOST,
-    virtual_host=server_config.RABBITMQ_VIRTUALHOST,
-    username=server_config.RABBITMQ_USERNAME,
-    password=server_config.RABBITMQ_PASSWORD
 )
 
 @emails_router.post("/emails/fetch_new", status_code=200)
@@ -41,7 +52,7 @@ async def new_email(
     user_data = await query_helpers.update_token_db(user, db_session)
     user_settings = await query_helpers.get_settings(db_session, user.account_id)
 
-    emails = graph_api.read_emails_after_date(
+    emails = await graph_api.read_emails_after_date(
         user_data.access_token,
         after_date=user_data.most_recent_fetched_email,
         select=["id"]
@@ -56,6 +67,7 @@ async def new_email(
 
         user_data.most_recent_fetched_email = most_recent
 
+    full_emails = [] # emails with all fields
     for email in emails:
         response = await graph_api.get_message(
             email["id"],
@@ -63,13 +75,16 @@ async def new_email(
         )
         if(response["resp"].status != 200):
             raise HTTPException(status_code=500, detail=f"Failed to fetch an email with ID {email['id']}")
+        
+        full_emails.append(response["resp_json"])
 
-        await mail_sender_mq.send_new_email_to_parse(
-            user_data.user_id,
-            user_data.user_email,
-            user_settings.events_default_timezone.timezone,
-            response["resp_json"]
-        )
+    # TODO: maybe use aio-pika which is actually meant to be an async AMQP library
+    await mail_sender_mq.send_new_emails_to_parse(
+        user_data.user_id,
+        user_data.user_email,
+        user_settings.timezone.timezone,
+        full_emails
+    )
 
     await db_session.commit() # TODO: check if this can still update after the first commit in update_token_db
 

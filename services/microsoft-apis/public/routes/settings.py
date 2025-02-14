@@ -19,7 +19,7 @@ import os, db
 
 import server_config
 from helpers import auth
-from helpers import db_helpers
+from helpers import query_helpers
 from helpers.auth import UserData
 
 __logger = logging.getLogger(__name__)
@@ -35,12 +35,14 @@ async def get_settings(
     query = select(tables.SettingsTable) \
             .where(
                 tables.SettingsTable.user_id == user.account_id,
-                tables.SettingsTable.user_acc_type == user.account_type
             )
     
-    query_result = await db_session.execute(query)
+    settings_row = (await db_session.execute(query)).scalar_one()
 
-    return models.SettingsGetResponse.model_validate(query_result.scalar_one())
+    return models.SettingsGetResponse(
+        auto_fetch_emails=settings_row.auto_fetch_emails,
+        timezone=settings_row.timezone.timezone
+    )
 
 @settings_router.patch("/settings", status_code=204)
 async def update_settings(
@@ -50,10 +52,9 @@ async def update_settings(
 ):
     settings_row = tables.SettingsTable()
     settings_row.user_id = user.account_id
-    settings_row.user_acc_type = user.account_type
 
     settings_row.auto_fetch_emails = new_settings.auto_fetch_emails
-    settings_row.events_default_timezone = db_helpers.get_or_create_timezone(db_session, new_settings.events_default_timezone)
+    settings_row.timezone = await query_helpers.get_or_create_timezone(db_session, new_settings.timezone)
 
     await db_session.merge(settings_row)
     await db_session.commit()

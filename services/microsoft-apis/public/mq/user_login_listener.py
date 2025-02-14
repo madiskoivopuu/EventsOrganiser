@@ -11,6 +11,7 @@ import sys
 sys.path.append('..')
 from common import tables
 
+from helpers import query_helpers
 import db
 import logging
 
@@ -70,7 +71,8 @@ class LoginListenerMQ:
 
         results = await asyncio.gather(
             self.merge_user_info(data),
-            self.create_settings(data)
+            self.create_settings(data),
+            return_exceptions=True
         )
         
         if(all(results) == True):
@@ -82,13 +84,13 @@ class LoginListenerMQ:
         async with db.async_session() as db_session:
             q = select(tables.SettingsTable) \
                 .where(tables.SettingsTable.user_id == data["account_id"])
-            user_settings = await db_session.execute(q).scalar_one_or_none()
+            user_settings = (await db_session.execute(q)).scalar_one_or_none()
             if(user_settings != None): # user already has settings...
                 return True
 
             settings_row = tables.SettingsTable()
             settings_row.user_id = data["account_id"]
-            settings_row.events_default_timezone = ZoneInfo(data["user_timezone"])
+            settings_row.timezone = await query_helpers.get_or_create_timezone(db_session, ZoneInfo(data["user_timezone"]))
 
             db_session.add(settings_row)
 
@@ -112,11 +114,12 @@ class LoginListenerMQ:
         async with db.async_session() as db_session:
             user_info = tables.UserInfoTable()
             user_info.user_id = data["account_id"]
+            user_info.user_email = data["email"]
             user_info.access_token = data["access_token"]
             user_info.access_token_expires = datetime.fromisoformat(data["access_token_expiration"]) 
             user_info.refresh_token = data["refresh_token"]
 
-            db_session.merge(user_info)
+            await db_session.merge(user_info)
             await db_session.commit()
 
         return True

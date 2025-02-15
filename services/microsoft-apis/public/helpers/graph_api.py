@@ -71,9 +71,9 @@ async def get_messages(access_token: str, select: list | None, skip: int = 0, to
     if(select):
         params["$select"] = ",".join(select)
 
-    async with aiohttp.ClientSession("https://graph.microsoft.com/v1.0/") as session:
+    async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
         async with session.get(
-                "/me/messages", 
+                "/v1.0/me/messages", 
                 params=params,
                 headers={
                     "Authorization": f"Bearer {access_token}",
@@ -86,7 +86,7 @@ async def get_messages(access_token: str, select: list | None, skip: int = 0, to
                 "json_data": resp_json
             }
 
-async def get_message(id: str, access_token: str, select: list | None) -> dict:
+async def get_message(id: str, access_token: str, select: list | None = None) -> dict:
     """
     Gets the contents of a single email for a user from Microsoft Graph API
 
@@ -98,14 +98,14 @@ async def get_message(id: str, access_token: str, select: list | None) -> dict:
     if(select):
         params["$select"] = ",".join(select)
 
-    async with aiohttp.ClientSession("https://graph.microsoft.com/v1.0/") as session:
+    async with aiohttp.ClientSession("https://graph.microsoft.com/") as session:
         async with session.get(
-                f"/me/messages/{id}", 
+                f"/v1.0/me/messages/{id}", 
                 params=params,
                 headers={
                     "Authorization": f"Bearer {access_token}",
                     "Prefer": 'outlook.body-content-type="text"'
-                }) as resp:
+                }, ssl=sslcontext) as resp:
             resp_json = await resp.json()
 
             return {
@@ -115,8 +115,8 @@ async def get_message(id: str, access_token: str, select: list | None) -> dict:
 
 async def read_emails_after_date(
         access_token: str, 
-        after_date: datetime | None, 
         select: list | None,
+        after_date: datetime | None = datetime.now(timezone.utc) - timedelta(days=31), 
         skip: int = 0, 
         top: int = 100) -> dict:
     """
@@ -133,11 +133,11 @@ async def read_emails_after_date(
 
     while True:
         result = await get_messages(access_token, select=select, skip=skip, top=top)
-        if(len(result["json_data"]["data"]["value"]) == 0): # no more emails to read from user
+        if(len(result["json_data"]["value"]) == 0): # no more emails to read from user
             break
         
         added_emails = 0
-        for email in result["data"]["value"]:
+        for email in result["json_data"]["value"]:
             if(datetime.fromisoformat(email["sentDateTime"]) <= after_date):
                 continue
 

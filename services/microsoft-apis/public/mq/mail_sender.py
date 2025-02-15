@@ -59,6 +59,9 @@ class MailSenderMQ:
             self.mq_channel.basic_publish(
                 exchange="",
                 routing_key=self.queue_name,
+                properties=pika.BasicProperties(
+                    delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
+                ),
                 body=json.dumps({
                     "user_id": user_id,
                     "account_type": "outlook",

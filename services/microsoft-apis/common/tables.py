@@ -1,8 +1,8 @@
 import uuid
 from zoneinfo import ZoneInfo
-from datetime import datetime
+from datetime import datetime, tzinfo
 
-from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint
+from sqlalchemy import DateTime, ForeignKey, String
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship
@@ -11,6 +11,14 @@ from typing import Optional
 
 class Base(DeclarativeBase):
     pass
+
+def tz_aware(dt: datetime) -> tzinfo | None:
+    if(dt is not None and 
+       dt.tzinfo is not None and 
+       dt.tzinfo.utcoffset(dt) is not None):
+        return dt.tzinfo
+    else:
+        return None
 
 class _TimezoneSQLType(types.TypeDecorator):
     impl = types.VARCHAR
@@ -22,6 +30,20 @@ class _TimezoneSQLType(types.TypeDecorator):
     def process_result_value(self, value: str, dialect) -> ZoneInfo:
         return ZoneInfo(value)
 
+class _UTCDateTimeSQLType(types.TypeDecorator):
+    impl = DateTime
+    cache_ok = True
+
+    def process_bind_param(self, value: datetime, dialect) -> datetime:
+        if(value is not None):
+            value = value.astimezone(ZoneInfo("UTC"))
+        return value
+    
+    def process_result_value(self, value: datetime, dialect) -> datetime:
+        if(value is not None):
+            value = value.replace(tzinfo=ZoneInfo("UTC"))
+        return value
+    
 class UserInfoTable(Base):
     __tablename__ = "user_info"
 
@@ -29,9 +51,9 @@ class UserInfoTable(Base):
     
     user_email: Mapped[str] = mapped_column(String(256))
     access_token: Mapped[str] = mapped_column(String(4096), nullable=True)
-    access_token_expires: Mapped[datetime] = mapped_column(nullable=True)
+    access_token_expires: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
     refresh_token: Mapped[str] = mapped_column(String(2048), nullable=True)
-    most_recent_fetched_email: Mapped[datetime] = mapped_column(nullable=True)
+    most_recent_fetched_email_utc: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
 
 class TimezoneTable(Base):
     __tablename__ = "timezones"

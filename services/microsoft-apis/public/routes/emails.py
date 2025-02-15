@@ -41,7 +41,8 @@ async def router_lifespan(app: FastAPI):
     mail_sender_mq.close_conn()
 
 emails_router = APIRouter(
-    prefix="/api/microsoft"
+    prefix="/api/microsoft",
+    lifespan=router_lifespan
 )
 
 @emails_router.post("/emails/fetch_new", status_code=200)
@@ -54,19 +55,20 @@ async def new_email(
 
     emails = await graph_api.read_emails_after_date(
         user_data.access_token,
-        after_date=user_data.most_recent_fetched_email,
+        after_date=user_data.most_recent_fetched_email_utc,
         select=["id"]
     )
 
     if(len(emails) != 0):
         most_recent = None
         for email in emails:
-            sent_date = datetime.fromisoformat(email)
+            sent_date = datetime.fromisoformat(email["sentDateTime"])
             if(most_recent == None or sent_date > most_recent):
                 most_recent = sent_date
 
-        user_data.most_recent_fetched_email = most_recent
+        user_data.most_recent_fetched_email_utc = most_recent
 
+    # TODO: batched requests
     full_emails = [] # emails with all fields
     for email in emails:
         response = await graph_api.get_message(
@@ -76,9 +78,10 @@ async def new_email(
         if(response["resp"].status != 200):
             raise HTTPException(status_code=500, detail=f"Failed to fetch an email with ID {email['id']}")
         
-        full_emails.append(response["resp_json"])
+        full_emails.append(response["json_data"])
 
     # TODO: maybe use aio-pika which is actually meant to be an async AMQP library
+    global mail_sender_mq
     await mail_sender_mq.send_new_emails_to_parse(
         user_data.user_id,
         user_data.user_email,
@@ -88,6 +91,7 @@ async def new_email(
 
     await db_session.commit() # TODO: check if this can still update after the first commit in update_token_db
 
-    resp = models.FetchNewEmailsGetResponse()
-    resp.count = len(emails)
+    resp = models.FetchNewEmailsGetResponse(
+        count=len(emails)
+    )
     return resp

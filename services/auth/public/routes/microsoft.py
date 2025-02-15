@@ -111,6 +111,4 @@ async def finish_login(
         auth_flow["refresh_token"]
     )
 
-    ms_app.acquire_token_by_refresh_token()
-
     return RedirectResponse("/", status_code=303)

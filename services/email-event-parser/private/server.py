@@ -45,6 +45,9 @@ class EmailQueueServer():
         self.mq_channel.basic_publish(
             exchange="",
             routing_key=server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE,
+            properties=pika.BasicProperties(
+                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
+            ),
             body=json.dumps(dataclasses.asdict(response))
         )
 
@@ -64,6 +67,7 @@ class EmailQueueServer():
         self.queue.put(request)
 
     def run(self):
+        self.mq_channel.exchange_declare("dlx", exchange_type="direct")
         self.mq_channel.queue_declare(server_config.RABBITMQ_EMAILS_QUEUE, durable=True)
         self.mq_channel.queue_declare(
             server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE, 

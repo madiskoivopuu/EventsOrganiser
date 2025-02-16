@@ -25,3 +25,9 @@
 - name: Security harden Apache with mod_security
   ansible.builtin.import_tasks:
     file: apache_mod_security.yml
+
+- name: Start apache
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true

@@ -28,6 +28,6 @@
     fqdn: "cs.ut.ee"
 
   roles:
-    - setup
-    - update_packages
+    #- setup
+    #- update_packages
     - kubernetes_centos

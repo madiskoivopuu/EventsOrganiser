@@ -15,14 +15,19 @@ async def update_token_if_needed(
         client_secret: str,
         scopes: list[str],
         tenant: str = "common",
-        if_expires_in_less_than: timedelta = timedelta(minutes=5)) -> tuple[str, datetime] | None:
+        if_expires_in_less_than: timedelta = timedelta(minutes=5)) -> tuple[str, datetime, str] | None:
     """
-    Exchanges a refresh token for a new Microsoft access token, if the current one is about to expire
+    Exchanges a refresh token for a new Microsoft access token & refresh token, if the current one is about to expire
 
     :raises TokenUpdateError: If the response does not indicate that the refresh token has expired, but the response was erroneous (status code != 200)
 
-    :return: None if the refresh token has expired and access token cannot be updated. Otherwise, a tuple of the token (old if no update was needed) and the expiration time
+    :return: None if the refresh token has expired and access token cannot be updated.
+        Otherwise a tuple of: the token, the expiration date and the refresh token
     """
+
+    if("offline_access" not in scopes):
+        scopes.append("offline_access")
+
     if(expires_at - datetime.now(timezone.utc) < if_expires_in_less_than):
         async with aiohttp.ClientSession("https://login.microsoftonline.com") as session:
             async with session.post(
@@ -41,7 +46,7 @@ async def update_token_if_needed(
 
                     if(resp.status == 200):
                         resp_data = await resp.json()
-                        return (resp_data["access_token"], datetime.now(timezone.utc) + timedelta(seconds=resp_data["expires_in"]))
+                        return (resp_data["access_token"], datetime.now(timezone.utc) + timedelta(seconds=resp_data["expires_in"]), resp_data["refresh_token"])
                     elif(resp.status == 400):
                         # check for an error that says that the refresh token has expired
                         resp_data = await resp.json()
@@ -53,7 +58,7 @@ async def update_token_if_needed(
                     else:
                         raise TokenUpdateError(f"Received status code {resp.status} trying to update the token. Response: {resp_text}")
     else:
-        return (access_token, expires_at)
+        return (access_token, expires_at, refresh_token)
 
 async def get_messages(access_token: str, select: list | None, skip: int = 0, top: int = 100) -> dict:
     """

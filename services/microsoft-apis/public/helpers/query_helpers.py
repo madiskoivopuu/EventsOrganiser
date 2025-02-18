@@ -25,7 +25,10 @@ async def get_settings(db_session: AsyncSession, user_id: str) -> tables.Setting
     """
     Fetches settings for a user
 
-    :raises:
+    :param db_session: An existing database session
+    :param user_id: User id (oid) of the account
+
+    :raises: An exception if the row does not exist
 
     :return: Table row with user settings
     """
@@ -37,21 +40,41 @@ async def get_settings(db_session: AsyncSession, user_id: str) -> tables.Setting
 
     return (await db_session.execute(q)).scalar_one()
 
-async def update_token_db(user: auth.UserData, db_session: AsyncSession) -> tables.UserInfoTable:
+async def get_email_notification_subscription(db_session: AsyncSession, user_id: str) -> tables.EmailSubscriptionsTable | None:
+    """
+    Fetches the email subscription row for a user
+
+    :param db_session: An existing database session
+    :param user_id: User id (oid) of the account
+
+    :return: The email subscription row if it exists, otherwise None
+    """
+
+    q = select(tables.EmailSubscriptionsTable) \
+        .where(
+            tables.EmailSubscriptionsTable.user_id == user_id
+        )
+    
+    return (await db_session.execute(q)).scalar_one_or_none()
+
+async def update_token_db(db_session: AsyncSession, user_id: str) -> tables.UserInfoTable:
     """
     Updates user data row in MySQL with a new access token, if needed. 
     Stores the new access token in DB, or if refresh token has expired, clears refresh token & access token from db.
+
+    :param db_session: An existing database session
+    :param user_id: User id (oid) of the account
 
     :return: Updated user info row
     """
 
     q = select(tables.UserInfoTable) \
-        .where(tables.UserInfoTable.user_id == user.account_id) \
+        .where(tables.UserInfoTable.user_id == user_id) \
         .with_for_update()
     
     user_info = (await db_session.execute(q)).scalar_one()
 
-    new_token, new_exp = await graph_api.update_token_if_needed(
+    new_token, new_exp, new_refresh_token = await graph_api.update_token_if_needed(
         access_token=user_info.access_token,
         expires_at=user_info.access_token_expires.replace(tzinfo=ZoneInfo("UTC")),
         refresh_token=user_info.refresh_token,
@@ -66,6 +89,7 @@ async def update_token_db(user: auth.UserData, db_session: AsyncSession) -> tabl
     elif(new_token != user_info.access_token):
         user_info.access_token = new_token
         user_info.access_token_expires = new_exp
+        user_info.refresh_token = new_refresh_token
 
     await db_session.commit()
 

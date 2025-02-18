@@ -1,4 +1,4 @@
-from fastapi import APIRouter, FastAPI, Response, HTTPException, Depends
+from fastapi import APIRouter, FastAPI, Request, HTTPException, Depends
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
@@ -6,7 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from sqlalchemy.orm import selectinload
 
-import asyncio
+from typing import cast
+
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -19,11 +20,9 @@ from mq.mail_sender import MailSenderMQ
 from helpers import query_helpers, graph_api
 
 __logger = logging.getLogger(__name__)
-mail_sender_mq = None
 
 @asynccontextmanager
 async def router_lifespan(app: FastAPI):
-    global mail_sender_mq
     mail_sender_mq = MailSenderMQ(
         host=server_config.RABBITMQ_HOST,
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
@@ -31,10 +30,11 @@ async def router_lifespan(app: FastAPI):
         password=server_config.RABBITMQ_PASSWORD,
         queue_name=server_config.RABBITMQ_EMAILS_QUEUE
     )
+    await mail_sender_mq.open_conn()
 
-    yield
+    yield {"mail_sender_mq": mail_sender_mq}
 
-    mail_sender_mq.close_conn()
+    await mail_sender_mq.close_conn()
 
 emails_router = APIRouter(
     prefix="/api/microsoft",
@@ -43,10 +43,11 @@ emails_router = APIRouter(
 
 @emails_router.post("/emails/fetch_new", status_code=200)
 async def new_email(
+    request: Request,
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ) -> models.FetchNewEmailsGetResponse:
-    user_data = await query_helpers.update_token_db(user, db_session)
+    user_data = await query_helpers.update_token_db(db_session, user.account_id)
     user_settings = await query_helpers.get_settings(db_session, user.account_id)
 
     emails = await graph_api.read_emails_after_date(
@@ -77,8 +78,7 @@ async def new_email(
         full_emails.append(response["json_data"])
 
     # TODO: maybe use aio-pika which is actually meant to be an async AMQP library
-    global mail_sender_mq
-    await mail_sender_mq.send_new_emails_to_parse(
+    await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(
         user_data.user_id,
         user_data.user_email,
         user_settings.timezone.timezone,

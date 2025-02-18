@@ -54,17 +54,7 @@ class MailSenderMQ:
                             "user_timezone": str(user_timezone),
                             "email_data": email,
                             "reader_email": user_email
-                        }).encode()
+                        }).encode(),
+                        delivery_mode=aio_pika.DeliveryMode.PERSISTENT
                     )
-                    routing_key=self.queue_name,
-                    properties=pika.BasicProperties(
-                        delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
-                    ),
-                    body=json.dumps({
-                        "user_id": user_id,
-                        "account_type": "outlook",
-                        "user_timezone": str(user_timezone),
-                        "email_data": email,
-                        "reader_email": user_email
-                    })
                 )

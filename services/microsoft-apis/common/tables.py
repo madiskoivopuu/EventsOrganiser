@@ -5,8 +5,9 @@ from datetime import datetime, tzinfo
 from sqlalchemy import DateTime, ForeignKey, String
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship, MappedAsDataclass
 from sqlalchemy_utils import StringEncryptedType
+from dataclasses import dataclass
 
 class Base(DeclarativeBase):
     pass
@@ -73,7 +74,8 @@ class EmailSubscriptionsTable(Base):
     encryption_cert: Mapped[str] = mapped_column(String(4096))
     encryption_key: Mapped[str] = mapped_column(String(4096)) # TODO: encrypted type
 
-class SettingsTable(Base):
+@dataclass
+class SettingsTable(MappedAsDataclass, Base):
     __tablename__ = "settings"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)

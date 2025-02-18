@@ -4,14 +4,14 @@
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from mq.user_login_listener import LoginListenerMQ
+from mq.notifications import NotifiactionMQ
 
 import os, server_config
 from routes import settings_router, emails_router
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
-    user_listener = LoginListenerMQ(
+    user_listener = NotifiactionMQ(
         host=server_config.RABBITMQ_HOST,
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
         username=server_config.RABBITMQ_USERNAME,

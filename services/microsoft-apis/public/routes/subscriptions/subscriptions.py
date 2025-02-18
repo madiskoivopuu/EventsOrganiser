@@ -26,13 +26,12 @@ subscriptions_router = APIRouter(
 @subscriptions_router.post("/subscriptions/new_email", status_code=200)
 async def new_email(
     request: Request,
-    user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ) -> models.SettingsGetResponse:
     # new subscription validation
-    if("validationToken" in request.path_params):
+    if("validationToken" in request.query_params):
         return PlainTextResponse(
-            content=request.path_params.get("validationToken")
+            content=request.query_params.get("validationToken")
         )
     pass
 

@@ -1,22 +1,39 @@
+import aiohttp
 import jwt, jwt.exceptions
 from fastapi import Response
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from enum import Enum
+from asyncache import cached
+from cachetools import TTLCache
 
-def decode_jwt_token(id_token: str, keys: dict, audience: str) -> tuple[dict | None, str]:
-    """Verifies that a JWT is signed by a valid (trusted) public key. Decodes the token
+@cached(TTLCache(2, 600))
+async def get_ms_signing_keys() -> dict:
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://login.microsoftonline.com/common/discovery/v2.0/keys') as response:
+            resp_json = await response.json()
+            return resp_json
 
-       Returns the decoded token if it is valid, otherwise None and an error message
-    """
-    header = jwt.get_unverified_header(id_token)
+def find_key(token: str, keys: list[dict]) -> str | None:
+    header = jwt.get_unverified_header(token)
     decrypt_key = None
     for key in keys["keys"]:
         if(key["kid"] == header["kid"]):
             decrypt_key = key
             break
+
+    return decrypt_key
+
+async def decode_jwt_token(id_token: str, audience: str) -> tuple[dict | None, str]:
+    """Verifies that a JWT is signed by a valid (trusted) public key. Decodes the token
+
+       Returns the decoded token if it is valid, otherwise None and an error message
+    """
+    keys = await get_ms_signing_keys()
+    decrypt_key = find_key(id_token, keys)
+
     if(decrypt_key == None):
-        return None, f"Key {header['kid']} not found in Microsoft Entra tenant-independent key endpoint"
+        return None, f"Key not found in Microsoft Entra tenant-independent key endpoint"
     
     try:
         decoded = jwt.decode(

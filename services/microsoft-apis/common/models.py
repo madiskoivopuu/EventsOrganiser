@@ -17,5 +17,17 @@ class SettingsGetResponse(SettingsPostRequest):
 
     pass
 
+class _ResourceData(BaseModel):
+    id: str
+
+class _NotificationData(BaseModel):
+    change_type: str = Field(alias="changeType")
+    client_state: str = Field(alias="clientState")
+    subscription_id: str = Field(alias="subscriptionId")
+    resource_data: _ResourceData = Field(alias="resourceData")
+
+class NewEmailPostRequest(BaseModel):
+    value: list[_NotificationData]
+
 class FetchNewEmailsGetResponse(BaseModel):
     count: int

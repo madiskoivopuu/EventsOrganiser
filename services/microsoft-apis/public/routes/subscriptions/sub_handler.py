@@ -9,6 +9,10 @@ from mq.notifications import NotifiactionMQ
 from helpers import query_helpers, certs
 
 class SubscriptionHandler:
+    __SELECTABLE_GRAPH_EMAIL_PROPERTIES = ["id", "subject", "sentDateTime", "receivedDateTime", "body", "conversationId", "conversationIndex", 
+                                           "parentFolderId", "importance", "isRead", "isDraft", "hasAttachments", "webLink", "sender", "from", 
+                                           "toRecipients", "categories"]
+
     def __init__(self, host: str, virtual_host: str, username: str, password: str, 
                  domain_url: str, notification_path: str, notification_lifecycle_path: str, secret: str):
         """
@@ -93,10 +97,8 @@ class SubscriptionHandler:
                     "changeType": "created",
                     "notificationUrl": f"{self.domain_url}/{self.notification_path}",
                     "lifecycleNotificationUrl": f"{self.domain_url}/{self.notification_lifecycle_path}",
-                    "resource": "me/messages",
+                    "resource": f"me/messages?$select=id",
                     "includeResourceData": True,
-                    "encryptionCertificate": base64.b64encode(encryption_cert.decode()).decode(),
-                    "encryptionCertificateId": cert_id,
                     "expirationDateTime": expiration_date.isoformat(),
                     "clientState": self.secret
                 }
@@ -105,7 +107,9 @@ class SubscriptionHandler:
                     json_data = resp.json()
                     return (json_data["id"], datetime.fromisoformat(json_data["expirationDateTime"]))
                 elif(resp.status == 409): # sub already exists
-
+                    # cant even test it because microsoft docs say one thing (dupe sub not allowed)
+                    # but in reality they actually do allow this
+                    raise NotImplementedError("This condition was never met during development")
                 else:
                     return None
 
@@ -131,5 +135,12 @@ class SubscriptionHandler:
                 subscription_row.encryption_cert_id = serial_nr
                 subscription_row.encryption_cert = cert.decode()
                 subscription_row.encryption_key = key.decode()
+
+                subscription_id, expiration_date = await self.create_subscription(user_info.access_token, cert, serial_nr)
+                subscription_row.subscription_id = subscription_id
+                subscription_row.expires_at = expiration_date
+
+                db_session.merge(subscription_row)
+                await db_session.commit()
 
         return True

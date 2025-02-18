@@ -14,7 +14,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import server_config
-from helpers import auth
+from helpers import auth, security
 from mq.notification_sender import NotificationSenderMQ
 
 __logger = logging.getLogger(__name__)
@@ -93,8 +93,7 @@ async def finish_login(
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
         raise HTTPException(status_code=400, detail=f"Problem authenticating with Microsoft account: {error_str}")
 
-    signing_keys = await get_ms_signing_keys()
-    decoded_token, err_msg = auth.decode_jwt_token(auth_flow["id_token"], signing_keys, server_config.MICROSOFT_APP_CLIENT_ID)
+    decoded_token, err_msg = auth.decode_jwt_token(auth_flow["id_token"], server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
         __logger.warning(f"Problem decoding JWT token after Microsoft login callback: {err_msg}")
         raise HTTPException(status_code=400, detail=f"Unable to verify that the response token is issued by Microsoft")

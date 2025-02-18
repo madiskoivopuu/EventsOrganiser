@@ -80,8 +80,8 @@ async def update_settings(
     await db_session.commit()
 
     cast(NotifiactionMQ, request.state.settings_notification_mq).send_notification(
-        dataclasses.asdict(settings_row)
-        routing_key="notification.outlook.settings_updated"
+        dataclasses.asdict(settings_row),
+        routing_key="notification.outlook.settings_changed"
     )
 
     return

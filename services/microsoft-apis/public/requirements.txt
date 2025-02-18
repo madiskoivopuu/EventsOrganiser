@@ -8,3 +8,4 @@ SQLAlchemy-Utils
 PyOpenSSL
 pyjwt
 aio-pika
+asyncached

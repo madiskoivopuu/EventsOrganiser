@@ -1,11 +1,14 @@
+import aiohttp
 import random
+import jwt
 from OpenSSL import crypto
 from datetime import timedelta
 
 def generate_selfsigned_cert(expires_in: timedelta = timedelta(days=8)) -> tuple[int, bytes, bytes]:
-    """Generate a self signed certificate to be used for Microsoft Graph rich notifications
+    """
+    Generate a self signed certificate to be used for Microsoft Graph rich notifications
     
-    :returns: A tuple of serial number, certificate and key
+    :return: A tuple of serial number, certificate and key
     """
     pkey = crypto.PKey()
     pkey.generate_key(crypto.TYPE_RSA, 2048)

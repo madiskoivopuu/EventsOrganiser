@@ -6,6 +6,7 @@ import aio_pika
 
 import logging
 
+
 class NotifiactionMQ:
     def __init__(self, host: str, virtual_host: str, username: str, password: str, 
                  queue_name: str, routing_key: str, notification_callback: Callable[[dict], Awaitable[bool]]):

@@ -14,9 +14,9 @@
     #- update_packages
     #- apache
     #- kubernetes_centos
-    #- mysql
+    - mysql
     #- rabbitmq_centos
-    - redis_centos
+    #- redis_centos
 
 - hosts: workers
   user: centos
@@ -30,4 +30,4 @@
   roles:
     #- setup
     #- update_packages
-    - kubernetes_centos
+    #- kubernetes_centos

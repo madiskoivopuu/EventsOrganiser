@@ -6,8 +6,7 @@ from sqlalchemy import DateTime, ForeignKey, String
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship
-
-from typing import Optional
+from sqlalchemy_utils import StringEncryptedType
 
 class Base(DeclarativeBase):
     pass
@@ -63,11 +62,16 @@ class TimezoneTable(Base):
 
     _related_settings: Mapped["SettingsTable"] = relationship(back_populates="timezone", lazy="joined")
 
-class UserEmailSubscriptionTable(Base):
+class EmailSubscriptionsTable(Base):
     __tablename__ = "email_subscriptions"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
     subscription_id: Mapped[str] = mapped_column(String(256))
+
+    expires_at: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType())
+    encryption_cert_id: Mapped[int] = mapped_column(unique=True)
+    encryption_cert: Mapped[str] = mapped_column(String(4096))
+    encryption_key: Mapped[str] = mapped_column(String(4096)) # TODO: encrypted type
 
 class SettingsTable(Base):
     __tablename__ = "settings"

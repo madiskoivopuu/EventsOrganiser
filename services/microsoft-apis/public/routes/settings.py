@@ -1,6 +1,4 @@
 from fastapi import APIRouter, Request, Response, HTTPException, Depends
-from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
-from redis import asyncio as aioredis
 from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +8,6 @@ from sqlalchemy.orm import selectinload
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import sys
-sys.path.append('..')
 from common import models, tables
 
 import server_config
@@ -32,12 +28,7 @@ async def get_settings(
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ) -> models.SettingsGetResponse:
-    query = select(tables.SettingsTable) \
-            .where(
-                tables.SettingsTable.user_id == user.account_id,
-            )
-    
-    settings_row = (await db_session.execute(query)).scalar_one()
+    settings_row = await query_helpers.get_settings(db_session, user.account_id)
 
     return models.SettingsGetResponse(
         auto_fetch_emails=settings_row.auto_fetch_emails,
@@ -50,13 +41,12 @@ async def update_settings(
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ):
-    settings_row = tables.SettingsTable()
-    settings_row.user_id = user.account_id
+    prev_settings = await query_helpers.get_settings(db_session, user.account_id)
 
-    settings_row.auto_fetch_emails = new_settings.auto_fetch_emails
-    settings_row.timezone = await query_helpers.get_or_create_timezone(db_session, new_settings.timezone)
+    prev_settings.auto_fetch_emails = new_settings.auto_fetch_emails
+    prev_settings.timezone = await query_helpers.get_or_create_timezone(db_session, new_settings.timezone)
 
-    await db_session.merge(settings_row)
+    await db_session.merge(prev_settings)
     await db_session.commit()
 
     return

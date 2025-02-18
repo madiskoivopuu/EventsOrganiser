@@ -1,6 +1,4 @@
 from fastapi import APIRouter, FastAPI, Response, HTTPException, Depends
-from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
-from redis import asyncio as aioredis
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 
@@ -12,8 +10,6 @@ import asyncio
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import sys
-sys.path.append('..')
 from common import models, tables
 
 import server_config, db

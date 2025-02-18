@@ -8,8 +8,6 @@ import os
 
 import server_config
 
-import sys
-sys.path.append('..')
 from common.tables import Base
 
 url = URL.create(

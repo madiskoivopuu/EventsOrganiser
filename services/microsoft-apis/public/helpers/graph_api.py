@@ -1,5 +1,4 @@
 import aiohttp
-import jwt
 from datetime import datetime, timezone, timedelta
 
 class TokenUpdateError(Exception):
@@ -22,7 +21,7 @@ async def update_token_if_needed(
 
     :raises TokenUpdateError: If the response does not indicate that the refresh token has expired, but the response was erroneous (status code != 200)
 
-    :return: None if the token has expired and it cannot be updated. Otherwise, a tuple of the token (old if no update was needed) and the expiration time
+    :return: None if the refresh token has expired and access token cannot be updated. Otherwise, a tuple of the token (old if no update was needed) and the expiration time
     """
     if(expires_at - datetime.now(timezone.utc) < if_expires_in_less_than):
         async with aiohttp.ClientSession("https://login.microsoftonline.com") as session:

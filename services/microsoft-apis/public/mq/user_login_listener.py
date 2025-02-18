@@ -7,8 +7,6 @@ from datetime import datetime
 import pika, pika.channel, pika.spec
 from pika.adapters.asyncio_connection import AsyncioConnection
 
-import sys
-sys.path.append('..')
 from common import tables
 
 from helpers import query_helpers
@@ -18,6 +16,7 @@ import logging
 class LoginListenerMQ:
     def __init__(self, host: str, virtual_host: str, username: str, password: str):
         self._ioloop = asyncio.get_running_loop()
+        self._tasks = set() # keeps "process_login" async tasks
         self.mq_connection = AsyncioConnection(
             parameters=pika.ConnectionParameters(
                 host=host, 
@@ -57,7 +56,10 @@ class LoginListenerMQ:
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
-        self._ioloop.create_task(self.process_login(channel, method, properties, body))
+        # heisenbug fix: https://textual.textualize.io/blog/2023/02/11/the-heisenbug-lurking-in-your-async-code/
+        task = self._ioloop.create_task(self.process_login(channel, method, properties, body))
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
 
     async def process_login(self, channel: pika.channel.Channel, 
                     method: pika.spec.Basic.Deliver, 

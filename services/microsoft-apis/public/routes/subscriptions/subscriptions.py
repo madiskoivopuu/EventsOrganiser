@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Request, Response, HTTPException, Depends
-from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
-from redis import asyncio as aioredis
+from fastapi import APIRouter, Request, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 from datetime import timedelta
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,8 +9,6 @@ from sqlalchemy.orm import selectinload
 import logging
 logging.basicConfig(level=logging.INFO)
 
-import sys
-sys.path.append('..')
 from common import models, tables
 
 import server_config
@@ -26,9 +23,19 @@ subscriptions_router = APIRouter(
     prefix="/api/microsoft"
 )
 
-@subscriptions_router.post("/subscriptions/new_email")
+@subscriptions_router.post("/subscriptions/new_email", status_code=200)
 async def new_email(
+    request: Request,
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
 ) -> models.SettingsGetResponse:
+    # new subscription validation
+    if("validationToken" in request.path_params):
+        return PlainTextResponse(
+            content=request.path_params.get("validationToken")
+        )
+    pass
+
+@subscriptions_router.post("/subscriptions/email_sub_lifecycle")
+async def subscription_lifecycle():
     pass

@@ -2,13 +2,14 @@ import asyncio
 
 from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
-from datetime import timedelta
+from datetime import datetime
 import itertools
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from sqlalchemy.orm import selectinload
 from contextlib import asynccontextmanager
+from collections import defaultdict
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -27,10 +28,6 @@ __logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def app_lifecycle(api: FastAPI):
     subscription_handler = SubscriptionHandler(
-        host=server_config.RABBITMQ_HOST,
-        virtual_host=server_config.RABBITMQ_VIRTUALHOST,
-        username=server_config.RABBITMQ_USERNAME,
-        password=server_config.RABBITMQ_PASSWORD,
         domain_url=server_config.DOMAIN_URL,
         notification_path="/subscriptions/new_email",
         notification_lifecycle_path="/subscriptions/email_sub_lifecycle",
@@ -44,7 +41,6 @@ async def app_lifecycle(api: FastAPI):
         queue_name=server_config.RABBITMQ_EMAILS_QUEUE
     )
 
-    await subscription_handler.start()
     await mail_sender_mq.open_conn()
 
     yield {
@@ -52,7 +48,6 @@ async def app_lifecycle(api: FastAPI):
         "mail_sender_mq": mail_sender_mq
     }
 
-    await subscription_handler.stop()
     await mail_sender_mq.close_conn()
 
 subscriptions_router = APIRouter(
@@ -71,7 +66,7 @@ async def fetch_emails_batched(
 
     :raises HTTPException: if any request in the batch fails
 
-    :return: A list of parse request objects
+    :return: A list of emails that should be parsed for events. If an email has already been parsed, it will not be included in the parse request
     """
     results = []
     for batch in itertools.batched(fetch_data, batch_size):
@@ -86,6 +81,10 @@ async def fetch_emails_batched(
             data = task.result()
             if(data["resp"].status != 200):
                 raise HTTPException(status_code=500, detail="Failed to fetch one email")
+
+            if(user_info.most_recent_fetched_email_utc != None and 
+               user_info.most_recent_fetched_email_utc > datetime.fromisoformat(data["json_data"]["sentDateTime"])):
+                continue
 
             results.append(
                 ParseMailsRequest(
@@ -103,7 +102,7 @@ async def new_email(
     new_emails: models.NewEmailPostRequest | None,
     request: Request,
     db_session: AsyncSession = Depends(db.start_session)
-) -> models.SettingsGetResponse:
+) -> str | None:
     # new subscription validation
     if("validationToken" in request.query_params):
         return PlainTextResponse(
@@ -113,6 +112,7 @@ async def new_email(
     if(new_emails == None):
         raise HTTPException(status_code=400)
 
+    # check if each email in notification is supposed to be parsed (or can be)
     ids_and_users: list[tuple[str, str]] = []
     for data in new_emails.value:
         if(data.client_state != server_config.MICROSOFT_CALLBACK_SECRET):
@@ -130,17 +130,35 @@ async def new_email(
         user_settings = await query_helpers.get_settings(db_session, subscription_row.user_id)
         user_info = await query_helpers.update_token_db(db_session, subscription_row.user_id)
         if(user_info.access_token == None):
+            __logger.warning(f"User {user_info.user_id} does not have a valid access token")
             continue
         if(user_settings.auto_fetch_emails == False):
+            __logger.warning(f"User {user_info.user_id} has disabled automatic email fetching, but a notification was still sent by the Graph API")
             continue
 
         ids_and_users.append((data.resource_data.id, user_info, user_settings))
 
     email_parse_requests = await fetch_emails_batched(ids_and_users)
 
+    # get the latest sent email for a user
+    # so that we can update the database with these
+    latest_emails: defaultdict[str, datetime] = defaultdict(lambda: datetime(1, 1, 1))
+    for parse_request in email_parse_requests:
+        email_sent_date = datetime.fromisoformat(parse_request.email["sentDateTime"])
+        if(email_sent_date > latest_emails[parse_request.user_id]):
+            latest_emails[parse_request.user_id] = email_sent_date
+
+    for user_id, newest_email_date in latest_emails.values():
+        user_info = tables.UserInfoTable()
+        user_info.user_id = user_id
+        user_info.most_recent_fetched_email_utc = newest_email_date
+
+        await db_session.merge(user_info)
+
     await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(
         email_parse_requests
     )
+    await db_session.commit()
 
     return
 

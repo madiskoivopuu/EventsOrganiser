@@ -32,14 +32,14 @@ class MailSenderMQ:
 
         self.mq_connection = None
         self.mq_channel = None
-        self.queue_name = queue_name
+        self.email_parsing_queue = queue_name
 
     async def open_conn(self) -> bool:
         self.mq_connection = await self._mq_conn_coroutine
         self.mq_channel = await self.mq_connection.channel(publisher_confirms=False)
 
         await self.mq_channel.declare_queue(
-            name=self.queue_name,
+            name=self.email_parsing_queue,
             durable=True
         )
 
@@ -55,7 +55,7 @@ class MailSenderMQ:
     ):
         async with self.mq_channel.transaction():
             for data in requests:
-                self.mq_channel.default_exchange.publish(
+                await self.mq_channel.default_exchange.publish(
                     message=aio_pika.Message(
                         body=json.dumps({
                             "user_id": data.user_id,
@@ -65,5 +65,6 @@ class MailSenderMQ:
                             "reader_email": data.user_email
                         }).encode(),
                         delivery_mode=aio_pika.DeliveryMode.PERSISTENT
-                    )
+                    ),
+                    routing_key=self.email_parsing_queue
                 )

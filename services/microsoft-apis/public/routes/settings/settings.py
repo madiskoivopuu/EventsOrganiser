@@ -31,6 +31,7 @@ from helpers import auth
 from helpers import query_helpers
 from helpers.auth import UserData
 from mq.notifications import NotifiactionMQ
+from routes.subscriptions.sub_handler import SubscriptionHandler
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
@@ -81,13 +82,10 @@ async def update_settings(
     settings_row.auto_fetch_emails = new_settings.auto_fetch_emails
     settings_row.timezone = await query_helpers.get_or_create_timezone(db_session, new_settings.timezone)
 
+    await cast(SubscriptionHandler, request.state.subscription_handler).settings_changed_notification(settings_row)
+
     await db_session.merge(settings_row)
     await db_session.commit()
-
-    cast(NotifiactionMQ, request.state.settings_notification_mq).send_notification(
-        dataclasses.asdict(settings_row),
-        routing_key="notification.outlook.settings_changed"
-    )
 
     return
 

@@ -53,7 +53,7 @@ class UserInfoTable(Base):
     access_token: Mapped[str] = mapped_column(String(4096), nullable=True)
     access_token_expires: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
     refresh_token: Mapped[str] = mapped_column(String(2048), nullable=True)
-    most_recent_fetched_email_utc: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
+    most_recent_fetched_email_utc: Mapped[datetime | None] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
 
 class TimezoneTable(Base):
     __tablename__ = "timezones"

@@ -16,7 +16,7 @@ from common import models, tables
 import server_config, db
 from helpers import auth
 from helpers.auth import UserData
-from mq.mail_sender import MailSenderMQ
+from mq.mail_sender import MailSenderMQ, ParseMailsRequest
 from helpers import query_helpers, graph_api
 
 __logger = logging.getLogger(__name__)
@@ -75,15 +75,17 @@ async def new_email(
         if(response["resp"].status != 200):
             raise HTTPException(status_code=500, detail=f"Failed to fetch an email with ID {email['id']}")
         
-        full_emails.append(response["json_data"])
+        full_emails.append(                
+            ParseMailsRequest(
+                user_id=user.account_id,
+                user_email=user_data.user_email,
+                user_timezone=user_settings.timezone.timezone,
+                email=response["json_data"]
+            )
+        )
 
     # TODO: maybe use aio-pika which is actually meant to be an async AMQP library
-    await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(
-        user_data.user_id,
-        user_data.user_email,
-        user_settings.timezone.timezone,
-        full_emails
-    )
+    await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(full_emails)
 
     await db_session.commit() # TODO: check if this can still update after the first commit in update_token_db
 

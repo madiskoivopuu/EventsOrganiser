@@ -2,7 +2,7 @@ import asyncio
 
 from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
-from datetime import datetime
+from datetime import datetime, timezone
 import itertools
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -83,7 +83,10 @@ async def fetch_emails_batched(
                 raise HTTPException(status_code=500, detail="Failed to fetch one email")
 
             if(user_info.most_recent_fetched_email_utc != None and 
-               user_info.most_recent_fetched_email_utc > datetime.fromisoformat(data["json_data"]["sentDateTime"])):
+               user_info.most_recent_fetched_email_utc >= datetime.fromisoformat(data["json_data"]["sentDateTime"])):
+                continue
+
+            if(data["json_data"]["isDraft"] == True):
                 continue
 
             results.append(
@@ -142,13 +145,13 @@ async def new_email(
 
     # get the latest sent email for a user
     # so that we can update the database with these
-    latest_emails: defaultdict[str, datetime] = defaultdict(lambda: datetime(1, 1, 1))
+    latest_emails: defaultdict[str, datetime] = defaultdict(lambda: datetime(1, 1, 1, tzinfo=timezone.utc))
     for parse_request in email_parse_requests:
         email_sent_date = datetime.fromisoformat(parse_request.email["sentDateTime"])
         if(email_sent_date > latest_emails[parse_request.user_id]):
             latest_emails[parse_request.user_id] = email_sent_date
 
-    for user_id, newest_email_date in latest_emails.values():
+    for user_id, newest_email_date in latest_emails.items():
         user_info = tables.UserInfoTable()
         user_info.user_id = user_id
         user_info.most_recent_fetched_email_utc = newest_email_date

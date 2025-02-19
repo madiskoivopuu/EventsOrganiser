@@ -84,7 +84,7 @@ async def update_settings(
 
     res = await cast(SubscriptionHandler, request.state.subscription_handler).settings_changed_notification(settings_row)
     if(res == False):
-        raise HTTPException(status_code=500, detail="Failed to disable automatic email parsing on Microsoft's side")
+        raise HTTPException(status_code=500, detail=f"Failed to {"disable" if settings_row.auto_fetch_emails == False else "enable"} automatic email parsing on Microsoft's side")
 
     await db_session.merge(settings_row)
     await db_session.commit()

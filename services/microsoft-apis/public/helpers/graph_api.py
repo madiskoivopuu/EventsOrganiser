@@ -145,13 +145,12 @@ async def create_subscription(access_token: str, notification_url: str, lifecycl
                 "notificationUrl": notification_url,
                 "lifecycleNotificationUrl": lifecycle_url,
                 "resource": resource,
-                "includeResourceData": True,
                 "expirationDateTime": expiration_date.isoformat(),
                 "clientState": secret
             }, ssl=sslcontext
         ) as resp:
             if(resp.status == 201):
-                json_data = resp.json()
+                json_data = await resp.json()
                 return (json_data["id"], datetime.fromisoformat(json_data["expirationDateTime"]))
             elif(resp.status == 409): # sub already exists
                 # cant even test it because microsoft docs say one thing (dupe sub not allowed)
@@ -173,9 +172,10 @@ async def delete_subscription(subscription_id: str, access_token: str) -> bool:
     async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
         async with session.delete(
             f"/v1.0/subscriptions/{subscription_id}",
-            headers={"Authorization": f"Bearer {access_token}"}
+            headers={"Authorization": f"Bearer {access_token}"},
+            ssl=sslcontext
         ) as resp:
-            if(resp.status == 404 or resp.status == 204):
+            if(resp.status == 404 or 200 <= resp.status <= 299):
                 return True
             
     return False

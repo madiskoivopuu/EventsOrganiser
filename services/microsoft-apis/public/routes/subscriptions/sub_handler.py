@@ -38,23 +38,31 @@ class SubscriptionHandler:
                 if(not result):
                     return False
                 
-                db_session.delete(subscription_row)
+                await db_session.delete(subscription_row)
                 await db_session.commit()
 
             elif(settings_row.auto_fetch_emails == True and subscription_row == None):
                 subscription_row = tables.EmailSubscriptionsTable()
                 subscription_row.user_id = user_info.user_id
-                subscription_id, expiration_date = await graph_api.create_subscription(
+                subscription_result = await graph_api.create_subscription(
                     user_info.access_token,
                     f"{self.domain_url}/{self.notification_path}",
                     f"{self.domain_url}/{self.notification_lifecycle_path}",
                     self.secret,
-                    "me/messages?$select=id"
+                    "me/messages"
                 )
+                if(subscription_result == None):
+                    return False
+
+                subscription_id, expiration_date = subscription_result
                 subscription_row.subscription_id = subscription_id
                 subscription_row.expires_at = expiration_date
 
-                db_session.merge(subscription_row)
-                await db_session.commit()
+                try:
+                    await db_session.merge(subscription_row)
+                    await db_session.commit()
+                except:
+                    # try to clean up the subscription somehow
+                    await graph_api.delete_subscription(subscription_id, user_info.access_token)
 
         return True

@@ -6,8 +6,8 @@ from sqlalchemy import DateTime, ForeignKey, String
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship, MappedAsDataclass
-from sqlalchemy_utils import StringEncryptedType
-from dataclasses import dataclass
+
+from typing import Optional
 
 class Base(DeclarativeBase):
     pass
@@ -61,25 +61,20 @@ class TimezoneTable(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     timezone: Mapped[ZoneInfo] = mapped_column(_TimezoneSQLType(64), nullable=False, unique=True)
 
-    _related_settings: Mapped["SettingsTable"] = relationship(back_populates="timezone", lazy="joined")
+    _related_settings: Mapped[list["SettingsTable"]] = relationship(back_populates="timezone", lazy="joined")
 
 class EmailSubscriptionsTable(Base):
     __tablename__ = "email_subscriptions"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
     subscription_id: Mapped[str] = mapped_column(String(256))
-
     expires_at: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType())
-    encryption_cert_id: Mapped[int] = mapped_column(unique=True)
-    encryption_cert: Mapped[str] = mapped_column(String(4096))
-    encryption_key: Mapped[str] = mapped_column(String(4096)) # TODO: encrypted type
 
-@dataclass
 class SettingsTable(MappedAsDataclass, Base):
     __tablename__ = "settings"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
 
-    auto_fetch_emails: Mapped[bool] = mapped_column(default=False)
     timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
     timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings", lazy="joined")
+    auto_fetch_emails: Mapped[bool] = mapped_column(default=False)

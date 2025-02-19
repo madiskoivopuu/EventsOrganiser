@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from contextlib import asynccontextmanager
+from typing import cast
 import msal
 import aiohttp
 import certifi, ssl
@@ -14,7 +15,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 import server_config
-from helpers import auth, security
+from helpers import auth
 from mq.notification_sender import NotificationSenderMQ
 
 __logger = logging.getLogger(__name__)
@@ -29,11 +30,9 @@ ms_app = msal.ConfidentialClientApplication(
     client_id=server_config.MICROSOFT_APP_CLIENT_ID,
     client_credential=server_config.MICROSOFT_APP_SECRET
 )
-notifications_mq = None
 
 @asynccontextmanager
 async def router_lifespan(app: FastAPI):
-    global notifications_mq
     notifications_mq = NotificationSenderMQ(
         host=server_config.RABBITMQ_HOST,
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
@@ -41,7 +40,9 @@ async def router_lifespan(app: FastAPI):
         password=server_config.RABBITMQ_PASSWORD
     )
 
-    yield
+    yield {
+        "notifications_mq": notifications_mq
+    }
 
     notifications_mq.close_conn()
 
@@ -93,7 +94,7 @@ async def finish_login(
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
         raise HTTPException(status_code=400, detail=f"Problem authenticating with Microsoft account: {error_str}")
 
-    decoded_token, err_msg = auth.decode_jwt_token(auth_flow["id_token"], server_config.MICROSOFT_APP_CLIENT_ID)
+    decoded_token, err_msg = await auth.decode_jwt_token(auth_flow["id_token"], server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
         __logger.warning(f"Problem decoding JWT token after Microsoft login callback: {err_msg}")
         raise HTTPException(status_code=400, detail=f"Unable to verify that the response token is issued by Microsoft")
@@ -101,7 +102,7 @@ async def finish_login(
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)
     auth.set_jwt_cookie(server_config.JWT_SESSION_COOKIE_NAME, token_data, response)
 
-    await notifications_mq.notify_of_ms_login(
+    await cast(NotificationSenderMQ, request.state.notifications_mq).notify_of_ms_login(
         decoded_token["oid"],
         datetime.now(timezone.utc) + timedelta(seconds=auth_flow["expires_in"]),
         decoded_token["email"],

@@ -128,15 +128,9 @@ class SubscriptionHandler:
                 await db_session.commit()
 
             elif(settings_row.auto_fetch_emails == True and subscription == None):
-                serial_nr, cert, key = certs.generate_selfsigned_cert()
-
                 subscription_row = tables.EmailSubscriptionsTable()
                 subscription_row.user_id = user_info.user_id
-                subscription_row.encryption_cert_id = serial_nr
-                subscription_row.encryption_cert = cert.decode()
-                subscription_row.encryption_key = key.decode()
-
-                subscription_id, expiration_date = await self.create_subscription(user_info.access_token, cert, serial_nr)
+                subscription_id, expiration_date = await self.create_subscription(user_info.access_token)
                 subscription_row.subscription_id = subscription_id
                 subscription_row.expires_at = expiration_date
 

@@ -28,7 +28,7 @@ class NotifiactionMQ:
         self._mq_conn_coroutine = aio_pika.connect_robust(
             host=host,
             virtualhost=virtual_host,
-            username=username,
+            login=username,
             password=password
         )
 
@@ -43,6 +43,7 @@ class NotifiactionMQ:
     async def open_conn(self) -> bool:
         self.mq_connection = await self._mq_conn_coroutine
         self.mq_channel = await self.mq_connection.channel()
+        await self.mq_channel.set_qos(prefetch_count=10)
 
         self.notification_exchange = await self.mq_channel.declare_exchange(name="notifications", type=aio_pika.ExchangeType.TOPIC)
         queue = await self.mq_channel.declare_queue(
@@ -79,15 +80,15 @@ class NotifiactionMQ:
         try:
             data = json.loads(msg.body.decode())
         except json.JSONDecodeError:
-            self.__logger.error("Unable to decode new user notification due to a programmer JSON formatting error", exc_info=True)
-            msg.reject()
+            self.__logger.error("Unable to decode new user notification due to a programmer JSON formatting error", exc_info=True, stack_info=True)
+            await msg.reject()
 
         try:
             proc_success = await self.notification_callback(data)
             if(proc_success):
-                msg.ack()
+                await msg.ack()
             else:
-                self.__logger.warning("Notification was not processed fully by callback", exc_info=True)
-                msg.nack(requeue=True)
+                self.__logger.warning(f"Notification was not processed fully by callback '{getattr(self.notification_callback, "__name__", repr(self.notification_callback))}'", exc_info=True)
+                await msg.nack(requeue=True)
         except Exception:
             self.__logger.warning("Error passing on notification to 'notification_callback'", exc_info=True)

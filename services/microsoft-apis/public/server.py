@@ -1,32 +1,17 @@
-#import sys
-#sys.path.append('..')
+import os
+if(os.getenv("DEV_MODE") == "1"):
+    import sys
+    sys.path.append('..')
 
-
-from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from mq.notifications import NotifiactionMQ
 
 import os, server_config
-from routes import settings_router, emails_router
-
-@asynccontextmanager
-async def app_lifespan(app: FastAPI):
-    user_listener = NotifiactionMQ(
-        host=server_config.RABBITMQ_HOST,
-        virtual_host=server_config.RABBITMQ_VIRTUALHOST,
-        username=server_config.RABBITMQ_USERNAME,
-        password=server_config.RABBITMQ_PASSWORD
-    ) 
-
-    yield
-
-    # cleanup
-    user_listener.close_conn()
+from routes import settings_router, emails_router, subscriptions_router
 
 api = FastAPI(
     debug=(os.getenv("DEV_MODE") == "1"),
-    lifespan=app_lifespan
 )
 
 api.include_router(settings_router)
 api.include_router(emails_router)
+api.include_router(subscriptions_router)

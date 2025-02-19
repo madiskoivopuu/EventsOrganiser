@@ -38,7 +38,7 @@ async def get_settings(db_session: AsyncSession, user_id: str) -> tables.Setting
             tables.SettingsTable.user_id == user_id
         )
 
-    return (await db_session.execute(q)).scalar_one()
+    return (await db_session.execute(q)).unique().scalar_one()
 
 async def get_email_notification_subscription(db_session: AsyncSession, user_id: str) -> tables.EmailSubscriptionsTable | None:
     """

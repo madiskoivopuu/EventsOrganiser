@@ -1,3 +1,8 @@
+import os
+if(os.getenv("DEV_MODE") == "1"):
+    import sys
+    sys.path.append('..')
+
 import asyncio 
 
 from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends
@@ -19,7 +24,7 @@ logging.basicConfig(level=logging.INFO)
 from common import models, tables
 
 import server_config
-import os, db
+import db
 
 import server_config
 from helpers import auth
@@ -127,6 +132,7 @@ async def merge_user_info(data: dict):
     """
 
     async with db.async_session() as db_session:
+        db_session = cast(AsyncSession, db_session)
         user_info = tables.UserInfoTable()
         user_info.user_id = data["account_id"]
         user_info.user_email = data["email"]
@@ -135,3 +141,6 @@ async def merge_user_info(data: dict):
         user_info.refresh_token = data["refresh_token"]
 
         await db_session.merge(user_info)
+        await db_session.commit()
+
+    return True

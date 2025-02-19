@@ -31,17 +31,17 @@ class SubscriptionHandler:
     async def settings_changed_notification(self, settings_row: tables.SettingsTable) -> bool:
         async with db.async_session() as db_session:
             user_info = await query_helpers.update_token_db(db_session, settings_row.user_id)
-            subscription = await query_helpers.get_email_notification_subscription(db_session, settings_row.user_id)
+            subscription_row = await query_helpers.get_email_notification_subscription(db_session, settings_row.user_id)
 
-            if(settings_row.auto_fetch_emails == False and subscription != None):
-                result = await graph_api.delete_subscription(subscription.subscription_id, user_info.access_token)
+            if(settings_row.auto_fetch_emails == False and subscription_row != None):
+                result = await graph_api.delete_subscription(subscription_row.subscription_id, user_info.access_token)
                 if(not result):
                     return False
                 
-                db_session.delete(settings_row)
+                db_session.delete(subscription_row)
                 await db_session.commit()
 
-            elif(settings_row.auto_fetch_emails == True and subscription == None):
+            elif(settings_row.auto_fetch_emails == True and subscription_row == None):
                 subscription_row = tables.EmailSubscriptionsTable()
                 subscription_row.user_id = user_info.user_id
                 subscription_id, expiration_date = await graph_api.create_subscription(

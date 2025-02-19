@@ -41,7 +41,7 @@ async def update_token_if_needed(
                     "grant_type": "refresh_token",
                     "refresh_token": refresh_token,
                     "client_secret": client_secret
-                }) as resp:
+                }, ssl=sslcontext) as resp:
                     resp_text = await resp.text()
 
                     if(resp.status == 200):
@@ -116,6 +116,69 @@ async def get_message(id: str, access_token: str, select: list | None = None) ->
                 "resp": resp,
                 "json_data": resp_json
             }
+
+async def create_subscription(access_token: str, notification_url: str, lifecycle_url: str, secret: str,
+                              resource: str, expires_in: timedelta = timedelta(minutes=10000)) -> tuple[str, datetime] | None:
+    """
+    Creates an email listening subscription for a user
+
+    :param access_token: Access token for the user
+    :param notification_url: URL to receive notifications to
+    :param lifecycle_url: URL to receive updates about subscriptions (like reauth, expiration and missed notis)
+    :param secret: A secret value that gets sent in a subscription. Use to verify the authenticity of a notification
+    :param resource: MS Graph resource to subscribe to
+    :param expires_in: Expiration date for the subscription. Default value is fetched from Microsoft Graph API docs
+
+    :return: Subscription ID and the expiration date if the request was successful, otherwise None
+        If a duplicate subscription already exists, then the ID of an already existing subscription is returned
+    """
+
+    expiration_date = datetime.now(timezone.utc) + expires_in
+    async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
+        async with session.post(
+            f"/v1.0/subscriptions",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            },
+            json={
+                "changeType": "created",
+                "notificationUrl": notification_url,
+                "lifecycleNotificationUrl": lifecycle_url,
+                "resource": resource,
+                "includeResourceData": True,
+                "expirationDateTime": expiration_date.isoformat(),
+                "clientState": secret
+            }, ssl=sslcontext
+        ) as resp:
+            if(resp.status == 201):
+                json_data = resp.json()
+                return (json_data["id"], datetime.fromisoformat(json_data["expirationDateTime"]))
+            elif(resp.status == 409): # sub already exists
+                # cant even test it because microsoft docs say one thing (dupe sub not allowed)
+                # but in reality they actually do allow this
+                raise NotImplementedError("This condition was never met during development")
+            else:
+                return None
+
+async def delete_subscription(subscription_id: str, access_token: str) -> bool:
+    """
+    Deletes a Microsoft Graph email notification subscription
+
+    :param subscription_id: Subscription ID
+    :param access_token: Access token for the user
+
+    :return: True if the deletion was successful, or if there was no subscription to delete.
+        Returns False if an error occurred
+    """
+    async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
+        async with session.delete(
+            f"/v1.0/subscriptions/{subscription_id}",
+            headers={"Authorization": f"Bearer {access_token}"}
+        ) as resp:
+            if(resp.status == 404 or resp.status == 204):
+                return True
+            
+    return False
 
 async def read_emails_after_date(
         access_token: str, 

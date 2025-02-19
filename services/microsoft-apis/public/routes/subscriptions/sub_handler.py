@@ -6,7 +6,7 @@ from datetime import datetime, timezone, timedelta
 import db
 from common import tables
 from mq.notifications import NotifiactionMQ
-from helpers import query_helpers, certs
+from helpers import query_helpers, graph_api
 
 class SubscriptionHandler:
     __SELECTABLE_GRAPH_EMAIL_PROPERTIES = ["id", "subject", "sentDateTime", "receivedDateTime", "body", "conversationId", "conversationIndex", 
@@ -52,67 +52,6 @@ class SubscriptionHandler:
     async def stop(self):
         await self.setting_notifications_mq.close_conn()
 
-    async def delete_subscription(self, subscription_id: str, access_token: str) -> bool:
-        """
-        Deletes a Microsoft Graph email notification subscription
-
-        :param subscription_id: Subscription ID
-        :param access_token: Access token for the user
-
-        :return: True if the deletion was successful, or if there was no subscription to delete.
-            Returns False if an error occurred
-        """
-        async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
-            async with session.delete(
-                f"/v1.0/subscriptions/{subscription_id}",
-                headers={"Authorization": f"Bearer {access_token}"}
-            ) as resp:
-                if(resp.status == 404 or resp.status == 204):
-                    return True
-                
-        return False
-    
-    async def create_subscription(self, access_token: str, encryption_cert: bytes, cert_id: int,
-                                  expires_in: timedelta = timedelta(minutes=10000)) -> tuple[str, datetime] | None:
-        """
-        Creates an email listening subscription for a user
-
-        :param access_token: Access token for the user
-        :param encryption_cert: X.509 certificate bytes that Microsoft will encrypt rich notification data with
-        :param cert_id: Certificate serial number
-        :param expires_in: Expiration date for the subscription. Default value is fetched from Microsoft Graph API docs
-
-        :return: Subscription ID and the expiration date if the request was successful, otherwise None
-            If a duplicate subscription already exists, then the ID of an already existing subscription is returned
-        """
-
-        expiration_date = datetime.now(timezone.utc) + expires_in
-        async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
-            async with session.post(
-                f"/v1.0/subscriptions",
-                headers={
-                    "Authorization": f"Bearer {access_token}"
-                },
-                json={
-                    "changeType": "created",
-                    "notificationUrl": f"{self.domain_url}/{self.notification_path}",
-                    "lifecycleNotificationUrl": f"{self.domain_url}/{self.notification_lifecycle_path}",
-                    "resource": f"me/messages?$select=id",
-                    "includeResourceData": True,
-                    "expirationDateTime": expiration_date.isoformat(),
-                    "clientState": self.secret
-                }
-            ) as resp:
-                if(resp.status == 201):
-                    json_data = resp.json()
-                    return (json_data["id"], datetime.fromisoformat(json_data["expirationDateTime"]))
-                elif(resp.status == 409): # sub already exists
-                    # cant even test it because microsoft docs say one thing (dupe sub not allowed)
-                    # but in reality they actually do allow this
-                    raise NotImplementedError("This condition was never met during development")
-                else:
-                    return None
-
     async def settings_changed_notification(self, data: dict) -> bool:
         async with db.async_session() as db_session:
             settings_row = tables.SettingsTable(**data)
@@ -120,7 +59,7 @@ class SubscriptionHandler:
             subscription = await query_helpers.get_email_notification_subscription(db_session, settings_row.user_id)
 
             if(settings_row.auto_fetch_emails == False and subscription != None):
-                result = await self.delete_subscription(subscription.subscription_id, user_info.access_token)
+                result = await graph_api.delete_subscription(subscription.subscription_id, user_info.access_token)
                 if(not result):
                     return False
                 
@@ -130,7 +69,13 @@ class SubscriptionHandler:
             elif(settings_row.auto_fetch_emails == True and subscription == None):
                 subscription_row = tables.EmailSubscriptionsTable()
                 subscription_row.user_id = user_info.user_id
-                subscription_id, expiration_date = await self.create_subscription(user_info.access_token)
+                subscription_id, expiration_date = await graph_api.create_subscription(
+                    user_info.access_token,
+                    f"{self.domain_url}/{self.notification_path}",
+                    f"{self.domain_url}/{self.notification_lifecycle_path}",
+                    self.secret,
+                    "me/messages?$select=id"
+                )
                 subscription_row.subscription_id = subscription_id
                 subscription_row.expires_at = expiration_date
 

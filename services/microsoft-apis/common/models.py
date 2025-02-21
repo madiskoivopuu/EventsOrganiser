@@ -24,9 +24,10 @@ class _NotificationData(BaseModel):
     change_type: str = Field(alias="changeType")
     client_state: str = Field(alias="clientState")
     subscription_id: str = Field(alias="subscriptionId")
-    resource_data: _ResourceData = Field(alias="resourceData")
+    resource_data: Optional[_ResourceData] = Field(alias="resourceData")
+    lifecycle_event: Optional[str] = Field(alias="lifecycleEvent")
 
-class NewEmailPostRequest(BaseModel):
+class SubscriptionPayload(BaseModel):
     value: list[_NotificationData]
 
 class FetchNewEmailsGetResponse(BaseModel):

@@ -22,6 +22,7 @@ import server_config
 from helpers import query_helpers, graph_api
 from .sub_handler import SubscriptionHandler
 from mq.mail_sender import MailSenderMQ, ParseMailsRequest
+from mq.notifications import NotificationMQ, NotificationListener
 
 __logger = logging.getLogger(__name__)
 
@@ -40,15 +41,32 @@ async def app_lifecycle(api: FastAPI):
         password=server_config.RABBITMQ_PASSWORD,
         queue_name=server_config.RABBITMQ_EMAILS_QUEUE
     )
+    notification_mq = NotificationMQ(
+        host=server_config.RABBITMQ_HOST,
+        virtual_host=server_config.RABBITMQ_VIRTUALHOST,
+        username=server_config.RABBITMQ_USERNAME,
+        password=server_config.RABBITMQ_PASSWORD,
+        listeners=[
+            NotificationListener(
+                queue_name="sub_deleted_notis",
+                routing_key="notification.outlook.subscription_deleted",
+                notification_callback=subscription_handler.subscription_deleted_notification
+            )
+        ]
+    )
 
-    await mail_sender_mq.open_conn()
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(mail_sender_mq.try_open_conn_indefinite())
+        tg.create_task(notification_mq.try_open_conn_indefinite())
 
     yield {
         "subscription_handler": subscription_handler,
         "mail_sender_mq": mail_sender_mq
     }
 
-    await mail_sender_mq.close_conn()
+    async with asyncio.TaskGroup() as tg:
+        tg.create_task(mail_sender_mq.close_conn())
+        tg.create_task(notification_mq.close_conn())
 
 subscriptions_router = APIRouter(
     prefix="/api/microsoft",
@@ -82,9 +100,10 @@ async def fetch_emails_batched(
             if(data["resp"].status != 200):
                 raise HTTPException(status_code=500, detail="Failed to fetch one email")
 
-            if(user_info.most_recent_fetched_email_utc != None and 
-               user_info.most_recent_fetched_email_utc >= datetime.fromisoformat(data["json_data"]["sentDateTime"])):
-                continue
+            # TODO: use ID cache, this will not work since notifications can be delivered in any order
+            #if(user_info.most_recent_fetched_email_utc != None and 
+            #   user_info.most_recent_fetched_email_utc >= datetime.fromisoformat(data["json_data"]["sentDateTime"])):
+            #    continue
 
             if(data["json_data"]["isDraft"] == True):
                 continue
@@ -102,7 +121,7 @@ async def fetch_emails_batched(
 
 @subscriptions_router.post("/subscriptions/new_email", status_code=200)
 async def new_email(
-    new_emails: models.NewEmailPostRequest | None,
+    new_emails: models.SubscriptionPayload | None,
     request: Request,
     db_session: AsyncSession = Depends(db.start_session)
 ) -> str | None:
@@ -165,6 +184,15 @@ async def new_email(
 
     return
 
-@subscriptions_router.post("/subscriptions/email_sub_lifecycle")
-async def subscription_lifecycle():
-    pass
+@subscriptions_router.post("/subscriptions/email_sub_lifecycle", status_code=200)
+async def subscription_lifecycle(
+    lifecycle_notification: models.SubscriptionPayload | None,
+    request: Request
+) -> str | None:
+    # new subscription validation
+    if("validationToken" in request.query_params):
+        return PlainTextResponse(
+            content=request.query_params.get("validationToken")
+        )
+    
+    #for subscription_data in lifecycle_notification.value:

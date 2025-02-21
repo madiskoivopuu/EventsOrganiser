@@ -2,10 +2,10 @@ import asyncio
 import aiohttp
 import base64
 from datetime import datetime, timezone, timedelta
+from typing import cast
 
 import db
-from common import tables
-from mq.notifications import NotifiactionMQ
+from common import tables, models
 from helpers import query_helpers, graph_api
 
 class SubscriptionHandler:
@@ -30,8 +30,9 @@ class SubscriptionHandler:
 
     async def settings_changed_notification(self, settings_row: tables.SettingsTable) -> bool:
         async with db.async_session() as db_session:
+            db_session = cast(db.AsyncSession, db_session) # IDE thing
             user_info = await query_helpers.update_token_db(db_session, settings_row.user_id)
-            subscription_row = await query_helpers.get_email_notification_subscription(db_session, settings_row.user_id)
+            subscription_row = await query_helpers.get_email_notification_subscription(db_session, user_id=settings_row.user_id)
 
             if(settings_row.auto_fetch_emails == False and subscription_row != None):
                 result = await graph_api.delete_subscription(subscription_row.subscription_id, user_info.access_token)
@@ -66,3 +67,20 @@ class SubscriptionHandler:
                     await graph_api.delete_subscription(subscription_id, user_info.access_token)
 
         return True
+    
+    async def subscription_deleted_notification(self, data: dict) -> bool:
+        subscription_data = models._NotificationData.model_validate(data)
+
+        async with db.async_session() as db_session:
+            db_session = cast(db.AsyncSession, db_session) # IDE thing
+            subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
+            if(subscription_row == None): # subscription most likely deleted by user
+                return True
+            
+            user_settings = await query_helpers.get_settings(db_session, subscription_row.user_id)
+            if(user_settings.auto_fetch_emails == False):
+                return True
+            
+            user_info = await query_helpers.update_token_db(db_session, subscription_row.user_id)
+            if(user_info.access_token == None): # login expired
+                return True

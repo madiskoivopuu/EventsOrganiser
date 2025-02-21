@@ -30,26 +30,29 @@ import server_config
 from helpers import auth
 from helpers import query_helpers
 from helpers.auth import UserData
-from mq.notifications import NotifiactionMQ
+from mq.notifications import NotificationMQ, NotificationListener
 from routes.subscriptions.sub_handler import SubscriptionHandler
 
 @asynccontextmanager
 async def app_lifespan(app: FastAPI):
     # https://github.com/Kludex/fastapi-tips?tab=readme-ov-file#6-use-lifespan-state-instead-of-appstate
-    settings_notification_mq = NotifiactionMQ(
+    settings_notification_mq = NotificationMQ(
         host=server_config.RABBITMQ_HOST,
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
         username=server_config.RABBITMQ_USERNAME,
         password=server_config.RABBITMQ_PASSWORD,
-        queue_name="outlook_user_logins",
-        routing_key="notification.outlook.user_login",
-        notification_callback=process_login_notification
+        listeners=[
+            NotificationListener(
+                queue_name="outlook_user_logins",
+                routing_key="notification.outlook.user_login",
+                notification_callback=process_login_notification
+            )
+        ]
     ) 
-    await settings_notification_mq.open_conn()
+    await settings_notification_mq.try_open_conn_indefinite()
 
     yield {"settings_notification_mq": settings_notification_mq}
 
-    # cleanup
     await settings_notification_mq.close_conn()
 
 __logger = logging.getLogger(__name__)

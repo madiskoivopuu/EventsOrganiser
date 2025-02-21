@@ -40,7 +40,7 @@ async def get_settings(db_session: AsyncSession, user_id: str) -> tables.Setting
 
     return (await db_session.execute(q)).unique().scalar_one()
 
-async def get_email_notification_subscription(db_session: AsyncSession, user_id: str) -> tables.EmailSubscriptionsTable | None:
+async def get_email_notification_subscription(db_session: AsyncSession, user_id: str | None = None, sub_id: str | None = None) -> tables.EmailSubscriptionsTable | None:
     """
     Fetches the email subscription row for a user
 
@@ -50,9 +50,18 @@ async def get_email_notification_subscription(db_session: AsyncSession, user_id:
     :return: The email subscription row if it exists, otherwise None
     """
 
-    q = select(tables.EmailSubscriptionsTable) \
-        .where(
+    assert(not (sub_id == None and user_id == None))
+
+    q = select(tables.EmailSubscriptionsTable)
+
+    if(user_id != None):
+        q = q.where(
             tables.EmailSubscriptionsTable.user_id == user_id
+        )
+
+    if(sub_id != None):
+        q = q.where(
+            tables.EmailSubscriptionsTable.subscription_id == sub_id
         )
     
     return (await db_session.execute(q)).scalar_one_or_none()

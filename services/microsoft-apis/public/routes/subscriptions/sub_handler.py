@@ -65,12 +65,11 @@ class SubscriptionHandler:
                 except:
                     # try to clean up the subscription somehow
                     await graph_api.delete_subscription(subscription_id, user_info.access_token)
+                    return False
 
         return True
     
-    async def subscription_deleted_notification(self, data: dict) -> bool:
-        subscription_data = models._NotificationData.model_validate(data)
-
+    async def _subscription_deleted_notification(self, subscription_data: models._NotificationData) -> bool:
         async with db.async_session() as db_session:
             db_session = cast(db.AsyncSession, db_session) # IDE thing
             subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
@@ -84,3 +83,59 @@ class SubscriptionHandler:
             user_info = await query_helpers.update_token_db(db_session, subscription_row.user_id)
             if(user_info.access_token == None): # login expired
                 return True
+            
+            subscription_result = await graph_api.create_subscription(
+                user_info.access_token,
+                f"{self.domain_url}/{self.notification_path}",
+                f"{self.domain_url}/{self.notification_lifecycle_path}",
+                self.secret,
+                "me/messages"
+            )
+            if(subscription_result == None):
+                return False
+            
+            subscription_id, expiration_date = subscription_result
+            subscription_row.subscription_id = subscription_id
+            subscription_row.expires_at = expiration_date
+
+            try:
+                await db_session.merge()
+                await db_session.commit()
+            except:
+                # try to clean up the subscription hopefully...
+                await graph_api.delete_subscription(subscription_id, user_info.access_token)
+                return False
+
+        return True
+
+    async def _subscription_reauthorize_notification(self, subscription_data: models._NotificationData) -> bool:
+        async with db.async_session() as db_session:
+            db_session = cast(db.AsyncSession, db_session) # IDE thing
+            subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
+            if(subscription_row == None): # subscription most likely deleted by user
+                return True
+            
+            user_settings = await query_helpers.get_settings(db_session, subscription_row.user_id)
+            if(user_settings.auto_fetch_emails == False):
+                return True
+            
+            user_info = await query_helpers.update_token_db(db_session, subscription_row.user_id)
+            if(user_info.access_token == None): # login expired
+                return True
+            
+            result = await graph_api.extend_subscription(subscription_data.subscription_id, user_info.access_token)
+            if(result == None):
+                return False
+            
+            sub_exists, new_exp = result
+            if(not sub_exists):
+                return True
+            
+            subscription_row.expires_at = new_exp
+            await db_session.merge(subscription_row)
+            await db_session.commit()
+            
+        return True
+    
+    async def subscription_missed_data_notification(self, subscription_data: models._NotificationData) -> bool:
+        raise NotImplementedError("todo")

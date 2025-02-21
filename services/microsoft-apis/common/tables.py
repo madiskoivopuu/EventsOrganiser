@@ -55,6 +55,11 @@ class UserInfoTable(Base):
     refresh_token: Mapped[str] = mapped_column(String(2048), nullable=True)
     most_recent_fetched_email_utc: Mapped[datetime | None] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
 
+class ParsedEmails(Base):
+    __tablename__ = "parsed_emails"
+    user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
+    email_id: Mapped[str] = mapped_column(String(256), primary_key=True)
+
 class TimezoneTable(Base):
     __tablename__ = "timezones"
 

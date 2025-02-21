@@ -120,7 +120,7 @@ async def get_message(id: str, access_token: str, select: list | None = None) ->
 async def create_subscription(access_token: str, notification_url: str, lifecycle_url: str, secret: str,
                               resource: str, expires_in: timedelta = timedelta(minutes=10000)) -> tuple[str, datetime] | None:
     """
-    Creates an email listening subscription for a user
+    Creates a subscription for a user
 
     :param access_token: Access token for the user
     :param notification_url: URL to receive notifications to
@@ -161,7 +161,7 @@ async def create_subscription(access_token: str, notification_url: str, lifecycl
 
 async def delete_subscription(subscription_id: str, access_token: str) -> bool:
     """
-    Deletes a Microsoft Graph email notification subscription
+    Deletes a Microsoft Graph subscription
 
     :param subscription_id: Subscription ID
     :param access_token: Access token for the user
@@ -179,6 +179,37 @@ async def delete_subscription(subscription_id: str, access_token: str) -> bool:
                 return True
             
     return False
+
+async def extend_subscription(subscription_id: str, access_token: str, extend_by: timedelta = timedelta(minutes=10000)) -> tuple[bool, datetime] | None:
+    """
+    Extends a Microsoft Graph subscription by a predetermined amount. This also has the effect of reauthorizing the subscription.
+
+    :param subscription_id: Subscription ID
+    :param access_token: Access token for the user
+    :param extend_by: The amount of time to extend the subscription by. Depends on the resource.
+
+    :return: None if the subscription could not be extended.
+        On success, returns a tuple of boolean that says whether the subscription exists & a new expiration date. 
+        Expiration date will be None if the subscription does not exist
+    """
+    async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
+        async with session.patch(
+            f"/v1.0/subscriptions/{subscription_id}",
+            headers={
+                "Authorization": f"Bearer {access_token}"
+            },
+            json={
+                "expirationDateTime": datetime.now(timezone.utc) + extend_by
+            },
+            ssl=sslcontext
+        ) as resp:
+            if(resp.status == 404):
+                return False, None
+            elif(200 <= resp.status <= 299):
+                resp_data = await resp.json()
+                return True, datetime.fromisoformat(resp_data["expirationDateTime"])
+            
+    return None
 
 async def read_emails_after_date(
         access_token: str, 

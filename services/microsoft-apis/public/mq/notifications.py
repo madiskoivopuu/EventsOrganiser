@@ -1,15 +1,18 @@
 import asyncio, json
-
+import aio_pika
+from dataclasses import dataclass
+import functools
+import logging
 from typing import Callable, Awaitable
 
-import aio_pika
+@dataclass
+class NotificationListener:
+     queue_name: str
+     routing_key: str
+     notification_callback: Callable[[dict], Awaitable[bool]]
 
-import logging
-
-
-class NotifiactionMQ:
-    def __init__(self, host: str, virtual_host: str, username: str, password: str, 
-                 queue_name: str, routing_key: str, notification_callback: Callable[[dict], Awaitable[bool]]):
+class NotificationMQ:
+    def __init__(self, host: str, virtual_host: str, username: str, password: str, listeners: list[NotificationListener]):
         """
         Creates an instance of a MQ client listening for notifications on 'queue_name' that are routed there with 'routing_key'
 
@@ -17,47 +20,60 @@ class NotifiactionMQ:
         :param virtual_host: Virtual host name
         :param username: Broker login username
         :param password: Broker login password
+        :param listeners: A list of the endpoints that determines where notifications should be sent.
+            Each item makes RabbitMQ create a new queue "queue_name" and binds the notification exchange to the queue with "routing_key"
+            On a new message, notification_callback gets called with message data
         :param routing_key: Defines which type of notifications in RabbitMQ to send to a queue defined by 'queue_name'
         :queue_name: Queue to receive certain notifications on
         :param notification_callback: An async function that gets called on a new notification. 
             The callback must take a dictionary and return a bool value (True indicating that the notification was successfully processed)
         """
         self.__logger = logging.getLogger(__name__)
+        self.__retry_conn_task = None
 
         self._ioloop = asyncio.get_running_loop()
         self._mq_conn_coroutine = aio_pika.connect_robust(
             host=host,
             virtualhost=virtual_host,
             login=username,
-            password=password
+            password=password,
+            timeout=5,
         )
 
         self.mq_connection = None
         self.mq_channel = None
         self.notification_exchange = None
 
-        self.queue_name = queue_name
-        self.routing_key = routing_key
-        self.notification_callback = notification_callback
+        self.listeners = listeners
 
-    async def open_conn(self) -> bool:
+    async def try_open_conn_indefinite(self):
+        """
+        Tries to open an initial connection with RabbitMQ. If it fails, a task will be created to retry opening connection indefinitely.
+        """
+        try:
+            await self.open_conn()
+        except:
+            self.__logger.warning("Failed to open NotificationMQ connection, trying again later", exc_info=True)
+            self.__retry_conn_task = asyncio.create_task(self.try_open_conn_indefinite())
+
+    async def open_conn(self):
         self.mq_connection = await self._mq_conn_coroutine
         self.mq_channel = await self.mq_connection.channel()
         await self.mq_channel.set_qos(prefetch_count=10)
 
         self.notification_exchange = await self.mq_channel.declare_exchange(name="notifications", type=aio_pika.ExchangeType.TOPIC)
-        queue = await self.mq_channel.declare_queue(
-            name=self.queue_name,
-            durable=True
-        )
-        await queue.bind(exchange="notifications", routing_key=self.routing_key)
+        for listener in self.listeners:
+            queue = await self.mq_channel.declare_queue(
+                name=listener.queue_name,
+                durable=True
+            )
+            await queue.bind(exchange="notifications", routing_key=listener.routing_key)
 
-        await queue.consume(self._on_notification)
-
-        return self.mq_connection != None
+            _on_notification_with_bound_callback = functools.partial(self._on_notification, process_message_callback=listener.notification_callback)
+            await queue.consume(_on_notification_with_bound_callback)
 
     async def close_conn(self):
-        if(not self.mq_connection.is_closed):
+        if(self.mq_connection is not None and not self.mq_connection.is_closed):
             await self.mq_connection.close()    
 
     async def send_notification(self, data: dict, routing_key: str, **kwargs):
@@ -76,7 +92,8 @@ class NotifiactionMQ:
             routing_key=routing_key,
         )
 
-    async def _on_notification(self, msg: aio_pika.message.AbstractIncomingMessage):
+    async def _on_notification(self, msg: aio_pika.message.AbstractIncomingMessage,
+                               process_message_callback: Callable[[dict], Awaitable[bool]]):
         try:
             data = json.loads(msg.body.decode())
         except json.JSONDecodeError:
@@ -84,11 +101,11 @@ class NotifiactionMQ:
             await msg.reject()
 
         try:
-            proc_success = await self.notification_callback(data)
+            proc_success = await process_message_callback(data)
             if(proc_success):
                 await msg.ack()
             else:
-                self.__logger.warning(f"Notification was not processed fully by callback '{getattr(self.notification_callback, "__name__", repr(self.notification_callback))}'", exc_info=True)
+                self.__logger.warning(f"Notification was not processed fully by callback '{getattr(process_message_callback, "__name__", repr(process_message_callback))}'", exc_info=True)
                 await msg.nack(requeue=True)
         except Exception:
             self.__logger.warning("Error passing on notification to 'notification_callback'", exc_info=True)

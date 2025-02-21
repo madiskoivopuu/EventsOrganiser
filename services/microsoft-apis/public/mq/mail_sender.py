@@ -21,6 +21,7 @@ class ParseMailsRequest:
 class MailSenderMQ:
     def __init__(self, host: str, virtual_host: str, username: str, password: str, queue_name: str):
         self.__logger = logging.getLogger(__name__)
+        self.__retry_conn_task = None
 
         self._ioloop = asyncio.get_running_loop()
         self._mq_conn_coroutine = aio_pika.connect_robust(
@@ -34,7 +35,17 @@ class MailSenderMQ:
         self.mq_channel = None
         self.email_parsing_queue = queue_name
 
-    async def open_conn(self) -> bool:
+    async def try_open_conn_indefinite(self):
+        """
+        Tries to open an initial connection with RabbitMQ. If it fails, a task will be created to retry opening connection indefinitely.
+        """
+        try:
+            await self.open_conn()
+        except:
+            self.__logger.warning("Failed to open NotificationMQ connection, trying again later", exc_info=True)
+            self.__retry_conn_task = asyncio.create_task(self.try_open_conn_indefinite())
+
+    async def open_conn(self):
         self.mq_connection = await self._mq_conn_coroutine
         self.mq_channel = await self.mq_connection.channel(publisher_confirms=False)
 
@@ -42,8 +53,6 @@ class MailSenderMQ:
             name=self.email_parsing_queue,
             durable=True
         )
-
-        return self.mq_connection != None
 
     async def close_conn(self):
         if(not self.mq_connection.is_closed):

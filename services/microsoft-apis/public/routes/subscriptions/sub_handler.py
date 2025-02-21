@@ -6,10 +6,11 @@ from typing import cast
 
 import db
 from common import tables, models
-from helpers import query_helpers, graph_api
+from helpers import query_helpers, graph_api, mail_fetcher
+from mq.mail_sender import MailSenderMQ, ParseMailsRequest
 
 class SubscriptionHandler:
-    def __init__(self, domain_url: str, notification_path: str, notification_lifecycle_path: str, secret: str):
+    def __init__(self, domain_url: str, notification_path: str, notification_lifecycle_path: str, secret: str, mail_sender_mq: MailSenderMQ):
         """
         Creates an instance of a subscription handler that manages Microsoft Graph email subscriptions
         based on events (settings update, lifecycle notifications)
@@ -27,6 +28,7 @@ class SubscriptionHandler:
         self.notification_path = notification_path.removeprefix("/")
         self.notification_lifecycle_path = notification_lifecycle_path.removeprefix("/")
         self.secret = secret
+        self.mail_sender_mq = mail_sender_mq
 
     async def settings_changed_notification(self, settings_row: tables.SettingsTable) -> bool:
         async with db.async_session() as db_session:
@@ -68,8 +70,8 @@ class SubscriptionHandler:
                     return False
 
         return True
-    
-    async def _subscription_deleted_notification(self, subscription_data: models._NotificationData) -> bool:
+
+    async def subscription_deleted_notification(self, subscription_data: models._NotificationData) -> bool:
         async with db.async_session() as db_session:
             db_session = cast(db.AsyncSession, db_session) # IDE thing
             subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
@@ -108,7 +110,7 @@ class SubscriptionHandler:
 
         return True
 
-    async def _subscription_reauthorize_notification(self, subscription_data: models._NotificationData) -> bool:
+    async def subscription_reauthorize_notification(self, subscription_data: models._NotificationData) -> bool:
         async with db.async_session() as db_session:
             db_session = cast(db.AsyncSession, db_session) # IDE thing
             subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
@@ -137,5 +139,46 @@ class SubscriptionHandler:
             
         return True
     
-    async def subscription_missed_data_notification(self, subscription_data: models._NotificationData) -> bool:
-        raise NotImplementedError("todo")
+    async def subscription_missed_data_notification(self, subscription_data: models._NotificationData, max_email_age: timedelta) -> bool:
+        async with db.async_session() as db_session:
+            db_session = cast(db.AsyncSession, db_session) # IDE thing
+            subscription_row = await query_helpers.get_email_notification_subscription(db_session, sub_id=subscription_data.subscription_id)
+            if(subscription_row == None): # subscription most likely deleted by user
+                return True
+            
+            user_settings = await query_helpers.get_settings(db_session, subscription_row.user_id)
+            if(user_settings.auto_fetch_emails == False):
+                return True
+            
+            user_info = await query_helpers.update_token_db(db_session, subscription_row.user_id)
+            if(user_info.access_token == None): # login expired
+                return True
+            
+            parsed_email_ids = await query_helpers.get_parsed_emails(db_session, user_info.user_id)
+            unparsed_email_ids = await mail_fetcher.get_unparsed_emails_after_date(
+                user_info.access_token,
+                parsed_email_ids,
+                max_email_age,
+                "isDraft eq false"
+            )
+            ids_and_tokens = [(_id, user_info.access_token) for _id in unparsed_email_ids]
+            emails = await mail_fetcher.fetch_emails_batched(ids_and_tokens)
+
+            email_parse_requests = []
+            for email in emails:
+                email_parse_requests.append(                
+                    ParseMailsRequest(
+                        user_id=user_info.user_id,
+                        user_email=user_info.user_email,
+                        user_timezone=user_settings.timezone.timezone,
+                        email=email
+                    )
+                )
+
+            await query_helpers.add_parsed_emails(
+                db_session,
+                user_info.user_id,
+                emails
+            )
+            await cast(MailSenderMQ, self.mail_sender_mq).send_new_emails_to_parse(email_parse_requests)
+            await db_session.commit()

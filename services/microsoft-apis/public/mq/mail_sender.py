@@ -24,12 +24,10 @@ class MailSenderMQ:
         self.__retry_conn_task = None
 
         self._ioloop = asyncio.get_running_loop()
-        self._mq_conn_coroutine = aio_pika.connect_robust(
-            host=host,
-            virtualhost=virtual_host,
-            login=username,
-            password=password
-        )
+        self.host = host
+        self.virtual_host = virtual_host
+        self.username = username
+        self.password = password
 
         self.mq_connection = None
         self.mq_channel = None
@@ -46,7 +44,12 @@ class MailSenderMQ:
             self.__retry_conn_task = asyncio.create_task(self.try_open_conn_indefinite())
 
     async def open_conn(self):
-        self.mq_connection = await self._mq_conn_coroutine
+        self.mq_connection = await aio_pika.connect_robust(
+            host=self.host,
+            virtualhost=self.virtual_host,
+            login=self.username,
+            password=self.password
+        )
         self.mq_channel = await self.mq_connection.channel(publisher_confirms=False)
 
         await self.mq_channel.declare_queue(

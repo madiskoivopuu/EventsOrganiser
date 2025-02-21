@@ -17,7 +17,7 @@ import server_config, db
 from helpers import auth
 from helpers.auth import UserData
 from mq.mail_sender import MailSenderMQ, ParseMailsRequest
-from helpers import query_helpers, graph_api
+from helpers import query_helpers, graph_api, mail_fetcher
 
 __logger = logging.getLogger(__name__)
 
@@ -48,46 +48,36 @@ async def new_email(
     db_session: AsyncSession = Depends(db.start_session)
 ) -> models.FetchNewEmailsGetResponse:
     user_data = await query_helpers.update_token_db(db_session, user.account_id)
-    user_settings = await query_helpers.get_settings(db_session, user.account_id)
+    user_settings = await query_helpers.get_settings(db_session, user_data.user_id)
 
-    emails = await graph_api.read_emails_after_date(
+    parsed_email_ids = await query_helpers.get_parsed_emails(db_session, user_data.user_id)
+    unparsed_email_ids = await mail_fetcher.get_unparsed_emails_after_date(
         user_data.access_token,
-        after_date=user_data.most_recent_fetched_email_utc,
-        select=["id"]
+        parsed_email_ids,
+        datetime.now(timezone.utc) - server_config.MAX_EMAIL_AGE,
+        "isDraft eq false"
     )
+    ids_and_tokens = [(_id, user_data.access_token) for _id in unparsed_email_ids]
+    emails = await mail_fetcher.fetch_emails_batched(ids_and_tokens)
 
-    if(len(emails) != 0):
-        most_recent = None
-        for email in emails:
-            sent_date = datetime.fromisoformat(email["sentDateTime"])
-            if(most_recent == None or sent_date > most_recent):
-                most_recent = sent_date
-
-        user_data.most_recent_fetched_email_utc = most_recent
-
-    # TODO: batched requests
-    full_emails = [] # emails with all fields
+    email_parse_requests = []
     for email in emails:
-        response = await graph_api.get_message(
-            email["id"],
-            user_data.access_token
-        )
-        if(response["resp"].status != 200):
-            raise HTTPException(status_code=500, detail=f"Failed to fetch an email with ID {email['id']}")
-        
-        full_emails.append(                
+        email_parse_requests.append(                
             ParseMailsRequest(
-                user_id=user.account_id,
+                user_id=user_data.user_id,
                 user_email=user_data.user_email,
                 user_timezone=user_settings.timezone.timezone,
-                email=response["json_data"]
+                email=email
             )
         )
 
-    # TODO: maybe use aio-pika which is actually meant to be an async AMQP library
-    await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(full_emails)
-
-    await db_session.commit() # TODO: check if this can still update after the first commit in update_token_db
+    await query_helpers.add_parsed_emails(
+        db_session,
+        user_data.user_id,
+        emails
+    )
+    await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(email_parse_requests)
+    await db_session.commit()
 
     resp = models.FetchNewEmailsGetResponse(
         count=len(emails)

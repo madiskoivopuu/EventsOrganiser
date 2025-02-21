@@ -59,6 +59,7 @@ class ParsedEmails(Base):
     __tablename__ = "parsed_emails"
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
     email_id: Mapped[str] = mapped_column(String(256), primary_key=True)
+    expire_at: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType())
 
 class TimezoneTable(Base):
     __tablename__ = "timezones"

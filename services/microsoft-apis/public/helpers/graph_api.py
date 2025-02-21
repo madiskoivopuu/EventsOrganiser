@@ -60,7 +60,7 @@ async def update_token_if_needed(
     else:
         return (access_token, expires_at, refresh_token)
 
-async def get_messages(access_token: str, select: list | None, skip: int = 0, top: int = 100) -> dict:
+async def get_messages(access_token: str, select: list | None, _filter: list | None, skip: int = 0, top: int = 100) -> dict:
     """
     Gets emails of a user from Microsoft Graph API
     
@@ -74,6 +74,9 @@ async def get_messages(access_token: str, select: list | None, skip: int = 0, to
     }
     if(select):
         params["$select"] = ",".join(select)
+
+    if(_filter):
+        params["$filter"] = _filter
 
     async with aiohttp.ClientSession("https://graph.microsoft.com") as session:
         async with session.get(
@@ -214,23 +217,27 @@ async def extend_subscription(subscription_id: str, access_token: str, extend_by
 async def read_emails_after_date(
         access_token: str, 
         select: list | None,
-        after_date: datetime | None = datetime.now(timezone.utc) - timedelta(days=31), 
+        _filter: str | None,
+        after_date: datetime, 
         skip: int = 0, 
         top: int = 100) -> dict:
     """
     Fetches emails for a Microsoft user after a specified UTC time
     
-    Returns the emails that the user received after "after_date"
+    :param access_token: Access token for the user account
+    :param select: Resource properties to be fetched by Microsoft Graph
+    :param after_date: Time point that is used to cut off email fetching (older emails will not be fetched)
+    :param skip: Number of emails to skip
+    :param top: Amount of emails to fetch in a single batch internally
+
+    :return: Emails that the user received after "after_date"
     """
     emails = []
     if("sentDateTime" not in select):
         select.append("sentDateTime")
 
-    if(after_date == None):
-        after_date = datetime.now(timezone.utc) - timedelta(days=31)
-
     while True:
-        result = await get_messages(access_token, select=select, skip=skip, top=top)
+        result = await get_messages(access_token, select=select, _filter=_filter, skip=skip, top=top)
         if(len(result["json_data"]["value"]) == 0): # no more emails to read from user
             break
         

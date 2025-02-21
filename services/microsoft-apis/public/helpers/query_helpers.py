@@ -3,10 +3,12 @@ import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete, update
 from zoneinfo import ZoneInfo
+from datetime import datetime, timezone, timedelta
 
 from common import tables
 import server_config
-from helpers import auth, graph_api
+from helpers import graph_api
+import db
 
 async def get_or_create_timezone(db_session: AsyncSession, tz: ZoneInfo) -> tables.TimezoneTable:
     q = select(tables.TimezoneTable) \
@@ -66,10 +68,55 @@ async def get_email_notification_subscription(db_session: AsyncSession, user_id:
     
     return (await db_session.execute(q)).scalar_one_or_none()
 
+async def get_parsed_emails(db_session: AsyncSession | None, user_id: str) -> set[str]:
+    """
+    Gets a set of the parsed email IDs
+
+    :param user_id: User whose parsed emails to fetch
+
+    :return: A set of parsed email IDs found in database
+    """
+
+    if(db_session == None):
+        async with db.async_session() as db_session:
+            return await get_parsed_emails(db_session, user_id)
+
+    q = select(tables.ParsedEmails) \
+        .where(
+            tables.ParsedEmails.user_id == user_id
+        )
+    
+    results = await db_session.execute(q)
+
+    email_ids = set()
+    for row in results.all():
+        email_ids.add(row.tuple()[0].email_id)
+
+    return email_ids
+
+async def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list[dict], expire_in: timedelta):
+    """
+    Adds a list of email IDs along with their cache expiration date into the database
+    This function **does not autocommit**
+    
+    :param db_session: An existing database session
+    :param user_id: User id (oid) of the account
+    :param emails: Email resources as returned by Microsoft Graph
+    """
+
+    for email in emails:
+        parsed_email = tables.ParsedEmails()
+        parsed_email.user_id = user_id
+        parsed_email.email_id = email["id"]
+        parsed_email.expire_at = datetime.now(timezone.utc) + expire_in
+
+        db_session.add(parsed_email)
+
 async def update_token_db(db_session: AsyncSession, user_id: str) -> tables.UserInfoTable:
     """
     Updates user data row in MySQL with a new access token, if needed. 
     Stores the new access token in DB, or if refresh token has expired, clears refresh token & access token from db.
+    This function **autocommits**
 
     :param db_session: An existing database session
     :param user_id: User id (oid) of the account

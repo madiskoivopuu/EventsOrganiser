@@ -1,5 +1,6 @@
 import os, dotenv
 dotenv.load_dotenv() # only for local testing, the docker container will already have environment variables set for it
+from datetime import timedelta
 
 MICROSOFT_APP_CLIENT_ID = os.getenv("MICROSOFT_APP_CLIENT_ID")
 MICROSOFT_APP_SECRET = os.getenv("MICROSOFT_APP_SECRET")
@@ -20,4 +21,5 @@ RABBITMQ_EMAILS_QUEUE = os.getenv("RABBITMQ_EMAILS_QUEUE")
 JWT_SECRET=os.getenv("JWT_SECRET")
 JWT_SESSION_COOKIE_NAME=os.getenv("JWT_SESSION_COOKIE_NAME")
 
+MAX_EMAIL_AGE = timedelta(days=31)
 DOMAIN_URL = "https://11072100.xyz"

@@ -2,7 +2,7 @@ import uuid
 from zoneinfo import ZoneInfo
 from datetime import datetime, tzinfo
 
-from sqlalchemy import DateTime, ForeignKey, String
+from sqlalchemy import DateTime, ForeignKey, String, event, DDL
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship, MappedAsDataclass
@@ -53,7 +53,6 @@ class UserInfoTable(Base):
     access_token: Mapped[str] = mapped_column(String(4096), nullable=True)
     access_token_expires: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
     refresh_token: Mapped[str] = mapped_column(String(2048), nullable=True)
-    most_recent_fetched_email_utc: Mapped[datetime | None] = mapped_column(_UTCDateTimeSQLType(), nullable=True)
 
 class ParsedEmails(Base):
     __tablename__ = "parsed_emails"
@@ -84,3 +83,37 @@ class SettingsTable(MappedAsDataclass, Base):
     timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
     timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings", lazy="joined")
     auto_fetch_emails: Mapped[bool] = mapped_column(default=False)
+
+# An event that removes expired subscriptions from the database
+remove_expired_subscriptions = DDL(
+    "CREATE EVENT remove_old_subscriptions"
+    "   ON SCHEDULE EVERY 4 HOUR"
+    "   DO"
+    "       DELETE FROM email_subscriptions WHERE expires_at < UTC_TIMESTAMP() - INTERVAL 2 HOUR"
+)
+event.listen(EmailSubscriptionsTable.__table__, "after_create", remove_expired_subscriptions)
+
+# A scheduled event that automatically disables auto_fetch_emails, 
+# if for some reason subscription update was unsuccessful
+keep_settings_consistent = DDL(
+    "CREATE EVENT keep_settings_consistent"
+    "   ON SCHEDULE EVERY 1 MINUTE"
+    "   DO"
+    "       BEGIN"
+    "           DECLARE settings_cursor CURSOR"
+    "               FOR SELECT settings.user_id, email_subscriptions.subscription_id FROM settings LEFT JOIN email_subscriptions ON email_subscriptions.user_id = settings.user_id;"
+    "           DECLARE CONTINUE HANDLER FOR NOT FOUND SET finished = 1;"
+    "           OPEN settings_cursor;"
+    "           fetch_rows: LOOP"
+    "               FETCH settings_cursor INTO user_id, subscription_id;"
+    "               IF finished = 1 THEN"
+    "                   LEAVE fetch_rows;"
+    "               END IF;"
+    "               IF subscription_id = NULL THEN"
+    "                   UPDATE settings SET auto_fetch_emails = 0 WHERE settings.user_id = user_id;"
+    "               END IF;"
+    "           END LOOP fetch_rows;"
+    "           CLOSE settings_cursor;"
+    "       END"
+)
+event.listen(SettingsTable.__table__, "after_create", keep_settings_consistent)

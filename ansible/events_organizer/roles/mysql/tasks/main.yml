@@ -43,6 +43,12 @@
     group: mysql
     mode: '0440'
 
+- name: Enable event scheduler for MySQL
+  community.mysql.mysql_variables:
+    mode: persistent
+    variable: event_scheduler
+    value: 1
+
 - name: Create necessary databases for Events Organiser
   community.mysql.mysql_db:
     name: "{{ item }}"

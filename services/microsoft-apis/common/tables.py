@@ -85,19 +85,19 @@ class SettingsTable(MappedAsDataclass, Base):
     auto_fetch_emails: Mapped[bool] = mapped_column(default=False)
 
 # An event that removes expired subscriptions from the database
-remove_expired_subscriptions = DDL(
+remove_old_subscriptions = DDL(
     "CREATE EVENT IF NOT EXISTS remove_old_subscriptions"
     "   ON SCHEDULE EVERY 4 HOUR"
     "   DO"
     "       DELETE FROM email_subscriptions WHERE expires_at < UTC_TIMESTAMP() - INTERVAL 2 HOUR"
 )
-event.listen(Base.metadata, "after_create", remove_expired_subscriptions)
+event.listen(Base.metadata, "after_create", remove_old_subscriptions)
 
 # A scheduled event that automatically disables auto_fetch_emails, 
 # if for some reason subscription update was unsuccessful
 keep_settings_consistent = DDL(
     "CREATE EVENT IF NOT EXISTS keep_settings_consistent"
-    "   ON SCHEDULE EVERY 1 MINUTE"
+    "   ON SCHEDULE EVERY 2 HOUR"
     "   DO"
     "       BEGIN"
     "           DECLARE finished INTEGER DEFAULT 0;"
@@ -115,6 +115,8 @@ keep_settings_consistent = DDL(
     "               SET @uid = user_id;"
     "               IF subscription_id IS NULL THEN"
     "                   UPDATE settings SET auto_fetch_emails = 0 WHERE settings.user_id = @uid;"
+    "               ELSE"
+    "                    UPDATE settings SET auto_fetch_emails = 1 WHERE settings.user_id = @uid;"
     "               END IF;"
     "           END LOOP fetch_rows;"
     "           CLOSE settings_cursor;"

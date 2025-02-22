@@ -57,8 +57,7 @@ class NotificationMQ:
             host=self.host,
             virtualhost=self.virtual_host,
             login=self.username,
-            password=self.password,
-            timeout=5,
+            password=self.password
         )
         self.mq_channel = await self.mq_connection.channel()
         await self.mq_channel.set_qos(prefetch_count=10)

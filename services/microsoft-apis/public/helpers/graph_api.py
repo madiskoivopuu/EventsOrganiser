@@ -84,7 +84,7 @@ async def get_messages(access_token: str, select: list | None, _filter: list | N
                 params=params,
                 headers={
                     "Authorization": f"Bearer {access_token}",
-                    "Prefer": 'outlook.body-content-type="text"'
+                    "Prefer": 'outlook.body-content-type="text", IdType="ImmutableId"',
                 }, ssl=sslcontext) as resp:
             resp_json = await resp.json()
 
@@ -111,7 +111,7 @@ async def get_message(id: str, access_token: str, select: list | None = None) ->
                 params=params,
                 headers={
                     "Authorization": f"Bearer {access_token}",
-                    "Prefer": 'outlook.body-content-type="text"'
+                    "Prefer": 'outlook.body-content-type="text", IdType="ImmutableId"',
                 }, ssl=sslcontext) as resp:
             resp_json = await resp.json()
 

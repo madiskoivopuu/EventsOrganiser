@@ -141,16 +141,6 @@ async def subscription_lifecycle(
     subscription_handler = cast(SubscriptionHandler, request.state.subscription_handler)
     async with asyncio.TaskGroup() as tg:
         for subscription_data in lifecycle_notification.value:
-            if(subscription_data.lifecycle_event == "subscriptionRemoved"):
-                tg.create_task(subscription_handler.subscription_deleted_notification(subscription_data))
-            elif(subscription_data.lifecycle_event == "reauthorizationRequired"):
-                tg.create_task(subscription_handler.subscription_reauthorize_notification(subscription_data))
-            elif(subscription_data.lifecycle_event == "missed"):
-                tg.create_task(
-                    subscription_handler.subscription_missed_data_notification(
-                        subscription_data,
-                        datetime.now(timezone.utc) - server_config.MAX_EMAIL_AGE
-                    )
-                )
-            else:
-                __logger.warning(f"Unknown lifecycle event {subscription_data.lifecycle_event}")
+            tg.create_task(
+                subscription_handler.handle_lifecycle_notification(subscription_data, server_config.MAX_EMAIL_AGE)
+            )

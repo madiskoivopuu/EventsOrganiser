@@ -14,7 +14,7 @@
     #- update_packages
     #- apache
     #- kubernetes_centos
-    - mysql
+    #- mysql
     #- rabbitmq_centos
     #- redis_centos
 
@@ -23,11 +23,7 @@
   become_user: root
   become: yes
 
-  vars:
-    llm_webserver_loc: /srv/www/llm_api_webserver
-    fqdn: "cs.ut.ee"
-
   roles:
-    #- setup
+    - setup
     #- update_packages
-    #- kubernetes_centos
+    - kubernetes_centos

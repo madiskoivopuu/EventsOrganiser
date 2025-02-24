@@ -4,7 +4,6 @@ from enum import Enum
 
 from typing import Literal, Optional
 from typing_extensions import Self
-from fastapi import Query, Body
 
 from datetime import datetime, tzinfo
 import pytz
@@ -46,8 +45,8 @@ class EventBase(BaseModel):
         return self
 
 class EventsGetRequest(BaseModel):
-    direction: Literal["forward", "backward"] = Field(Query(description="Tells the API endpoint whether to fetch events before or after a given date"))
-    from_time: datetime = Field(Query(description="An ISO-8601 date-time string specifying the date to fetch events from (or up to). If no timezone is provided, then the time will be treated as an UTC timestamp."))
+    direction: Literal["forward", "backward"] = Field(description="Tells the API endpoint whether to fetch events before or after a given date")
+    from_time: datetime = Field(description="An ISO-8601 date-time string specifying the date to fetch events from (or up to). If no timezone is provided, then the time will be treated as an UTC timestamp.")
 
 class EventsGetResponse(EventBase):
     id: int = Field(description="Event identifier in database")

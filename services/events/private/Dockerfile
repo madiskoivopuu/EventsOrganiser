@@ -6,8 +6,6 @@ RUN mkdir common
 COPY --from=common . ./common
 COPY . .
 
-RUN ls -la ./common
-
 RUN pip install --no-cache-dir -r requirements.txt
 
 CMD ["fastapi", "run", "server.py", "--port", "80"] 

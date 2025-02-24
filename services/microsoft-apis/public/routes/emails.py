@@ -85,6 +85,6 @@ async def new_email(
     await db_session.commit()
 
     resp = models.FetchNewEmailsGetResponse(
-        count=len(email)
+        count=len(emails)
     )
     return resp

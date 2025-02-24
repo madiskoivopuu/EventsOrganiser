@@ -59,7 +59,10 @@ async def new_email(
         "isDraft eq false"
     )
     ids_and_tokens = [(_id, user_data.access_token) for _id in unparsed_email_ids]
-    emails = await mail_fetcher.fetch_emails_batched(ids_and_tokens)
+    emails = await mail_fetcher.fetch_emails_batched(
+        ids_and_tokens,
+        batch_size=25,
+    )
 
     email_parse_requests = []
     for email in emails:
@@ -82,6 +85,6 @@ async def new_email(
     await db_session.commit()
 
     resp = models.FetchNewEmailsGetResponse(
-        count=len(emails)
+        count=len(email)
     )
     return resp

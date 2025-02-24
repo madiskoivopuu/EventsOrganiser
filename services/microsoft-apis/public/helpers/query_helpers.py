@@ -109,7 +109,7 @@ async def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list
         parsed_email = tables.ParsedEmails()
         parsed_email.user_id = user_id
         parsed_email.email_id = email["id"]
-        parsed_email.expire_at = datetime.fromisoformat(timezone.utc) + expire_in
+        parsed_email.expire_at = datetime.now(timezone.utc) + expire_in
 
         db_session.add(parsed_email)
 

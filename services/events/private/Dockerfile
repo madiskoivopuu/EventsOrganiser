@@ -1,5 +1,4 @@
 FROM python:3.12-slim
-EXPOSE 80
 
 WORKDIR /app
 RUN mkdir common

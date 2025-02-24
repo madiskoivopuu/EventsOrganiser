@@ -3,7 +3,7 @@ from fastapi_pagination import Page, add_pagination, paginate
 from fastapi.responses import JSONResponse
 from fastapi_pagination.ext.sqlalchemy import paginate
 
-import os, pytz, uuid
+import os, uuid
 
 import icalendar
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,8 +42,8 @@ async def get_events(
     """
 
     if(not models.tz_aware(request_data.from_time)):
-        request_data.from_time = request_data.from_time.replace(tzinfo=pytz.UTC)
-    request_data.from_time = request_data.from_time.astimezone(pytz.utc) # NOTE: MySQL DATETIME comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since DATETIMEs in the database are stored as UTC)
+        request_data.from_time = request_data.from_time.replace(tzinfo=timezone.utc)
+    request_data.from_time = request_data.from_time.astimezone(timezone.utc) # NOTE: MySQL DATETIME comparision is done disregarding timezones, please always convert a non UTC datetime to an UTC one (since DATETIMEs in the database are stored as UTC)
  
     query = select(tables.EventsTable) \
             .where(

@@ -1,1 +1,3 @@
+python-dotenv
 pika==1.3.2
+llama-cpp-python

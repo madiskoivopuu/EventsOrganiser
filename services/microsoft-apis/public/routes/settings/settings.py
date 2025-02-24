@@ -49,7 +49,8 @@ async def app_lifespan(app: FastAPI):
             )
         ]
     ) 
-    await settings_notification_mq.try_open_conn_indefinite()
+    
+    t1 = asyncio.create_task(settings_notification_mq.try_open_conn_indefinite())
 
     yield {"settings_notification_mq": settings_notification_mq}
 

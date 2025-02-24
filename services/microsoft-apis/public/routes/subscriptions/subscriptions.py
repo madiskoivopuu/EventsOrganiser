@@ -43,7 +43,7 @@ async def app_lifecycle(api: FastAPI):
         mail_sender_mq=mail_sender_mq
     )
 
-    await mail_sender_mq.try_open_conn_indefinite()
+    t1 = asyncio.create_task(mail_sender_mq.try_open_conn_indefinite())
 
     yield {
         "subscription_handler": subscription_handler,

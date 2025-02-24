@@ -1,5 +1,7 @@
 *.env
 *.gguf
+*.rar
+*.zip
 emails.json
 emails_output/
 

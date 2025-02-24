@@ -40,7 +40,7 @@ class MailSenderMQ:
         try:
             await self.open_conn()
         except:
-            self.__logger.warning("Failed to open NotificationMQ connection, trying again later", exc_info=True)
+            self.__logger.warning("Failed to open MailSenderMQ connection, trying again later", exc_info=True)
             self.__retry_conn_task = asyncio.create_task(self.try_open_conn_indefinite())
 
     async def open_conn(self):

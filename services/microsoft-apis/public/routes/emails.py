@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, FastAPI, Request, HTTPException, Depends
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
@@ -30,7 +31,7 @@ async def router_lifespan(app: FastAPI):
         password=server_config.RABBITMQ_PASSWORD,
         queue_name=server_config.RABBITMQ_EMAILS_QUEUE
     )
-    await mail_sender_mq.open_conn()
+    t1 = asyncio.create_task(mail_sender_mq.try_open_conn_indefinite())
 
     yield {"mail_sender_mq": mail_sender_mq}
 
@@ -74,7 +75,8 @@ async def new_email(
     await query_helpers.add_parsed_emails(
         db_session,
         user_data.user_id,
-        emails
+        emails,
+        expire_in=server_config.MAX_EMAIL_AGE
     )
     await cast(MailSenderMQ, request.state.mail_sender_mq).send_new_emails_to_parse(email_parse_requests)
     await db_session.commit()

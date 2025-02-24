@@ -84,6 +84,15 @@ class SettingsTable(MappedAsDataclass, Base):
     timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings", lazy="joined")
     auto_fetch_emails: Mapped[bool] = mapped_column(default=False)
 
+# An event that clears out expired email IDs from the parsed email cache
+remove_expired_emails = DDL(
+    "CREATE EVENT IF NOT EXISTS remove_expired_emails"
+    "   ON SCHEDULE EVERY 6 HOUR"
+    "   DO"
+    "       DELETE FROM parsed_emails WHERE expire_at < UTC_TIMESTAMP()"
+)
+event.listen(Base.metadata, "after_create", remove_expired_emails)
+
 # An event that removes expired subscriptions from the database
 remove_old_subscriptions = DDL(
     "CREATE EVENT IF NOT EXISTS remove_old_subscriptions"

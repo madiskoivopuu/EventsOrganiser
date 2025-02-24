@@ -102,13 +102,14 @@ async def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list
     :param db_session: An existing database session
     :param user_id: User id (oid) of the account
     :param emails: Email resources as returned by Microsoft Graph
+    :param expire_in: The amount of time the IDs are kept in the cache
     """
 
     for email in emails:
         parsed_email = tables.ParsedEmails()
         parsed_email.user_id = user_id
         parsed_email.email_id = email["id"]
-        parsed_email.expire_at = datetime.now(timezone.utc) + expire_in
+        parsed_email.expire_at = datetime.fromisoformat(timezone.utc) + expire_in
 
         db_session.add(parsed_email)
 

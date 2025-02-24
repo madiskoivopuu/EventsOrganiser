@@ -142,7 +142,8 @@ class SubscriptionHandler:
         await query_helpers.add_parsed_emails(
             db_session,
             user_info.user_id,
-            emails
+            emails,
+            expire_in=max_email_age
         )
         await cast(MailSenderMQ, self.mail_sender_mq).send_new_emails_to_parse(email_parse_requests)
         await db_session.commit()

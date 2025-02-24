@@ -109,7 +109,7 @@ def get_parse_output_grammar() -> LlamaGrammar:
                 },
                 "tags": {
                     "type": "array",
-                    "items": map(_tag_to_schema, __TAGS)
+                    "items": list(map(_tag_to_schema, __TAGS))
                 },
             },
             "required": ["event_name", "start_date", "end_date", "country", "city", "address", "room", "tags"]

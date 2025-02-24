@@ -1,6 +1,5 @@
 from helpers.email_data import Email
 from llm.model import Llama3Model 
-from helpers import mq_email_parser
 
 from dataclasses import dataclass
 from collections.abc import Callable
@@ -37,6 +36,16 @@ class ParserThread(threading.Thread):
         self.current_work_delivery_tag = None
         self.llm = Llama3Model(llm_model_path)
 
+    def to_email_obj(self, msg_with_email: dict[str]) -> Email:
+        email_data = msg_with_email["email_data"]
+        reader_email = msg_with_email["reader_email"]
+
+        match msg_with_email["account_type"]:
+            case "outlook":
+                return Email.from_outlook_json(email_data, reader_email)
+            case _:
+                return None
+
     def run(self):
         while True:
             data: ParseRequest = self.email_queue.get()
@@ -48,7 +57,7 @@ class ParserThread(threading.Thread):
             # TODO: add some proper error handling in case
 
             msg_with_email: dict[str] = json.loads(data.body)
-            email: Email = mq_email_parser.parse(msg_with_email)
+            email: Email = self.to_email_obj(msg_with_email)
             events = self.parse_and_validate(email)
 
             callback_with_args = functools.partial(self.callback, data.channel, data.delivery_tag, ParseResponse(

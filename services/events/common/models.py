@@ -5,8 +5,7 @@ from enum import Enum
 from typing import Literal, Optional
 from typing_extensions import Self
 
-from datetime import datetime, tzinfo
-import pytz
+from datetime import datetime, tzinfo, timezone
 
 # Based on https://docs.python.org/3/library/datetime.html#determining-if-an-object-is-aware-or-naive , checks if datetime object knows what timezone it is in
 def tz_aware(dt: datetime) -> tzinfo | None:
@@ -37,10 +36,10 @@ class EventBase(BaseModel):
             raise ValueError("'end_date' cannot be none")
         
         if(self.start_date_utc != None and not tz_aware(self.start_date_utc)):
-            self.start_date_utc = self.start_date_utc.replace(tzinfo=pytz.UTC)
+            self.start_date_utc = self.start_date_utc.replace(tzinfo=timezone.utc)
 
         if(self.end_date_utc != None and not tz_aware(self.end_date_utc)):
-            self.end_date_utc = self.end_date_utc.replace(tzinfo=pytz.UTC)
+            self.end_date_utc = self.end_date_utc.replace(tzinfo=timezone.utc)
 
         return self
 

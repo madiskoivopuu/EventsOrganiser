@@ -36,7 +36,7 @@ tags_to_events = Table(
 class TagsTable(Base):
     __tablename__ = "tags"
 
-    id: Mapped[int]  = mapped_column(primary_key=True)
+    id: Mapped[int]  = mapped_column(primary_key=True, unique=True)
     name: Mapped[str] = mapped_column(String(64), unique=True)
 
 class EventsTable(Base):
@@ -45,7 +45,7 @@ class EventsTable(Base):
         CheckConstraint("end_date_utc IS NOT NULL", name="date_check"),
     )
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, unique=True)
     user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
     user_id: Mapped[str] = mapped_column(String(256))
     

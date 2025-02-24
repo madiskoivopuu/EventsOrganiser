@@ -1,0 +1,34 @@
+version: '3'
+services:
+  auth-public:
+    build: 
+      context: ./auth/public
+    image: ${IMAGE_REGISTRY}/auth-public
+  
+  email-event-parser-private:
+    build: 
+      context: ./email-event-parser/private
+      additional_contexts:
+        - common=./microsoft-apis/common
+    image: ${IMAGE_REGISTRY}/email-event-parser-private
+    
+  events-public:
+    build: 
+      context: ./events/public
+      additional_contexts:
+        - common=./events/common
+    image: ${IMAGE_REGISTRY}/events-public
+
+  events-private:
+    build: 
+      context: ./events/private
+      additional_contexts:
+        - common=./microsoft-apis/common
+    image: ${IMAGE_REGISTRY}/events-private
+
+  microsoft-apis-public:
+    build: 
+      context: ./microsoft-apis/public
+      additional_contexts:
+        - common=./microsoft-apis/common
+    image: ${IMAGE_REGISTRY}/microsoft-apis-public

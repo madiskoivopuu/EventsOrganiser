@@ -5,8 +5,8 @@ This playbook can be used to set up the servers with the appropriate software ne
 ## Prerequisites
 
 A few community modules need to be installed before the Ansible playbook:
-`ansible-galaxy collection install devsec.hardening`
 `ansible-galaxy collection install community.rabbitmq`
+`ansible-galaxy collection install community.general`
 
 Some roles will also need additional variables to be set (passwords/secrets etc) so that they can work. You can do that with Ansible Vault, creating it in the same directory as the playbook, or through some other means.
 

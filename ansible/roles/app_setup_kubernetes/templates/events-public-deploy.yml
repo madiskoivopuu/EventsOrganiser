@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: events-public-deployment
+  #namespace: events-organiser
+  labels:
+    app: events-public
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: events-public
+  template:
+    metadata:
+      labels:
+        app: events-public
+    spec:
+      containers:
+        - name: events-public
+          image: madiskoivopuu/events-public # TODO: variable to allow custom image
+          ports:
+            - containerPort: 80
+          env: # TODO: all env variables from jinja2 template
+            - name: MYSQL_EVENTS_USER
+              value: "events"
+            - name: MYSQL_EVENTS_PASSWORD
+              value: "0Km7#aY7l9016lV?o4k"
+            - name: MYSQL_HOST
+              value: "192.168.42.186"
+            - name: JWT_SECRET
+              value: "j8sa90SOLl,cIDkl)!mdf0+LS8ksdf9aöUIFlz98!ker"
+            - name: JWT_SESSION_COOKIE_NAME
+              value: "session-jwt"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: events-public-svc
+  #namespace: events-organiser
+spec:
+  type: NodePort
+  selector:
+    app: events-public
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      name: tcp-80

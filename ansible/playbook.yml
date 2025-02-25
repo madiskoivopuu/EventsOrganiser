@@ -6,6 +6,7 @@
   vars:
     mysql_socket: "/var/lib/mysql/mysql.sock"
     redis_config: "/etc/redis/redis.conf"
+    domain_name: "www.11072100.xyz"
   vars_files:
     - vault.yml
 
@@ -19,11 +20,11 @@
     #- redis_centos
 
 - hosts: workers
-  user: centos
+  user: ubuntu
   become_user: root
   become: yes
 
   roles:
-    - setup
+    #- setup
     #- update_packages
     - kubernetes_centos

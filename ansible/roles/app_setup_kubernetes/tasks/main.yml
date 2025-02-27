@@ -1,22 +1,3 @@
-- name: Install NGINX directly on VM
-  ansible.builtin.apt:
-    name: nginx
-    state: present
+- include_tasks: nginx-proxy-and-gateway-kube.yml
 
-- name: Remove default configuration for NGINX
-  ansible.builtin.file:
-    path: /etc/nginx/sites-enabled/main-site.conf
-    state: absent
-
-- name: Copy NGINX configuration to VM 
-  ansible.builtin.template:
-    src: main-site.conf
-    dest: /etc/nginx/sites-enabled/main-site.conf
-    user: root
-    group: root
-    mode: "0755"
-
-- name: Reload service NGINX
-  ansible.builtin.service:
-    name: nginx
-    state: reloaded
+- include_tasks: app.yml

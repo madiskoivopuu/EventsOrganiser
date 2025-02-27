@@ -1,0 +1,9 @@
+- name: Deploy HTTPRoute for the app
+  kubernetes.core.k8s:
+    definition: "{{ item }}"
+  loop: "{{ lookup('ansible.builtin.template', 'gateway-and-routing.yml') | from_yaml_all }}"
+
+- name: Deploy public events microservice
+  kubernetes.core.k8s:
+    definition: "{{ item }}"
+  loop: "{{ lookup('ansible.builtin.file', 'events-public-deploy.yml') | from_yaml_all }}"

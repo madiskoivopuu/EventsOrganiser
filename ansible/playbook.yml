@@ -8,16 +8,20 @@
     redis_config: "/etc/redis/redis.conf"
     domain_name: "www.11072100.xyz"
     is_kube_master_node: true
+
+    events_org_config:
+
   vars_files:
     - vault.yml
 
   roles:
-    - update_packages
-    - setup
-    - rabbitmq
-    - kubernetes
-    - mysql
-    - redis
+    #- update_packages
+    #- setup
+    #- rabbitmq
+    #- kubernetes
+    #- mysql
+    #- redis
+    - app_setup_kubernetes
 
 - hosts: workers
   user: ubuntu
@@ -28,6 +32,6 @@
     - vault.yml
 
   roles:
-    - update_packages
-    - setup
-    - kubernetes
+    #- update_packages
+    #- setup
+    #- kubernetes

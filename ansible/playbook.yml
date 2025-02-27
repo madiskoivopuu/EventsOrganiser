@@ -28,9 +28,6 @@
     - vault.yml
 
   roles:
-    #- update_packages
-    #- setup
-    #- kubernetes
-    #- mysql
-    - rabbitmq
-    - redis
+    - update_packages
+    - setup
+    - kubernetes

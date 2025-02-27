@@ -58,6 +58,14 @@
     - erlang-xmerl
     - rabbitmq-server
 
+- name: Create env file for RabbitMQ (required to fix startup problems)
+  ansible.builtin.copy:
+    content: HOSTNAME=localhost
+    dest: /etc/rabbitmq/rabbitmq-env.conf
+    owner: root
+    group: root
+    mode: "0644"
+
 - name: Start rabbitmq-server
   ansible.builtin.systemd:
     name: rabbitmq-server
@@ -78,12 +86,12 @@
     - "15672"
     - "25672"
 
-#- name: Enable RabbitMQ Plugins
-#  community.rabbitmq.rabbitmq_plugin:
-#    name: "{{ item }}"
-#    state: enabled
-#  with_items:
-#    - rabbitmq_management
+- name: Enable RabbitMQ Plugins
+  community.rabbitmq.rabbitmq_plugin:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+     - rabbitmq_management
 
 - name: Ensure that the vhost /events-parser exists.
   community.rabbitmq.rabbitmq_vhost:

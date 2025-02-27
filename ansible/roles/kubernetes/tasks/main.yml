@@ -97,4 +97,4 @@
     prompt: "Use 'kubeadm init' to create a cluster on the main VM, or 'kubeadm join ...' command worker nodes. Press enter after this is done"
 
 - include_tasks: kube-control-plane.yml
-  when: is_kube_master_node == true
+  when: is_kube_master_node

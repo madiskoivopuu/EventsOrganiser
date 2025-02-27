@@ -7,13 +7,16 @@ This playbook can be used to set up the servers with the appropriate software ne
 A few community modules need to be installed before the Ansible playbook:
 `ansible-galaxy collection install community.rabbitmq`
 `ansible-galaxy collection install community.general`
+`ansible-galaxy collection install kubernetes.core`
 
 Some roles will also need additional variables to be set (passwords/secrets etc) so that they can work. You can do that with Ansible Vault, creating it in the same directory as the playbook, or through some other means.
 
 The list of required variables for each role is the following:
-* mysql_install
+* mysql
     1. mysql_root_password
-* rabbitmq_centos_install
+    2. mysql_user_events_password
+    3. mysql_user_microsoft_password
+* rabbitmq
     1. events_parser_rabbitmq_password
 
 ## Adding hosts

@@ -1,17 +1,10 @@
 apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
-metadata:
-  name: events-organiser-gateway-cls
-spec:
-  controllerName: example.com/gateway-controller
----
-apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: http-gateway
   namespace: events-organiser
 spec:
-  gatewayClassName: events-organiser-gateway-cls
+  gatewayClassName: nginx
   listeners:
   - name: http
     protocol: HTTP
@@ -27,6 +20,7 @@ spec:
   - name: http-gateway
     namespace: events-organiser
   hostnames:
+  - "193.40.155.167"
   - "www.11072100.xyz" # TODO: jinja2 template
   rules:
   - matches:
@@ -34,5 +28,5 @@ spec:
         type: PathPrefix
         value: /api/events
     backendRefs:
-    - name: events-svc
+    - name: events-public-svc
       port: 80

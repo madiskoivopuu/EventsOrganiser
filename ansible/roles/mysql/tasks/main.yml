@@ -1,36 +1,35 @@
 - name: Install Python package "PyMySQL[rsa]" necessary for Ansible role 
-  ansible.builtin.pip:
-    name: "PyMySQL[rsa]"
+  ansible.builtin.apt:
+    name: "python3-pymysql"
     state: latest
 
 - name: Install/update MySQL
-  ansible.builtin.dnf:
+  ansible.builtin.apt:
     name: '{{ item }}'
     state: latest
   with_items:
-  - "mysql"
   - "mysql-server"
   notify:
   - Restart mysql
 
-- name: Open MySQL ports
-  ansible.posix.firewalld:
-    permanent: true
-    immediate: true
-    port: "{{ item }}"
+- name: Enable ufw, open SSH port
+  community.general.ufw:
     state: enabled
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
   with_items:
-    - 3306/tcp
-    - 3306/udp
+    - "3306"
 
-- name: Start mysqld
+- name: Start mysql
   ansible.builtin.systemd:
-    name: mysqld
+    name: mysql
     state: started
     enabled: true
 
 - name: Set root user password
   community.mysql.mysql_user:
+    config_file: /etc/mysql/debian.cnf
     name: root
     password: "{{ mysql_root_password | mandatory }}"
     update_password: always
@@ -45,7 +44,7 @@
 
 - name: Enable event scheduler for MySQL
   community.mysql.mysql_variables:
-    mode: persistent
+    mode: persist
     variable: event_scheduler
     value: 1
 
@@ -65,7 +64,7 @@
   with_items:
     - "localhost"
     - "10.0.0.0/255.0.0.0"
-    - "88.196.111.110" # add your own IP here, if you want to access the DB outside of the cluster
+    #- "11.11.11.11" # add your own IP here, if you want to access the DB outside of the cluster
 
 - name: Create MySQL user "microsoft"
   community.mysql.mysql_user:
@@ -76,4 +75,4 @@
   with_items:
     - "localhost"
     - "10.0.0.0/255.0.0.0"
-    - "88.196.111.110" # add your own IP here, if you want to access the DB outside of the cluster
+    #- "11.11.11.11" # add your own IP here, if you want to access the DB outside of the cluster

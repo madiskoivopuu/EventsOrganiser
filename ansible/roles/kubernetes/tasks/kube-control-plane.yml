@@ -1,0 +1,31 @@
+- name: Create kubeconfig directory for root and regular user 'ubuntu'
+  ansible.builtin.file:
+    path: "{{ item['home_path'] }}/.kube" 
+    owner: "{{ item['user'] }}"
+    group: "{{ item['user'] }}"
+    mode: "0755"
+    state: directory
+  with_items:
+    - user: root
+      home_path: /root
+    - user: ubuntu
+      home_path: "/home/ubuntu"
+
+- name: Copy over kubeconfig
+  ansible.builtin.copy:
+    remote_src: true
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ item['home_path'] }}/.kube/config" 
+    owner: "{{ item['user'] }}"
+    group: "{{ item['user'] }}"
+    mode: "0600"
+  with_items:
+  - user: root
+    home_path: /root
+  - user: ubuntu
+    home_path: "/home/ubuntu"
+
+- name: Create CNI with Weave
+  kubernetes.core.k8s:
+    src: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+    state: present

@@ -1,5 +1,5 @@
 - hosts: controller
-  user: centos
+  user: ubuntu
   become_user: root
   become: yes
 
@@ -7,24 +7,30 @@
     mysql_socket: "/var/lib/mysql/mysql.sock"
     redis_config: "/etc/redis/redis.conf"
     domain_name: "www.11072100.xyz"
+    is_kube_master_node: true
   vars_files:
     - vault.yml
 
   roles:
-    #- setup
-    #- update_packages
-    #- apache
-    #- kubernetes_centos
-    #- mysql
-    #- rabbitmq_centos
-    #- redis_centos
+    - update_packages
+    - setup
+    - rabbitmq
+    - kubernetes
+    - mysql
+    - redis
 
 - hosts: workers
   user: ubuntu
   become_user: root
   become: yes
 
+  vars_files:
+    - vault.yml
+
   roles:
-    #- setup
     #- update_packages
-    - kubernetes_centos
+    #- setup
+    #- kubernetes
+    #- mysql
+    - rabbitmq
+    - redis

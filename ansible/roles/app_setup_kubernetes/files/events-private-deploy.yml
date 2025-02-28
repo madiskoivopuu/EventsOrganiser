@@ -54,31 +54,25 @@ spec:
               value: "email_parsing_queue"
             - name: RABBITMQ_EVENTS_OUTPUT_QUEUE
               value: "parsed_events_queue"
-            #- name: MYSQL_DB_PASSWORD
-            #  valueFrom:
-            #    secretKeyRef:
-            #      name: secrets
-            #      key: microsoft.MYSQL_MICROSOFT_PASSWORD
-            #- name: MYSQL_HOST
-            #  valueFrom:
-            #    configMapKeyRef:
-            #      name: config
-            #      key: microsoft.MYSQL_HOST
-
-      #initContainers:
-      #- name: install
-      #  image: busybox
-      #  command:
-      #  - wget
-      #  - "-O"
-      #  - "/llm/llama.gguf"
-      #  - http://kubernetes.io
-      #  volumeMounts:
-      #  - name: llm-dir
-      #    mountPath: "/llm"
-      #volumes:
-      #- name: llm-dir
-      #  emptyDir: {}
+            - name: LLM_PATH
+              value: "/llm/llama.gguf"
+          volumeMounts:
+          - name: llm-dir
+            mountPath: /llm
+      initContainers:
+      - name: install
+        image: busybox
+        command:
+        - wget
+        - "-O"
+        - "/llm/llama.gguf"
+        - https://filebin.net/akvct1cqhq024wmq/Llama-3.2-3B-Instruct.gguf  # Replace this with your own Llama-3 file if necessary
+        volumeMounts:
+        - name: llm-dir
+          mountPath: /llm
+      volumes:
+      - name: llm-dir
+        emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

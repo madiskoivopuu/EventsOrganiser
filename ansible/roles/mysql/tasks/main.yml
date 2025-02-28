@@ -12,14 +12,14 @@
   notify:
   - Restart mysql
 
-- name: Enable ufw, open SSH port
-  community.general.ufw:
-    state: enabled
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  with_items:
-    - "3306"
+#- name: Enable ufw, open SSH port
+#  community.general.ufw:
+#    state: enabled
+#    rule: allow
+#    port: "{{ item }}"
+#    proto: tcp
+#  with_items:
+#    - "3306"
 
 - name: Start mysql
   ansible.builtin.systemd:
@@ -31,7 +31,7 @@
   community.mysql.mysql_user:
     config_file: /etc/mysql/debian.cnf
     name: root
-    password: "{{ mysql_root_password | mandatory }}"
+    password: "{{ events_org_secret.mysql_root_password | mandatory }}"
     update_password: always
 
 - name: Set .my.cnf with root user credentials
@@ -59,7 +59,7 @@
   community.mysql.mysql_user:
     name: events
     host: "{{ item }}"
-    password: "{{ mysql_user_events_password | mandatory }}"
+    password: "{{ events_org_secret.mysql_user_events_password | mandatory }}"
     priv: "events.*:ALL"
   with_items:
     - "localhost"
@@ -70,7 +70,7 @@
   community.mysql.mysql_user:
     name: microsoft
     host: "{{ item }}"
-    password: "{{ mysql_user_microsoft_password | mandatory }}"
+    password: "{{ events_org_secret.mysql_user_microsoft_password | mandatory }}"
     priv: "microsoft.*:ALL"
   with_items:
     - "localhost"

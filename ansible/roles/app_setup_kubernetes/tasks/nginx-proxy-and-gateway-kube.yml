@@ -26,11 +26,11 @@
 
 # Sets up the NGINX pod for Kubernetes Gateway API
 - name: Download the Gateway API resources with kubectl kustomize
-  ansible.builtin.command: kubectl kustomize -o /tmp/nginx-gateway-fabric-crds.yaml https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v1.6.1 
+  ansible.builtin.command: kubectl kustomize -o /tmp/nginx-gateway-fabric-crds.yml https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v1.6.1 
 
 - name: Install the Gateway API resources
   kubernetes.core.k8s:
-    src: "/tmp/nginx-gateway-fabric-crds.yaml"
+    src: "/tmp/nginx-gateway-fabric-crds.yml"
 
 - name: Deploy the NGINX Gateway Fabric CRDs
   kubernetes.core.k8s:
@@ -39,5 +39,4 @@
 - name: Deploy the NGINX Gateway
   kubernetes.core.k8s:
     state: present
-    definition: "{{ item }}"
-  loop: "{{ lookup('ansible.builtin.file', 'nginx-gateway-controller.yaml') | from_yaml_all }}"
+    definition: "{{ lookup('ansible.builtin.file', 'nginx-gateway-controller.yml') | from_yaml_all }}"

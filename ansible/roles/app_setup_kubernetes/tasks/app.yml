@@ -1,9 +1,29 @@
+- name: Create ConfigMap & Secret for events organiser microservices
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'general-conf.yml') | from_yaml_all }}"
+
 - name: Deploy HTTPRoute for the app
   kubernetes.core.k8s:
-    definition: "{{ item }}"
-  loop: "{{ lookup('ansible.builtin.template', 'gateway-and-routing.yml') | from_yaml_all }}"
+    state: present
+    definition: "{{ lookup('ansible.builtin.template', 'gateway-and-routing.yml') | from_yaml_all }}"
 
 - name: Deploy public events microservice
   kubernetes.core.k8s:
-    definition: "{{ item }}"
-  loop: "{{ lookup('ansible.builtin.file', 'events-public-deploy.yml') | from_yaml_all }}"
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', 'events-public-deploy.yml') | from_yaml_all }}"
+
+- name: Deploy private events microservice
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', 'events-private-deploy.yml') | from_yaml_all }}"
+
+- name: Deploy public auth microservice
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', 'auth-public-deploy.yml') | from_yaml_all }}"
+
+- name: Deploy public Microsoft accounts microservice
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('ansible.builtin.file', 'microsoft-public-deploy.yml') | from_yaml_all }}"

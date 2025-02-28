@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-public-deployment
+  namespace: events-organiser
+  labels:
+    app: auth-public
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth-public
+  template:
+    metadata:
+      labels:
+        app: auth-public
+    spec:
+      containers:
+        - name: auth-public
+          image: madiskoivopuu/auth-public
+          ports:
+            - containerPort: 80
+          env:
+            - name: MICROSOFT_APP_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: MICROSOFT_APP_CLIENT_ID
+            - name: MICROSOFT_APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: MICROSOFT_APP_SECRET
+
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: auth.RABBITMQ_HOST
+            - name: RABBITMQ_VIRTUALHOST
+              value: "/events-parser"
+            - name: RABBITMQ_USERNAME
+              value: "events-parser"
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: auth.RABBITMQ_PASSWORD
+
+            - name: REDIS_HOST_URL
+              value: "redis://localhost:6379" # temporary, replaced with MySQL very soon
+            #- name: MYSQL_DB_PASSWORD
+            #  valueFrom:
+            #    secretKeyRef:
+            #      name: secrets
+            #      key: microsoft.MYSQL_MICROSOFT_PASSWORD
+            #- name: MYSQL_HOST
+            #  valueFrom:
+            #    configMapKeyRef:
+            #      name: config
+            #      key: microsoft.MYSQL_HOST
+
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: JWT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-public-svc
+  namespace: events-organiser
+spec:
+  type: ClusterIP
+  selector:
+    app: auth-public
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

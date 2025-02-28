@@ -22,14 +22,14 @@
     - redis
     - redis-tools
 
-- name: Enable ufw, open SSH port
-  community.general.ufw:
-    state: enabled
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  with_items:
-    - "6379"
+#- name: Enable ufw, open SSH port
+#  community.general.ufw:
+#    state: enabled
+#    rule: allow
+#    port: "{{ item }}"
+#    proto: tcp
+#  with_items:
+#    - "6379"
 
 - name: Start redis server
   ansible.builtin.systemd:
@@ -41,6 +41,6 @@
   ansible.builtin.lineinfile:
     path: "{{ redis_config }}"
     regexp: "#?\\s*requirepass"
-    line: "requirepass {{redis_password | mandatory}}"
+    line: "requirepass {{ events_org_secret.redis_password | mandatory}}"
   notify:
     - Restart redis

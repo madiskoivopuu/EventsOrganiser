@@ -1,8 +1,3 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: events-organiser
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,20 +17,29 @@ spec:
     spec:
       containers:
         - name: events-public
-          image: madiskoivopuu/events-public # TODO: variable to allow custom image
+          image: madiskoivopuu/events-public
           ports:
             - containerPort: 80
-          env: # TODO: all env variables from jinja2 template
+          env:
             - name: MYSQL_EVENTS_USER
               value: "events"
             - name: MYSQL_EVENTS_PASSWORD
-              value: "0Km7#aY7l9016lV?o4k"
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: events.MYSQL_EVENTS_PASSWORD
             - name: MYSQL_HOST
-              value: "192.168.42.186"
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: events.MYSQL_HOST
             - name: JWT_SECRET
-              value: "j8sa90SOLl,cIDkl)!mdf0+LS8ksdf9aöUIFlz98!ker"
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: JWT_SECRET
             - name: JWT_SESSION_COOKIE_NAME
-              value: "session-jwt"
+              value: "__Host-session-jwt"
 ---
 apiVersion: v1
 kind: Service

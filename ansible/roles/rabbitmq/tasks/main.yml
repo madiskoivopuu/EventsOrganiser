@@ -72,19 +72,19 @@
     state: started
     enabled: true
 
-- name: Enable ufw, open SSH port
-  community.general.ufw:
-    state: enabled
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  with_items:
-    - "4369"
-    - "5551:5552"
-    - "5671:5672"
-    - "6000:6500"
-    - "15672"
-    - "25672"
+#- name: Open RabbitMQ related ports
+#  community.general.ufw:
+#    state: enabled
+#    rule: allow
+#    port: "{{ item }}"
+#    proto: tcp
+#  with_items:
+#    - "4369"
+#    - "5551:5552"
+#    - "5671:5672"
+#    - "6000:6500"
+#    - "15672"
+#    - "25672"
 
 - name: Enable RabbitMQ Plugins
   community.rabbitmq.rabbitmq_plugin:
@@ -101,7 +101,7 @@
 - name: Add a new user to RabbitMQ for emails/events parsing
   community.rabbitmq.rabbitmq_user:
     user: "events-parser"
-    password: "{{ events_parser_rabbitmq_password | mandatory }}"
+    password: "{{ events_org_secret.events_parser_rabbitmq_password | mandatory }}"
     tags: management
     permissions:
       - vhost: /events-parser

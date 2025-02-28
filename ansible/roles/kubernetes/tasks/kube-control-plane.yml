@@ -25,7 +25,23 @@
   - user: ubuntu
     home_path: "/home/ubuntu"
 
-- name: Create CNI with Weave
-  kubernetes.core.k8s:
-    src: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
-    state: present
+- name: Create Cilium download folder
+  file:
+    path: /tmp/cilium/
+    state: directory
+
+- name: Download Cilium CLI
+  ansible.builtin.get_url:
+    url: https://github.com/cilium/cilium-cli/releases/download/v0.17.0/cilium-linux-amd64.tar.gz # x64 arch, for arm this needs to be changed
+    dest: /tmp/cilium/cilium-linux-amd64.tar.gz
+    checksum: sha256:https://github.com/cilium/cilium-cli/releases/download/v0.17.0/cilium-linux-amd64.tar.gz.sha256sum
+
+- name: Unzip and move the CLI tool into /usr/local/bin
+  ansible.builtin.unarchive:
+    remote_src: yes
+    src: /tmp/cilium/cilium-linux-amd64.tar.gz
+    dest: /usr/local/bin
+
+- name: "PAUSED | Manually install cilium"
+  ansible.builtin.pause:
+    prompt: "Use 'cilium install --version 1.17.1' to install CNI"

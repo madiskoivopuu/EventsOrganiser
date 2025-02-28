@@ -10,13 +10,13 @@
   notify:
     - Restart server
 
-- name: Enable ufw, open SSH port
-  community.general.ufw:
-    state: enabled
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  with_items:
-    - "22"
-    - "80"
-    - "443"
+#- name: Enable ufw, open SSH port
+#  community.general.ufw:
+#    state: enabled
+#    rule: allow
+#    port: "{{ item }}"
+#    proto: tcp
+#  with_items:
+#    - "22"
+#    - "80"
+#    - "443"

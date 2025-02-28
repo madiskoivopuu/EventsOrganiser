@@ -6,10 +6,14 @@
   vars:
     mysql_socket: "/var/lib/mysql/mysql.sock"
     redis_config: "/etc/redis/redis.conf"
-    domain_name: "www.11072100.xyz"
+    domain_name: "11072100.xyz"
     is_kube_master_node: true
 
-    events_org_config:
+    events_org_config: # NOTE: set DEFAULT_HASH_BEHAVIOUR to merge
+      microsoft_app_client_id: e7531514-8913-47a8-8cd2-b80dcef955b7
+      mysql_host: 192.168.42.26
+      rabbitmq_host: 192.168.42.26
+      llm_gguf_url: ""
 
   vars_files:
     - vault.yml

@@ -61,7 +61,7 @@ spec:
             mountPath: /llm
       initContainers:
       - name: install
-        image: busybox
+        image: alpine
         command:
         - wget
         - "-O"

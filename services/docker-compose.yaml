@@ -4,13 +4,6 @@ services:
     build: 
       context: ./auth/public
     image: ${IMAGE_REGISTRY}/auth-public
-  
-  email-event-parser-private:
-    build: 
-      context: ./email-event-parser/private
-      additional_contexts:
-        - common=./microsoft-apis/common
-    image: ${IMAGE_REGISTRY}/email-event-parser-private
     
   events-public:
     build: 

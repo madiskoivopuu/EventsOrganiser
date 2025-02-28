@@ -7,6 +7,6 @@
       metadata:
         name: events-organiser
 
-#- include_tasks: nginx-proxy-and-gateway-kube.yml
+- include_tasks: nginx-proxy-and-gateway-kube.yml
 
 - include_tasks: app.yml

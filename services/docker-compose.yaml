@@ -15,7 +15,7 @@ services:
     build: 
       context: ./events/private
       additional_contexts:
-        - common=./microsoft-apis/common
+        - common=./events/common
     image: ${IMAGE_REGISTRY}/events-private
 
   microsoft-apis-public:

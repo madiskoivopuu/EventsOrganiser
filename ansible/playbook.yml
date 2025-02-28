@@ -23,9 +23,9 @@
     #- setup
     #- rabbitmq
     #- kubernetes
-    #- mysql
+    - mysql
     #- redis
-    - app_setup_kubernetes
+    #- app_setup_kubernetes
 
 - hosts: workers
   user: ubuntu

@@ -33,4 +33,5 @@ class Email:
                     recipient_emails=recipients,
                     reader_email=reader_email,
                     mail_link=email_data["webLink"],
-                    is_draft=email_data["isDraft"])
+                    is_draft=email_data["isDraft"]
+                    )

@@ -16,4 +16,4 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 if(os.getenv("DEV_MODE") == "1"):
     JWT_SESSION_COOKIE_NAME = "session-jwt"
 else:
-    JWT_SESSION_COOKIE_NAME = "__Secure-session-jwt"
+    JWT_SESSION_COOKIE_NAME = "__Host-session-jwt"

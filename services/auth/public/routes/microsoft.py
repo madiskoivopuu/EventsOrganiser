@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Request, Response, HTTPException, Depends, FastAPI
 from fastapi.responses import RedirectResponse
-from fastapi_server_session import Session, SessionManager, AsyncRedisSessionInterface
-from redis import asyncio as aioredis
+from fastapi_server_session import Session, SessionManager, AsyncMysqlSessionInterface
 from pydantic import BaseModel
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
@@ -13,6 +12,7 @@ import certifi, ssl
 sslcontext = ssl.create_default_context(cafile=certifi.where())
 import logging
 logging.basicConfig(level=logging.INFO)
+import aiomysql
 
 import server_config
 from helpers import auth
@@ -22,8 +22,14 @@ __logger = logging.getLogger(__name__)
 
 session_manager = SessionManager(
     default_sess_duration=timedelta(minutes=10),
-    interface=AsyncRedisSessionInterface(
-        redis_client=aioredis.from_url(server_config.REDIS_HOST_URL)
+    interface=AsyncMysqlSessionInterface(
+        pool_ctx=aiomysql.create_pool(
+            host=server_config.MYSQL_HOST, 
+            port=3306, 
+            user=server_config.MYSQL_DB_USER, 
+            password=server_config.MYSQL_DB_PASSWORD, 
+            db=server_config.MYSQL_DB_NAME
+        )
     )
 )
 ms_app = msal.ConfidentialClientApplication(

@@ -47,18 +47,20 @@ spec:
                   name: secrets
                   key: auth.RABBITMQ_PASSWORD
 
-            - name: REDIS_HOST_URL
-              value: "redis://localhost:6379" # temporary, replaced with MySQL very soon
-            #- name: MYSQL_DB_PASSWORD
-            #  valueFrom:
-            #    secretKeyRef:
-            #      name: secrets
-            #      key: microsoft.MYSQL_MICROSOFT_PASSWORD
-            #- name: MYSQL_HOST
-            #  valueFrom:
-            #    configMapKeyRef:
-            #      name: config
-            #      key: microsoft.MYSQL_HOST
+            - name: MYSQL_DB_NAME
+              value: auth
+            - name: MYSQL_DB_USER
+              value: auth
+            - name: MYSQL_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: auth.MYSQL_AUTH_PASSWORD
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: config
+                  key: auth.MYSQL_HOST
 
             - name: JWT_SECRET
               valueFrom:

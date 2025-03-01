@@ -32,5 +32,5 @@ stringData:
   microsoft.MYSQL_MICROSOFT_PASSWORD: "{{ events_org_secret.mysql_user_microsoft_password | mandatory }}"
   microsoft.RABBITMQ_PASSWORD: "{{ events_org_secret.events_parser_rabbitmq_password | mandatory }}"
 
-  auth.MYSQL_MICROSOFT_PASSWORD: "{{ events_org_secret.mysql_user_microsoft_password | mandatory }}"
+  auth.MYSQL_AUTH_PASSWORD: "{{ events_org_secret.mysql_user_auth_password | mandatory }}"
   auth.RABBITMQ_PASSWORD: "{{ events_org_secret.events_parser_rabbitmq_password | mandatory }}"

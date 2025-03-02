@@ -91,9 +91,10 @@ async def get_login_link(
 @microsoft_router.get("/login_callback", status_code=303)
 async def finish_login(
     request: Request,
-    response: RedirectResponse = RedirectResponse("/", status_code=303),
     session: Session = Depends(session_manager.get_session)
 ):
+    response = RedirectResponse("/", status_code=303)
+
     if(session == None):
         raise HTTPException(status_code=400, detail="Auth flow not initiated prior to this request")
     

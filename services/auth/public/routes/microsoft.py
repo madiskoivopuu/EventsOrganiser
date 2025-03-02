@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from typing import cast
 import msal
 import aiohttp
-import certifi, ssl
+import certifi, ssl, os
 sslcontext = ssl.create_default_context(cafile=certifi.where())
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -59,6 +59,8 @@ microsoft_router = APIRouter(
 
 def get_redirect_uri(request: Request):
     host = str(request.url).replace(str(request.url.path), "")
+    host = host.replace("http://", "https://")
+    
     return host + "/api/auth/microsoft/login_callback"
 
 async def get_ms_signing_keys() -> dict:

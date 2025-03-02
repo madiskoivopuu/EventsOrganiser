@@ -71,5 +71,5 @@ def set_jwt_cookie(name: str, value: str, response: Response, expiration: timede
         value=value,
         httponly=True,
         secure=True,
-        max_age=expiration.total_seconds()
+        expires=datetime.now(timezone.utc)+expiration
     )

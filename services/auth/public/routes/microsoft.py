@@ -88,10 +88,10 @@ async def get_login_link(
 
     return flow["auth_uri"]
 
-@microsoft_router.get("/login_callback", status_code=204)
+@microsoft_router.get("/login_callback", status_code=303)
 async def finish_login(
     request: Request,
-    response: Response,
+    response: RedirectResponse = RedirectResponse("/", status_code=303),
     session: Session = Depends(session_manager.get_session)
 ):
     if(session == None):
@@ -119,4 +119,4 @@ async def finish_login(
         auth_flow["refresh_token"]
     )
 
-    return RedirectResponse("/", status_code=303)
+    return response

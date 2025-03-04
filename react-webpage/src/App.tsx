@@ -29,7 +29,8 @@ function App() {
 			<main>
 				<Routes>
 					<Route path="/" element={<HomePage allTags={allPossibleTags} />} />
-					<Route path="/" element={<>TODO:</>} />
+					<Route path="/settings" element={<>TODO:</>} />
+					<Route path="/login" element={<>TODO:</>} />
 				</Routes>
 			</main>
 		</>

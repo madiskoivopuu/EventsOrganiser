@@ -8,8 +8,6 @@ from contextlib import asynccontextmanager
 from typing import cast
 import msal
 import aiohttp
-import certifi, ssl, os
-sslcontext = ssl.create_default_context(cafile=certifi.where())
 import logging
 logging.basicConfig(level=logging.INFO)
 import aiomysql
@@ -59,15 +57,9 @@ microsoft_router = APIRouter(
 
 def get_redirect_uri(request: Request):
     host = str(request.url).replace(str(request.url.path), "")
-    host = host.replace("http://", "https://")
+    #host = host.replace("http://", "https://")
     
     return host + "/api/auth/microsoft/login_callback"
-
-async def get_ms_signing_keys() -> dict:
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://login.microsoftonline.com/common/discovery/v2.0/keys', ssl=sslcontext) as response:
-            resp_json = await response.json()
-            return resp_json
         
 class LoginLinkPostRequest(BaseModel):
     timezone: ZoneInfo

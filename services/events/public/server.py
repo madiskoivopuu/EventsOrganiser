@@ -84,15 +84,20 @@ async def update_event(
         raise HTTPException(status_code=404, detail=f"Event with id {id} not found")
 
     # new tags to replace old ones with
+    new_tags_ids = [tag.id for tag in new_data.tags]
+
     tags_query = select(tables.TagsTable) \
-                .filter(tables.TagsTable.name.in_(new_data.tags))
+                .filter(tables.TagsTable.id.in_(new_tags_ids))
     tags_query_result = await db_session.execute(tags_query)
 
     event.event_name = new_data.event_name
-    event.start_date_utc = new_data.start_date_utc
-    event.end_date_utc = new_data.end_date_utc
+    event.start_date_utc = new_data.start_date
+    event.end_date_utc = new_data.start_date
     event.address = new_data.address
-    event.tags = [tag for (tag, ) in tags_query_result.all()]
+    event.tags = []
+    for (tag, ) in tags_query_result.all():
+        event.tags.append(tag)
+
     
     await db_session.commit()
 

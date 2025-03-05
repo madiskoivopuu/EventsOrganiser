@@ -1,20 +1,30 @@
-import { EventDetails } from "@/interfaces/global_interfaces";
+import { AccountSettings } from "@/interfaces/global_interfaces";
 import { create } from "zustand";
 
 interface AccountData {
     authenticated: boolean,
     settings: AccountSettings | null,
-}
 
-interface AccountSettings {
-    auto_fetch_emails: boolean,
-    timezone: string // IANA timezone
-    // tags...
+    setAuthenticated: (val: boolean) => void;
+    updateSettings: (newSettings: AccountSettings) => void;
 }
 
 const useAccountDataStore = create<AccountData>((set) => ({
     authenticated: false,
-    settings: null
+    settings: null,
+    
+    setAuthenticated: (val) => {
+        set((state) => ({
+            ...state,
+            authenticated: val,
+        }));
+    },
+    updateSettings: (newSettings) => {
+        set((state) => ({
+            ...state,
+            settings: newSettings,
+        }));
+    }
 }));
 
 export default useAccountDataStore;

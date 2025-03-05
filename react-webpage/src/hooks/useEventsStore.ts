@@ -1,10 +1,15 @@
-import { EventDetails } from "@/interfaces/global_interfaces";
+import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
 import { create } from "zustand";
 
-interface EventsState {
+export type EventChangerFunc = (events: EventDetails[]) => void;
+
+export interface EventsState {
     events: EventDetails[],
-    addOrUpdate: (events: EventDetails[]) => void,
-    deleteEvents: (events: EventDetails[]) => void
+    tags: EventTag[],
+
+    addOrUpdate: EventChangerFunc,
+    deleteEvents: EventChangerFunc,
+    setTags: (tags: EventTag[]) => void
 }
 
 function addOrUpdateEvents(prevEvents: EventDetails[], newEvents: EventDetails[]) {
@@ -23,18 +28,26 @@ function deleteEvents(prevEvents: EventDetails[], removeEvents: EventDetails[]) 
 
 const useEventsStore = create<EventsState>((set) => ({
     events: [],
+    tags: [],
+    //calendarLink: null,
 
     addOrUpdate: (newEvents: EventDetails[]) => {
         set((state) => ({
-                events: addOrUpdateEvents(state.events, newEvents)
-            })
-        );
+            ...state,
+            events: addOrUpdateEvents(state.events, newEvents)
+        }));
     },
     deleteEvents: (removeEvents: EventDetails[]) => {
         set((state) => ({
-                events: deleteEvents(state.events, removeEvents)
-            })
-        );
+            ...state,
+            events: deleteEvents(state.events, removeEvents)
+        }));
+    },
+    setTags: (newTags) => {
+        set((state) => ({
+            ...state,
+            tags: newTags
+        }));
     }
 }));
 

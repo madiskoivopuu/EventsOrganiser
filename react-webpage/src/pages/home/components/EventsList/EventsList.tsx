@@ -1,4 +1,4 @@
-import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
+import { ActiveTab, EventDetails } from "@/interfaces/global_interfaces";
 import { EventAccordion } from "../EventAccordion";
 import { ComponentProps } from "react";
 
@@ -25,29 +25,32 @@ const groupEventsByYearAndMonth = (events: EventDetails[]): Dictionary<EventDeta
     return groupedByYM;
 }
 
-const sortEvents = (events: EventDetails[]): EventDetails[] => {
+const sortEvents = (events: EventDetails[], tab: ActiveTab): EventDetails[] => {
     return [ ...events ].sort((a, b) => {
         let aDate: Date = new Date((a.start_date || a.end_date)!);
-        let bDate: Date = new Date((a.start_date || a.end_date)!);
+        let bDate: Date = new Date((b.start_date || b.end_date)!);
 
+        if(tab == ActiveTab.UPCOMING)
+            return aDate.valueOf() - bDate.valueOf();
+        else
         return bDate.valueOf() - aDate.valueOf();
     })
 }
 
 interface EventsListProps extends ComponentProps<"div"> {
     events: EventDetails[],
-    allTags: EventTag[]
+    tab: ActiveTab
 };
 
-function EventsList({ events, allTags, ...props }: EventsListProps) {
-    events = sortEvents(events);
+function EventsList({ events, tab, ...props }: EventsListProps) {
+    events = sortEvents(events, tab);
     var groupedEvents = groupEventsByYearAndMonth(events);
 
     var headerAndEvents: JSX.Element[] = Object.entries(groupedEvents).map(([header, events]) => {
         return (
             <>
                 <h1>{header}</h1>
-                {events.map(event => <EventAccordion key={event.id} event={event} allTags={allTags} />)}
+                {events.map(event => <EventAccordion key={event.id} event={event}/>)}
             </>
         );
     });

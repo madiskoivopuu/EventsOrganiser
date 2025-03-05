@@ -28,7 +28,7 @@ export const createEditableEventObject = (event: EventDetails): EditableEventDet
         address: event.address,
         start_date: event.start_date ? new Date(new Date(event.start_date).toDateString()) : null,
         start_time: format8601TimestampToTime(event.start_date),
-        end_date: event.end_date ? new Date(new Date(event.end_date).toDateString()) : null,
+        end_date: new Date(new Date(event.end_date).toDateString()),
         end_time: format8601TimestampToTime(event.end_date),
         tags: event.tags
     };
@@ -42,13 +42,13 @@ export const editableEventToEventDetails = (origEvent: EventDetails, event: Edit
         id: origEvent.id,
         event_name: event.event_name,
         start_date: event.start_date ? event.start_date.toISOString() : null,
-        end_date: event.end_date!.toISOString(),
+        end_date: event.end_date.toISOString(),
         address: event.address,
         tags: event.tags
     };
 }
 
-export const format8601TimestampToTime = (utcDateTime: string | null): string => {
+export const format8601TimestampToTime = (utcDateTime?: string | null): string => {
     if(!utcDateTime)
         return "";
 

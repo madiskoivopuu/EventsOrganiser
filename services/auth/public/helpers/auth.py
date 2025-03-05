@@ -7,10 +7,15 @@ from enum import Enum
 from asyncache import cached
 from cachetools import TTLCache
 
+import certifi, ssl, os
+sslcontext = ssl.create_default_context(cafile=certifi.where())
+
+DEFAULT_EXPIRATION_TIME = timedelta(minutes=30)
+
 @cached(TTLCache(2, 600))
 async def get_ms_signing_keys() -> dict:
     async with aiohttp.ClientSession() as session:
-        async with session.get('https://login.microsoftonline.com/common/discovery/v2.0/keys') as response:
+        async with session.get('https://login.microsoftonline.com/common/discovery/v2.0/keys', ssl=sslcontext) as response:
             resp_json = await response.json()
             return resp_json
 
@@ -48,7 +53,7 @@ async def decode_jwt_token(id_token: str, audience: str) -> tuple[dict | None, s
         return None, f"Unable to decode token due to some issue ({e})"
     return decoded, ""
 
-def create_jwt_from_microsoft(id_token_data: dict, secret: str, expiration: timedelta = timedelta(minutes=30)) -> str:
+def create_jwt_from_microsoft(id_token_data: dict, secret: str, expiration: timedelta = DEFAULT_EXPIRATION_TIME) -> str:
     """Creates a JWT token from Microsoft's id_token data"""
     data = {}
     data["account_id"] = id_token_data["oid"]
@@ -64,7 +69,7 @@ def create_jwt_from_microsoft(id_token_data: dict, secret: str, expiration: time
         secret
     )
 
-def set_jwt_cookie(name: str, value: str, response: Response, expiration: timedelta = timedelta(minutes=30)):
+def set_jwt_cookie(name: str, value: str, response: Response, expiration: timedelta = DEFAULT_EXPIRATION_TIME):
     """Puts a Set-Cookie header in the HTTP response to carry the JWT"""
     response.set_cookie(
         key=name,

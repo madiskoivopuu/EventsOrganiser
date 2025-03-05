@@ -4,32 +4,56 @@ import { create } from "zustand";
 interface TabPage {
     currPage: number,
     maxPages: number,
-    //error?: string
+    isBeingFetched: boolean,
 }
 
 type TabsPagination = {
     [key in ActiveTab]: TabPage
 }
 
+export type FinishedFetchingFunc = (tab: ActiveTab, newCurrPage: number, maxPages: number) => void;
+export type StartFetchingFunc = (tab: ActiveTab) => void;
+
 interface PaginationState extends TabsPagination {
-    a: () => void;
+    startFetching: StartFetchingFunc,
+    finishedFetching: FinishedFetchingFunc
 }
 
 const useEventPagination = create<PaginationState>((set) => ({
     [ActiveTab.PAST]: {
-        currPage: 1,
-        maxPages: Number.MAX_SAFE_INTEGER
+        currPage: 0,
+        maxPages: Number.MAX_SAFE_INTEGER,
+        isBeingFetched: false,
     },
     [ActiveTab.ONGOING]: {
-        currPage: 1,
-        maxPages: 0
+        currPage: 0,
+        maxPages: -1,
+        isBeingFetched: false,
     },
     [ActiveTab.UPCOMING]: {
-        currPage: 1,
-        maxPages: Number.MAX_SAFE_INTEGER
+        currPage: 0,
+        maxPages: Number.MAX_SAFE_INTEGER,
+        isBeingFetched: false,
     },
-    a: () => {}
-})
-);
+    startFetching: (tab: ActiveTab) => {
+        set((state) => ({ // if this ever gets to more than 1 nested object, use a helper that zustand recommends
+            ...state,
+            [tab]: {
+                ...state[tab],
+                isBeingFetched: true
+            }
+        }));
+    },
+    finishedFetching: (tab: ActiveTab, newCurrPage: number, maxPages: number) => {
+        set((state) => ({
+            ...state,
+            [tab]: {
+                currPage: newCurrPage,
+                maxPages: maxPages,
+                isBeingFetched: false
+            }
+        }));
+    }
+}));
 
 export default useEventPagination;

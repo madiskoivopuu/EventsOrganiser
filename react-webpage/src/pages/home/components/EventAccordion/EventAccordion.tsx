@@ -10,18 +10,24 @@ import { useEventsStore } from "@/hooks";
 
 import "./event-accordion.scss";
 import "./date.scss";
+import { deleteEvent, updateEvent } from "@/apis/events";
+import { toast } from "react-toastify";
+import TailSpin from "react-loading-icons/dist/esm/components/tail-spin";
 
 interface EventAccordionProps {
-	event: EventDetails,
-	allTags: EventTag[]
+	event: EventDetails
 }
 
-function EventAccordion({ event, allTags }: EventAccordionProps) {
+function EventAccordion({ event }: EventAccordionProps) {
 	const [editableEvent, setEditableEvent] = useState<EditableEventDetails>(helpers.createEditableEventObject(event));
 	const [isBeingEdited, setIsBeingEdited] = useState<boolean>(false);
+
+	const [deleteReqInProgress, setDeleteReqInProgress] = useState<boolean>(false);
+	const [updateReqInProgress, setUpdateReqInProgress] = useState<boolean>(false);
+
 	const modalRef = useRef<HTMLDialogElement | null>(null);
 
-	const { addOrUpdate, deleteEvents } = useEventsStore();
+	const { tags, addOrUpdate, deleteEvents } = useEventsStore();
 
 	const setKeyOfEditableEvent = <K extends keyof EditableEventDetails>(key: K, value: EditableEventDetails[K]) => {
 		setEditableEvent(prev => ({
@@ -32,18 +38,32 @@ function EventAccordion({ event, allTags }: EventAccordionProps) {
 	}
 
 	const saveEventChanges = () => {
-		// TODO: request to server
-
-		setIsBeingEdited(false);
 		let updatedEvent = helpers.editableEventToEventDetails(event, editableEvent);
-		addOrUpdate([updatedEvent]);
+		setUpdateReqInProgress(true);
+
+		updateEvent(updatedEvent).then(() => {
+			setIsBeingEdited(false);
+			addOrUpdate([updatedEvent]);
+		}).catch(err => {
+			console.error("Event update error", err);
+			toast.error(`Failed to update event ${event.event_name}`);
+		}).finally(() => {
+			setUpdateReqInProgress(false);
+		})
 	}
 
 	const deleteEventChanges = () => {
-		// TODO: request to server
+		setDeleteReqInProgress(true);
 
-		modalRef.current?.close();
-		deleteEvents([event]);
+		deleteEvent(event).then(() => {
+			deleteEvents([event]);
+		}).catch(err => {
+			console.error("Event deletion error", err);
+			toast.error(`Failed to delete event ${event.event_name}`);
+		}).finally(() => {
+			modalRef.current?.close();
+			setDeleteReqInProgress(false);
+		})
 	}
 
 	let formErrors = helpers.validateEditableEvent(editableEvent);
@@ -51,15 +71,36 @@ function EventAccordion({ event, allTags }: EventAccordionProps) {
 	if(isBeingEdited) {
 		eventButtons = (
 			<>
-				<button disabled={formErrors.length !== 0} onClick={saveEventChanges}>Save</button>
-				<button className="warning" onClick={() => setIsBeingEdited(false)}>Cancel</button>
+				<button 
+					disabled={formErrors.length !== 0 || updateReqInProgress}
+					onClick={saveEventChanges}
+				>
+					{updateReqInProgress && <TailSpin style={{height: "1em"}}/>}
+					Save
+				</button>
+				<button 
+					className="warning" 
+					disabled={updateReqInProgress}
+					onClick={() => setIsBeingEdited(false)}
+				>
+					Cancel
+				</button>
 			</>
 		);
 	} else {
 		eventButtons = (
 			<>
-				<button onClick={() => setIsBeingEdited(true)}>Edit</button>
-				<button className="warning" onClick={() => modalRef.current?.showModal()}>Delete</button>
+				<button 
+					onClick={() => setIsBeingEdited(true)}
+				>
+					Edit
+				</button>
+				<button 
+					className="warning" 
+					onClick={() => modalRef.current?.showModal()}
+				>
+					Delete
+				</button>
 			</>
 		);
 	}
@@ -102,7 +143,7 @@ function EventAccordion({ event, allTags }: EventAccordionProps) {
 							header={"Event categories"} 
 							text={isBeingEdited
 									? <StyledSelect
-										options={allTags}
+										options={tags}
 										defaultValue={editableEvent.tags}
 
 										menuPortalTarget={document.body}
@@ -133,8 +174,21 @@ function EventAccordion({ event, allTags }: EventAccordionProps) {
 				<p>Are you sure you want to delete <b>{event.event_name}</b>?</p>
 
 				<div style={{display: "flex", justifyContent: "flex-end"}}>
-					<button className="plain" onClick={() => modalRef.current?.close()}>Cancel</button>
-					<button className="warning" onClick={deleteEventChanges}>Delete</button>
+					<button 
+						className="plain" 
+						onClick={() => modalRef.current?.close()}
+						disabled={deleteReqInProgress}
+					>
+						Cancel
+					</button>
+					<button 
+						className="warning" 
+						onClick={deleteEventChanges}
+						disabled={deleteReqInProgress}
+					>
+						{deleteReqInProgress && <TailSpin style={{height: "1em"}} />}
+						Delete
+					</button>
 				</div>
 			</dialog>
 		</>

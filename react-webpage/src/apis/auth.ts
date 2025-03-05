@@ -1,0 +1,29 @@
+export interface MicrosoftAuthRequest {
+    timezone: string
+}
+
+export interface MicrosoftAuthResponse {
+    link?: string,
+    error?: any
+};
+
+export function getMicrosoftLoginLink(timezone: string): Promise<MicrosoftAuthResponse> {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/auth/microsoft`, {
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ timezone }),
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then((resp) => resp.json()
+    ).then(resp => {
+        return {
+            link: resp as string
+        };
+    }).catch(e => {
+        return {
+            error: e
+        };
+    })
+}

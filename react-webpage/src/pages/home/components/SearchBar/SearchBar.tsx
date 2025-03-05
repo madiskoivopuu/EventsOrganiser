@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import { InputWithIcon, StyledSelect } from "@/components";
 import { EventTag } from "@/interfaces/global_interfaces";
 import { useEffect, useState } from "react";
+import { useEventsStore } from "@/hooks";
 
 export interface SearchOptions {
     eventName?: string,
@@ -14,13 +15,13 @@ export interface SearchOptions {
 }
 
 interface SearchBarProps {
-    selectableTags: EventTag[],
     searchCallback: (opts: SearchOptions) => void;
 }
 
 const pStyle = {margin: "0rem", marginTop: "0.5rem", marginLeft: "0.35rem"};
 
-function SearchBar({ selectableTags, searchCallback }: SearchBarProps) {
+function SearchBar({ searchCallback }: SearchBarProps) {
+    const { tags } = useEventsStore();
     const [searchOptions, setSearchOptions] = useState<SearchOptions>({ });
 
     const updateSearchOptKey = <K extends keyof SearchOptions>(key: K, value: SearchOptions[K]) => {
@@ -71,7 +72,7 @@ function SearchBar({ selectableTags, searchCallback }: SearchBarProps) {
 
             <p style={pStyle}><b>Event categories</b></p>
             <StyledSelect
-                options={selectableTags}
+                options={tags}
                 isMulti
                 isSearchable
                 getOptionLabel={tag => tag.name}

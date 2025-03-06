@@ -9,9 +9,11 @@ import HomePage from './pages/home';
 import { useNavigate } from "react-router";
 import { EventTag, JWTData } from './interfaces/global_interfaces';
 import { useEventsStore, useAccountDataStore } from './hooks';
+import { loadSettings } from './pages/settings/setting-helpers';
 
 import { getTags } from './apis/events';
 import LoginPage from './pages/login';
+import SettingsPage from './pages/settings';
 
 async function fetchTags(setTags: (t: EventTag[]) => void, retryAttempt: number = 0) {
 	getTags().then(result => {
@@ -37,8 +39,6 @@ function init(
 		fetchTags(setTags);
 		
 		try {
-			// @ts-ignore
-			// for some reason, using env variable in the usecookies function will just fuck up typescript type checker
 			const decoded: JWTData = jwtDecode(jwt);
 			if(Date.now() > decoded.exp * 1000)
 				throw new Error("auth expired");
@@ -96,7 +96,7 @@ function App() {
 				<Routes>
 					<Route element={<ProtectedRoute/>}>
 						<Route path="/" element={<HomePage/>} />
-						<Route path="/settings" element={<>TODO:</>} />
+						<Route path="/settings" element={<SettingsPage />} />
 					</Route>
 
 					<Route path="/login" element={<LoginPage/>} />

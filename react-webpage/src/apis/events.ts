@@ -1,4 +1,4 @@
-import { EventDetails, EventTag } from "@/interfaces/global_interfaces.ts";
+import { EventDetails, EventSettings, EventTag } from "@/interfaces/global_interfaces.ts";
 
 export type EventFetchDirection = "forward" | "backward";
 
@@ -89,4 +89,27 @@ export function deleteCalendarLink() {
     }).then((_) => {
         return;
     });
+}
+
+export function getEventSettings(): Promise<EventSettings> {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/settings`, {
+        method: "GET",
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then((resp) => resp.json()
+    ).then(resp => {
+        return resp as EventSettings;
+    })
+}
+
+export function updateEventSettings(newSettings: EventSettings) {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/settings`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(newSettings),
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then(_ => {
+        return;
+    })
 }

@@ -19,8 +19,13 @@ export interface AccountSettings {
     timezone: string // IANA timezone
 }
 
-export interface TagSelectionSettings {
-    tags: EventTag[],
+export interface EventSettings {
+    categories: EventTag[],
+}
+
+export interface Settings {
+    accountSettings: AccountSettings,
+    eventSettings: EventSettings
 }
 
 export interface EventTag {

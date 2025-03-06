@@ -1,17 +1,38 @@
-import { AccountSettings } from "@/interfaces/global_interfaces";
+import { AccountSettings, Settings } from "@/interfaces/global_interfaces";
 import { create } from "zustand";
 
 interface AccountData {
     authenticated: boolean,
-    settings: AccountSettings | null,
+    settings: Partial<Settings>,
 
     setAuthenticated: (val: boolean) => void;
-    updateSettings: (newSettings: AccountSettings) => void;
+    updateSettings: (newSettings: Partial<Settings>) => void;
 }
 
 const useAccountDataStore = create<AccountData>((set) => ({
     authenticated: false,
-    settings: null,
+    settings: {
+        accountSettings: {
+            auto_fetch_emails: true,
+            timezone: "Europe/Tallinn",
+        },
+        eventSettings: {
+            categories: [
+                {
+                    id: 1,
+                    name: "abc"
+                },
+                {
+                    id: 2,
+                    name: "abcd"
+                },
+                {
+                    id: 3,
+                    name: "abcde"
+                }
+            ]
+        }
+    },
     
     setAuthenticated: (val) => {
         set((state) => ({
@@ -22,7 +43,7 @@ const useAccountDataStore = create<AccountData>((set) => ({
     updateSettings: (newSettings) => {
         set((state) => ({
             ...state,
-            settings: newSettings,
+            settings: Object.assign(state.settings, newSettings),
         }));
     }
 }));

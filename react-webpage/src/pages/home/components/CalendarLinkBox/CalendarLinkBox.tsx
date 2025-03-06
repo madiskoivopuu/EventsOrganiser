@@ -54,7 +54,7 @@ export default function CalendarLinkBox() {
         calendarLinkActions = (
             <>
                 <div style={{width: "60%"}}>
-                    <InputWithIcon value={linkDisplayValue} readOnly style={{direction: "rtl", textOverflow: "ellipsis"}}>
+                    <InputWithIcon value={linkDisplayValue} readOnly style={{direction: "rtl", textOverflow: "ellipsis", textAlign: "left"}}>
                         <MdContentCopy 
                             className="icon" 
                             style={{cursor:"pointer"}}

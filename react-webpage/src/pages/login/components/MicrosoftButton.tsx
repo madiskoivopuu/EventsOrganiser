@@ -15,9 +15,9 @@ export default function MicrosoftButton() {
         setLoginInProgress(true);
         getMicrosoftLoginLink(
             Intl.DateTimeFormat().resolvedOptions().timeZone
-        ).then(result => {
+        ).then(link => {
             setLoginInProgress(false);
-            window.location.href = result.link!;
+            window.location.href = link;
         }).catch(err => {
             toast.error("Failed to log in using Microsoft, try again later."); 
             console.error("MS login error: ", err);

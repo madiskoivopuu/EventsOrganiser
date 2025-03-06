@@ -35,8 +35,10 @@ export const applySearchQuery = (events: EventDetails[], searchOptions: SearchOp
                 return new Date(event.end_date) >= searchOptions.startDate!;
         });
 
-    if(searchOptions.endDate)
+    if(searchOptions.endDate) {
+        searchOptions.endDate.setHours(23, 59, 59)
         events = events.filter((event) => new Date(event.end_date) <= searchOptions.endDate!);
+    }
 
     if(searchOptions.tags && searchOptions.tags.length > 0)
         events = events.filter((event) => {

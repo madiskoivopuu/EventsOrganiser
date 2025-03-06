@@ -98,7 +98,6 @@ async def update_event(
     for (tag, ) in tags_query_result.all():
         event.tags.append(tag)
 
-    
     await db_session.commit()
 
     return
@@ -202,6 +201,28 @@ async def generate_link(
         link=helpers.format_calendar_link(calendar_identifier, request)
     )
 
+@api.delete("/api/events/calendar/link", status_code=204)
+async def delete_calendar_link(
+    user: UserData = Depends(auth.authenticate_user),
+    db_session: AsyncSession = Depends(db.start_session),
+):
+    """
+    Authenticated API endpoint for deleting a calendar link for the user
+    """
+
+    query = delete(tables.CalendarLinksTable) \
+            .where(
+                tables.CalendarLinksTable.user_id == user.account_id, 
+                tables.CalendarLinksTable.user_acc_type == user.account_type, 
+            )
+    query_result = await db_session.execute(query)
+    await db_session.commit()
+
+    if(query_result.rowcount == 0): # rowcount will be -1 for SQL db which will not support showing deleted rows
+        raise HTTPException(status_code=404, detail="Calendar link not found")
+
+    return
+
 @api.get("/api/events/calendar/{calendar_id}")
 async def get_calendar_file(
     calendar_id: uuid.UUID,
@@ -233,27 +254,3 @@ async def get_calendar_file(
         calendar.add_component(calendar_event)
 
     return Response(calendar.to_ical(), media_type="text/calendar")
-
-@api.delete("/api/events/calendar/{calendar_id}", status_code=204)
-async def delete_calendar_link(
-    calendar_id: uuid.UUID,
-    user: UserData = Depends(auth.authenticate_user),
-    db_session: AsyncSession = Depends(db.start_session),
-):
-    """
-    Authenticated API endpoint for deleting a calendar link for the user
-    """
-
-    query = delete(tables.CalendarLinksTable) \
-            .where(
-                tables.CalendarLinksTable.user_id == user.account_id, 
-                tables.CalendarLinksTable.user_acc_type == user.account_type, 
-                tables.CalendarLinksTable.calendar_identifier == calendar_id
-            )
-    query_result = await db_session.execute(query)
-    await db_session.commit()
-
-    if(query_result.rowcount == 0): # rowcount will be -1 for SQL db which will not support showing deleted rows
-        raise HTTPException(status_code=404, detail="Calendar link not found")
-
-    return

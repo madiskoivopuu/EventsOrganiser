@@ -7,12 +7,12 @@ import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
 import { EditableEventDetails } from "./interfaces";
 import * as helpers from "./helpers";
 import { useEventsStore } from "@/hooks";
+import { SpinnerCircular } from 'spinners-react';
 
 import "./event-accordion.scss";
 import "./date.scss";
 import { deleteEvent, updateEvent } from "@/apis/events";
 import { toast } from "react-toastify";
-import TailSpin from "react-loading-icons/dist/esm/components/tail-spin";
 
 interface EventAccordionProps {
 	event: EventDetails
@@ -75,7 +75,11 @@ function EventAccordion({ event }: EventAccordionProps) {
 					disabled={formErrors.length !== 0 || updateReqInProgress}
 					onClick={saveEventChanges}
 				>
-					{updateReqInProgress && <TailSpin style={{height: "1em"}}/>}
+					<SpinnerCircular
+						color="white"
+						enabled={updateReqInProgress}
+						size="1em"
+					/>
 					Save
 				</button>
 				<button 
@@ -186,7 +190,11 @@ function EventAccordion({ event }: EventAccordionProps) {
 						onClick={deleteEventChanges}
 						disabled={deleteReqInProgress}
 					>
-						{deleteReqInProgress && <TailSpin style={{height: "1em"}} />}
+						<SpinnerCircular
+							size="1em"
+							color="white"
+							enabled={deleteReqInProgress}
+						/>
 						Delete
 					</button>
 				</div>

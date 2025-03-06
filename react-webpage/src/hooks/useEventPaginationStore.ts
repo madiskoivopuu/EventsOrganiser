@@ -11,7 +11,7 @@ type TabsPagination = {
     [key in ActiveTab]: TabPage
 }
 
-export type FinishedFetchingFunc = (tab: ActiveTab, newCurrPage: number, maxPages: number) => void;
+export type FinishedFetchingFunc = (tab: ActiveTab, newCurrPage?: number, maxPages?: number) => void;
 export type StartFetchingFunc = (tab: ActiveTab) => void;
 
 interface PaginationState extends TabsPagination {
@@ -44,12 +44,12 @@ const useEventPagination = create<PaginationState>((set) => ({
             }
         }));
     },
-    finishedFetching: (tab: ActiveTab, newCurrPage: number, maxPages: number) => {
+    finishedFetching: (tab: ActiveTab, newCurrPage?: number, maxPages?: number) => {
         set((state) => ({
             ...state,
             [tab]: {
-                currPage: newCurrPage,
-                maxPages: maxPages,
+                currPage: newCurrPage || state[tab].currPage,
+                maxPages: maxPages || state[tab].maxPages,
                 isBeingFetched: false
             }
         }));

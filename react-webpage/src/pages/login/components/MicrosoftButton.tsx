@@ -1,8 +1,10 @@
-import MicrosoftIcon from "@/assets/ms-symbollockup_mssymbol_19.svg";
-import { TailSpin } from 'react-loading-icons'
+
 import { useState } from "react";
-import { getMicrosoftLoginLink } from "@/apis/auth";
+import { SpinnerCircular } from 'spinners-react';
 import { toast } from "react-toastify"
+
+import { getMicrosoftLoginLink } from "@/apis/auth";
+import MicrosoftIcon from "@/assets/ms-symbollockup_mssymbol_19.svg";
 
 export default function MicrosoftButton() {
     const [loginInProgress, setLoginInProgress] = useState<boolean>(false);
@@ -27,7 +29,11 @@ export default function MicrosoftButton() {
             <img src={MicrosoftIcon} />
             <strong>Log in with Microsoft</strong>
 
-            {loginInProgress && <TailSpin style={{height: "1.25em", marginLeft: "1em"}}/>}
+            <SpinnerCircular 
+                enabled={loginInProgress}
+                size="1.25em"
+                style={{marginLeft: "1em"}}
+            />
         </button>
     )
 }

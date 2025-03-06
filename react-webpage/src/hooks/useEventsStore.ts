@@ -6,10 +6,13 @@ export type EventChangerFunc = (events: EventDetails[]) => void;
 export interface EventsState {
     events: EventDetails[],
     tags: EventTag[],
+    calendarLink?: string,
+    calendarLinkFetched: boolean,
 
     addOrUpdate: EventChangerFunc,
     deleteEvents: EventChangerFunc,
-    setTags: (tags: EventTag[]) => void
+    setTags: (tags: EventTag[]) => void,
+    setCalendarLink: (link?: string) => void
 }
 
 function addOrUpdateEvents(prevEvents: EventDetails[], newEvents: EventDetails[]) {
@@ -29,7 +32,8 @@ function deleteEvents(prevEvents: EventDetails[], removeEvents: EventDetails[]) 
 const useEventsStore = create<EventsState>((set) => ({
     events: [],
     tags: [],
-    //calendarLink: null,
+    calendarLink: undefined,
+    calendarLinkFetched: false,
 
     addOrUpdate: (newEvents: EventDetails[]) => {
         set((state) => ({
@@ -48,6 +52,13 @@ const useEventsStore = create<EventsState>((set) => ({
             ...state,
             tags: newTags
         }));
+    },
+    setCalendarLink: (link?: string) => {
+        set((state) => ({
+            ...state,
+            calendarLink: link,
+            calendarLinkFetched: true
+        }))
     }
 }));
 

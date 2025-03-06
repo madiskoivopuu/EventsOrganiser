@@ -10,6 +10,10 @@ export interface EventsGetResponse {
     pages: number,
 }
 
+export interface CalendarLinkGetResponse {
+    link: string
+}
+
 export function getTags(): Promise<EventTag[]> {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/tags`, {
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
@@ -57,4 +61,32 @@ export function deleteEvent(event: EventDetails) {
     }).then((_) => {
         return;
     })
+}
+
+export function getCalendarLink(): Promise<string> {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then((resp) => resp.json()
+    ).then((resp) => {
+        return (resp as CalendarLinkGetResponse).link;
+    })
+}
+
+export function changeCalendarLink(): Promise<string> {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
+        method: "POST",
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then((resp) => resp.json()
+    ).then((resp) => {
+        return (resp as CalendarLinkGetResponse).link;
+    })
+}
+
+export function deleteCalendarLink() {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
+        method: "DELETE",
+        credentials: import.meta.env.VITE__CREDENTIALS_SETTING
+    }).then((_) => {
+        return;
+    });
 }

@@ -12,9 +12,9 @@ import { EventFetchDirection, getEvents } from "@/apis/events";
 import { FinishedFetchingFunc, StartFetchingFunc } from "@/hooks/useEventPaginationStore";
 import { toast } from "react-toastify";
 import { EventChangerFunc } from "@/hooks/useEventsStore";
-import Circles from "react-loading-icons/dist/esm/components/circles";
-import TailSpin from "react-loading-icons/dist/esm/components/tail-spin";
 import { useShallow } from 'zustand/react/shallow'
+import { CalendarLinkBox } from "./components/CalendarLinkBox";
+import { SpinnerCircular } from 'spinners-react';
 
 let pageLoadTime = new Date().toISOString();
 
@@ -40,6 +40,8 @@ function loadMoreEvents(
 	.catch(err => {
 		console.error("Event fetch error", err);
 		toast.error(`Failed to fetch ${tab} events for page ${page}`);
+	}).finally(() => {
+		finishedFetching(tab);
 	})
 }
 
@@ -48,7 +50,7 @@ export default function HomePage() {
 	const [cachedSearchOpts, setCachedSearchOpts] = useState<SearchOptions>({});
 
 	const {events, addOrUpdate} = useEventsStore();
-	const [currTabPagination, startFetching, finishedFetching] = useEventPaginationStore(useShallow((state) => [state[activeTab], state.startFetching, state.finishedFetching]));
+	const [currTabPagination, paginationData, startFetching, finishedFetching] = useEventPaginationStore(useShallow((state) => [state[activeTab], state, state.startFetching, state.finishedFetching]));
 
 	const onSearchChanged = (opts: SearchOptions) => {
 		setCachedSearchOpts(opts);
@@ -57,8 +59,10 @@ export default function HomePage() {
 	useEffect(() => {
 		pageLoadTime = new Date().toISOString();
 
-		loadMoreEvents(ActiveTab.PAST, 1, startFetching, finishedFetching, addOrUpdate);
-		loadMoreEvents(ActiveTab.UPCOMING, 1, startFetching, finishedFetching, addOrUpdate);
+		if(paginationData[ActiveTab.PAST].currPage === 0)
+			loadMoreEvents(ActiveTab.PAST, 1, startFetching, finishedFetching, addOrUpdate);
+		if(paginationData[ActiveTab.UPCOMING].currPage === 0)
+			loadMoreEvents(ActiveTab.UPCOMING, 1, startFetching, finishedFetching, addOrUpdate);
 
 		// TODO: calendar link
 	}, []);
@@ -73,7 +77,10 @@ export default function HomePage() {
 				disabled={currTabPagination.isBeingFetched}
 				onClick={() => loadMoreEvents(activeTab, currTabPagination.currPage+1, startFetching, finishedFetching, addOrUpdate)}
 			>
-				{currTabPagination.isBeingFetched && <TailSpin style={{height: "1em"}}/>}
+				<SpinnerCircular
+					enabled={currTabPagination.isBeingFetched}
+					size="1.5em"
+				/>
 				Load more events
 			</button>
 		);
@@ -82,7 +89,17 @@ export default function HomePage() {
     return (
         <div className="container" style={{height: "100%", display: "flex", justifyContent: "center", alignItems: "center"}}>
             <div className="card events-card">
-				<SearchBar searchCallback={onSearchChanged}/>
+				<aside
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						justifyContent: "space-between"
+					}}
+				>
+					<SearchBar searchCallback={onSearchChanged}/>
+
+					<CalendarLinkBox />
+				</aside>
 				<div>
 					<ul className="tabs" style={{display: "flex", justifyContent: "center"}}>
 						<li className={"tab-item" + (activeTab === ActiveTab.PAST ? " active" : "") } onClick={() => setActiveTab(ActiveTab.PAST)}>PAST EVENTS</li>

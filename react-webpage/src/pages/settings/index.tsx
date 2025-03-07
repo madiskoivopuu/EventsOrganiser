@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TimezoneSelect, { ITimezoneOption } from "react-timezone-select";
 import Select from "react-select";
 
@@ -9,11 +9,44 @@ import { SettingRow } from "./components";
 
 import "./settings.css";
 import * as settingHelpers from "./setting-helpers";
+import { toast } from "react-toastify";
 
 export default function SettingsPage() {
     const { settings, updateSettings } = useAccountDataStore();
     const { tags } = useEventsStore();
     const [changedSettings, setChangedSettings] = useState<Partial<Settings>>(settings);
+
+    useEffect(() => {
+        reloadSettings();
+    }, []);
+
+    useEffect(() => {
+        setChangedSettings(settings);
+    }, [settings]);
+
+    const reloadSettings = () => {
+        if(!settingHelpers.areSettingsFullyLoaded(settings))
+            settingHelpers.loadSettings(settings).then(data => {
+                data.forEach(result => {
+                    if(result.status === "fulfilled")
+                        updateSettings(result.value);
+                })
+
+                if(data.some(result => result.status === "rejected")) {
+                    toast.error("Failed to fetch settings");
+                }
+            })
+    }
+
+    const saveSettings = () => {
+        settingHelpers.updateSettings(changedSettings as Settings).then((results) => {
+            if(results.some(result => result.status === "rejected")) {
+                toast.error("Failed to update settings, try again later");
+            } else {
+                updateSettings(changedSettings);
+            }
+        })
+    }
 
     const updateTimezone = (tz: ITimezoneOption) => {
         setChangedSettings((state) => ({
@@ -45,9 +78,16 @@ export default function SettingsPage() {
         }))
     }
 
-    useEffect(() => {
-
-    }, []);
+    let refetchSettingsRow: JSX.Element = <></>;
+    if(!settingHelpers.areSettingsFullyLoaded(settings))
+        refetchSettingsRow = (
+            <>
+                <p>Could not load all settings related to the account.</p>
+                <button onClick={reloadSettings}>
+                    Load settings
+                </button>
+            </>
+        );
 
     return (
         <>
@@ -123,7 +163,8 @@ export default function SettingsPage() {
                 <hr className="settings-cat-divider"/>
 
                 <button
-                    disabled={settingHelpers.areSettingsFullyLoaded(settings)}
+                    disabled={!settingHelpers.areSettingsFullyLoaded(settings)}
+                    onClick={saveSettings}
                 >
                     Save settings
                 </button>

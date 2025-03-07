@@ -1,0 +1,111 @@
+import sys
+sys.path.append('..')
+from common import models, tables
+
+import logging
+logging.basicConfig(level=logging.INFO)
+
+from pydantic import BaseModel, field_validator, model_validator
+from datetime import datetime, tzinfo
+from zoneinfo import ZoneInfo
+from queue import Queue
+import sqlalchemy.exc
+import pydantic
+import json
+
+from sqlalchemy import select, delete, update
+from sqlalchemy import func
+from sqlalchemy.orm import Session
+import threading
+import pika, pika.spec, pika.channel
+
+import db, server_config
+
+from common import models
+
+def get_account_type(routing_key: str) -> models.AccountType:
+    parts = routing_key.split(".")
+    return models.AccountType(parts[1])
+
+class UserListener(threading.Thread):
+    """
+    Listens for logins and creates necessary SQL tables that are necessary for 
+    """
+    def __init__(self):
+        super(UserListener, self).__init__()
+
+        self.__logger = logging.getLogger(__name__ + "." + type(self).__name__)
+
+        self.mq_connection = pika.BlockingConnection(
+            pika.ConnectionParameters(
+                host=server_config.RABBITMQ_HOST, 
+                port=5672, 
+                virtual_host=server_config.RABBITMQ_VIRTUALHOST, 
+                credentials=pika.PlainCredentials(server_config.RABBITMQ_USERNAME, server_config.RABBITMQ_PASSWORD))
+        )
+        self.mq_channel = self.mq_connection.channel()
+        self.mq_channel.basic_qos(prefetch_count=1)
+
+    def _create_queues(self):
+        """
+        Create queues where the notifications exchange shall send user login notifications
+        """
+        self.mq_channel.queue_declare(queue='user_logins_events_listener')
+        self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
+
+    def _on_user_login(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        try:
+            user_data = json.loads(body)
+        except json.JSONDecodeError:
+            self.__logger.warning(f"Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
+            channel.basic_reject(method.delivery_tag, requeue=False)
+            return
+        
+        with db.start_session() as db_session:
+            query = select(tables.EventSettingsTable) \
+                    .where(
+                        tables.EventSettingsTable.user_id == user_data["account_id"],
+                        tables.EventSettingsTable.user_acc_type == get_account_type(method.routing_key)
+                    )
+            query_result = db_session.execute(query)
+            settings_row = query_result.scalar_one_or_none()
+            if(settings_row != None):
+                return
+            
+            settings_row = tables.EventSettingsTable()
+            settings_row.user_id = user_data["account_id"]
+            settings_row.user_acc_type = get_account_type(method.routing_key)
+            # tags/categories, default to having everything
+            categories_query = db_session.execute(select(tables.TagsTable))
+            for (category_tag, ) in categories_query.all():
+                settings_row.categories.append(category_tag)
+
+            db_session.add(settings_row)
+
+            try:
+                db_session.commit()
+            except sqlalchemy.exc.IntegrityError as e:
+                db_session.rollback()
+                if("duplicate" in e._message().lower()):
+                    self.__logger.warning(f"Event Settings for user {user_data['account_id']} already exist somehow (not overwritten by this notification)")
+                else:
+                    self.__logger.warning("Unknown IntegrityError when trying to create new settings for user", exc_info=True)
+                    channel.basic_reject(method.delivery_tag, requeue=False)
+                    return
+
+        channel.basic_ack(method.delivery_tag)
+
+    def run(self):
+        self._create_queues()
+
+        self.mq_channel.basic_consume('user_logins_events_listener', self._on_user_login)
+
+        try:
+            self.mq_channel.start_consuming()
+        finally:
+            self.mq_channel.stop_consuming()
+            self.mq_connection.close()
+

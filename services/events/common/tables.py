@@ -1,14 +1,18 @@
 import uuid
+import enum
 from zoneinfo import ZoneInfo
 from datetime import datetime
 
-from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint
+from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint, Enum, ForeignKeyConstraint
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship
 
 from typing import Optional
 
+from common import models
+
+UserIdType = String(256)
 
 class TimezoneSQLType(types.TypeDecorator):
     impl = types.VARCHAR
@@ -33,6 +37,18 @@ tags_to_events = Table(
     Column("tag_id", ForeignKey("tags.id"), primary_key=True),
 )
 
+user_settings_selected_categories = Table(
+    "user_settings_selected_categories",
+    Base.metadata,
+    Column("user_id", UserIdType, primary_key=True),
+    Column("acc_type", Enum(models.AccountType), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+    ForeignKeyConstraint(
+        ["user_id", "acc_type"],
+        ["event_settings.user_id", "event_settings.user_acc_type"],
+    )
+)
+
 class TagsTable(Base):
     __tablename__ = "tags"
 
@@ -46,10 +62,10 @@ class EventsTable(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, unique=True)
-    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
-    user_id: Mapped[str] = mapped_column(String(256))
+    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
+    user_id: Mapped[str] = mapped_column(UserIdType)
     
-    event_name: Mapped[str] = mapped_column(String(128))
+    event_name: Mapped[str | None] = mapped_column(String(128))
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
     end_date_utc: Mapped[datetime] # Always stores UTC ISO-8601 datetime
     address: Mapped[str] = mapped_column(String(256))
@@ -60,23 +76,14 @@ class EventsTable(Base):
 class CalendarLinksTable(Base):
     __tablename__ = "calendar_links"
 
-    user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)
-    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
+    user_id: Mapped[str] = mapped_column(UserIdType, primary_key=True, unique=True)
+    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     calendar_identifier: Mapped[uuid.UUID] = mapped_column(default=uuid.uuid4)
-
-class TimezoneTable(Base):
-    __tablename__ = "timezones"
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    timezone: Mapped[ZoneInfo] = mapped_column(TimezoneSQLType(64), nullable=False)
-
-    _related_settings: Mapped["EventSettingsTable"] = relationship(back_populates="timezone")
 
 class EventSettingsTable(Base):
     __tablename__ = "event_settings"
 
-    user_id: Mapped[str] = mapped_column(String(256), primary_key=True)
-    user_acc_type: Mapped[str] = mapped_column(String(64), nullable=False, primary_key=True)
+    user_id: Mapped[str] = mapped_column(UserIdType, primary_key=True, unique=True)
+    user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     
-    timezone_id: Mapped[int] = mapped_column(ForeignKey("timezones.id"))
-    timezone: Mapped[TimezoneTable] = relationship(back_populates="_related_settings")
+    categories: Mapped[list[TagsTable]] = relationship(secondary=user_settings_selected_categories, lazy="joined")

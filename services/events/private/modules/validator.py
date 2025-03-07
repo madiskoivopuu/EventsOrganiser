@@ -52,6 +52,9 @@ class NewEvents(BaseModel):
 
 
 class EventValidatorThread(threading.Thread):
+    """
+    Validates incoming events from the parser, fixes issues and adds them to the database.
+    """
     def __init__(self):
         super(EventValidatorThread, self).__init__()
 

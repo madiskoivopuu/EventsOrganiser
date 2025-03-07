@@ -70,7 +70,9 @@ async def get_login_link(
     request: Request,
     session: Session = Depends(session_manager.get_or_start_session)
 ) -> str:
-    
+    """
+    API endpoint that initiates the Microsoft login flow
+    """
     flow = ms_app.initiate_auth_code_flow(
         scopes=server_config.MICROSOFT_SCOPES,
         redirect_uri=get_redirect_uri(request),
@@ -85,6 +87,11 @@ async def finish_login(
     request: Request,
     session: Session = Depends(session_manager.get_session)
 ):
+    """
+    API endpoint that finalizes the login process by giving the user a JWT token and redirecting him to the home page.
+
+    A notification gets sent in the RabbitMQ 'notifications' exchange with routing key 'notification.outlook.user_login'
+    """
     response = RedirectResponse("/", status_code=303)
 
     if(session == None):

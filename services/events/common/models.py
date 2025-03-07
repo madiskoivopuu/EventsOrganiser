@@ -1,6 +1,6 @@
 import pydantic
 from pydantic import BaseModel, Field, ConfigDict, AliasChoices
-from enum import Enum
+import enum
 
 from typing import Literal, Optional
 from typing_extensions import Self
@@ -15,6 +15,9 @@ def tz_aware(dt: datetime) -> tzinfo | None:
         return dt.tzinfo
     else:
         return None
+
+class AccountType(enum.Enum):
+    OUTLOOK = "outlook"
 
 class Tag(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -55,6 +58,10 @@ class EventsGetResponse(EventBase):
 class EventsUpdateRequest(EventBase):
     tags: list[Tag] = Field(description="Category tags for the event. Only tags from the /events/tags endpoint are going to be included. Tags that aren't defined there will be ignored.")
 
-
 class CalendarLinkResponse(BaseModel):
     link: str = Field(description="Calendar link's full URL")
+
+class Settings(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    categories: list[Tag]

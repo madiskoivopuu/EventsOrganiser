@@ -10,6 +10,11 @@ import server_config
 # This should still work fine with pika andmost LLM libraries, since 
 # most of them release the GIL when it comes time to run the LLM with a prompt
 class ParserThread(threading.Thread):
+    """
+    Listens on RabbitMQ new emails queue and parses events from them.
+
+    Uses DB to get the categories of events the user wants to be parsed.
+    """
     def __init__(self):
         super(ParserThread, self).__init__()
 

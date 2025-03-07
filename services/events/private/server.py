@@ -5,7 +5,7 @@ import logging
 import time
 logging.basicConfig(level=logging.INFO)
 
-import parser, validator
+from modules import parser, validator
 
 class PrivateEventsServer():
     def __init__(self):

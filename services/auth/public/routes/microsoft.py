@@ -14,7 +14,7 @@ import aiomysql
 
 import server_config
 from helpers import auth
-from mq.notification_sender import NotificationSenderMQ
+from mq.notification_sender import NotificationMQ
 
 __logger = logging.getLogger(__name__)
 
@@ -37,11 +37,12 @@ ms_app = msal.ConfidentialClientApplication(
 
 @asynccontextmanager
 async def router_lifespan(app: FastAPI):
-    notifications_mq = NotificationSenderMQ(
+    notifications_mq = NotificationMQ(
         host=server_config.RABBITMQ_HOST,
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
         username=server_config.RABBITMQ_USERNAME,
-        password=server_config.RABBITMQ_PASSWORD
+        password=server_config.RABBITMQ_PASSWORD,
+        listeners=[]
     )
 
     yield {
@@ -110,7 +111,7 @@ async def finish_login(
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)
     auth.set_jwt_cookie(server_config.JWT_SESSION_COOKIE_NAME, token_data, response)
 
-    await cast(NotificationSenderMQ, request.state.notifications_mq).notify_of_ms_login(
+    await cast(NotificationMQ, request.state.notifications_mq).notify_of_ms_login(
         decoded_token["oid"],
         datetime.now(timezone.utc) + timedelta(seconds=auth_flow["expires_in"]),
         decoded_token["email"],

@@ -12,7 +12,7 @@ from modules import parser, validator, user_listener
 
 @dataclass
 class ThreadModule:
-    thread_instance: threading.Thread = None
+    thread_instance: threading.Thread
     thread_constructor: Callable[[], threading.Thread]
 
 

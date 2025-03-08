@@ -45,11 +45,13 @@ async def router_lifespan(app: FastAPI):
         listeners=[]
     )
 
+    await notifications_mq.try_open_conn_indefinite()
+
     yield {
         "notifications_mq": notifications_mq
     }
 
-    notifications_mq.close_conn()
+    await notifications_mq.close_conn()
 
 microsoft_router = APIRouter(
     prefix="/api/auth/microsoft",

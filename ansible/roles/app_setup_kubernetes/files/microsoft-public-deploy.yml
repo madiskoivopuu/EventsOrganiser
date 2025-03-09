@@ -39,7 +39,7 @@ spec:
               value: "email_parsing_queue"
 
             - name: MYSQL_DB_USER
-              value: "microsoft"
+              value: "msmicroservice"
             - name: MYSQL_DB_PASSWORD
               valueFrom:
                 secretKeyRef:

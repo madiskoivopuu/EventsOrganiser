@@ -21,11 +21,11 @@
   roles:
     #- update_packages
     #- setup
-    - rabbitmq
+    #- rabbitmq
     #- kubernetes
-    #- mysql
+    - mysql
     #- redis
-    #- app_setup_kubernetes
+    - app_setup_kubernetes
 
 - hosts: workers
   user: ubuntu

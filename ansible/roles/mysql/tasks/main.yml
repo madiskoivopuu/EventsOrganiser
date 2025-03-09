@@ -76,9 +76,9 @@
     - "10.0.0.0/255.0.0.0"
     #- "11.11.11.11" # add your own IP here, if you want to access the DB outside of the cluster
 
-- name: Create MySQL user "microsoft"
+- name: Create MySQL user "msmicroservice" # if name = microsoft then mysql just doesn't want to allow any connections to that user.....
   community.mysql.mysql_user:
-    name: microsoft
+    name: msmicroservice
     host: "{{ item }}"
     password: "{{ events_org_secret.mysql_user_microsoft_password | mandatory }}"
     priv: "microsoft.*:ALL"

@@ -16,7 +16,7 @@
 - name: Deploy private events microservice
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.file', 'events-private-deploy.yml') | from_yaml_all }}"
+    definition: "{{ lookup('ansible.builtin.template', 'events-private-deploy.yml') | from_yaml_all }}"
 
 - name: Deploy public auth microservice
   kubernetes.core.k8s:

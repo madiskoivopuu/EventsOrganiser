@@ -62,6 +62,7 @@ settings_router = APIRouter(
     lifespan=app_lifespan
 )
 
+@settings_router.get("/settings/", include_in_schema=False) # avoid stupid redirects
 @settings_router.get("/settings")
 async def get_settings(
     user: UserData = Depends(auth.authenticate_user),
@@ -74,6 +75,7 @@ async def get_settings(
         timezone=settings_row.timezone.timezone
     )
 
+@settings_router.patch("/settings/", status_code=204, include_in_schema=False) # avoid stupid redirects
 @settings_router.patch("/settings", status_code=204)
 async def update_settings(
     new_settings: models.SettingsPostRequest,

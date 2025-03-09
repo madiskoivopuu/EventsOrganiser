@@ -42,6 +42,7 @@ emails_router = APIRouter(
     lifespan=router_lifespan
 )
 
+@emails_router.post("/emails/fetch_new/", status_code=200, include_in_schema=False) # avoid stupid redirects
 @emails_router.post("/emails/fetch_new", status_code=200)
 async def new_email(
     request: Request,

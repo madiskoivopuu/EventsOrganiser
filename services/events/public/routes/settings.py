@@ -24,7 +24,8 @@ settings_router = APIRouter(
     prefix="/api/events/settings"
 )
 
-@settings_router.get("/")
+@settings_router.get("/", include_in_schema=False) # avoid stupid redirects
+@settings_router.get("")
 async def get_settings(
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session)
@@ -46,6 +47,7 @@ async def get_settings(
     
     return models.Settings.model_validate(settings_row)
 
+@settings_router.patch("/", status_code=204, include_in_schema=False) # avoid stupid redirects
 @settings_router.patch("/", status_code=204)
 async def update_settings(
     new_settings: models.Settings,

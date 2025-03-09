@@ -69,7 +69,8 @@ def get_redirect_uri(request: Request):
 class LoginLinkPostRequest(BaseModel):
     timezone: ZoneInfo
 
-@microsoft_router.post("/")
+@microsoft_router.post("/", include_in_schema=False) # avoid stupid redirects
+@microsoft_router.post("")
 async def get_login_link(
     data: LoginLinkPostRequest,
     request: Request,
@@ -87,6 +88,7 @@ async def get_login_link(
 
     return flow["auth_uri"]
 
+@microsoft_router.get("/login_callback/", include_in_schema=False) # avoid stupid redirects
 @microsoft_router.get("/login_callback", status_code=303)
 async def finish_login(
     request: Request,

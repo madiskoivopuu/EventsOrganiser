@@ -24,7 +24,8 @@ events_router = APIRouter(
     prefix="/api/events"
 )
 
-@events_router.get("/")
+@events_router.get("/", include_in_schema=False) # avoid stupid redirects
+@events_router.get("")
 async def get_events(
     request_data: models.EventsGetRequest = Depends(), # Required for the input parameters, so that FastAPI displays descriptions for query fields in Swagger
     user: UserData = Depends(auth.authenticate_user),
@@ -54,6 +55,7 @@ async def get_events(
         query
     )
 
+@events_router.patch("/{id}/", status_code=204, include_in_schema=False) # avoid stupid redirects
 @events_router.patch("/{id}", status_code=204)
 async def update_event(
     id: int,
@@ -96,6 +98,7 @@ async def update_event(
 
     return
 
+@events_router.delete("/{id}/", status_code=204, include_in_schema=False) # avoid stupid redirects
 @events_router.delete("/{id}", status_code=204)
 async def delete_event(
     id: int,
@@ -121,6 +124,7 @@ async def delete_event(
 
     return
 
+@events_router.get("/tags/", include_in_schema=False) # avoid stupid redirects
 @events_router.get("/tags")
 async def get_tags(
     db_session: AsyncSession = Depends(db.start_session)

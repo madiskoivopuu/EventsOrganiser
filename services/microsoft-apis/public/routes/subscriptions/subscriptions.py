@@ -57,6 +57,7 @@ subscriptions_router = APIRouter(
     lifespan=app_lifecycle
 )
 
+@subscriptions_router.post("/subscriptions/new_email/", status_code=200, include_in_schema=False) # avoid stupid redirects
 @subscriptions_router.post("/subscriptions/new_email", status_code=200)
 async def new_email(
     new_emails: models.SubscriptionPayload | None,
@@ -127,6 +128,7 @@ async def new_email(
 
     return
 
+@subscriptions_router.post("/subscriptions/email_sub_lifecycle/", status_code=200, include_in_schema=False) # avoid stupid redirects
 @subscriptions_router.post("/subscriptions/email_sub_lifecycle", status_code=200)
 async def subscription_lifecycle(
     lifecycle_notification: models.SubscriptionPayload | None,

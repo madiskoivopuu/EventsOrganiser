@@ -12,6 +12,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 import aiomysql
 
+import os
 import server_config
 from helpers import auth
 from mq.notification_sender import NotificationMQ
@@ -60,7 +61,8 @@ microsoft_router = APIRouter(
 
 def get_redirect_uri(request: Request):
     host = str(request.url).replace(str(request.url.path), "")
-    #host = host.replace("http://", "https://")
+    if(os.getenv("DEV_MODE") != "1"):
+        host = host.replace("http://", "https://")
     
     return host + "/api/auth/microsoft/login_callback"
         

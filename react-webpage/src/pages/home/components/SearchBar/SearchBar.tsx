@@ -37,7 +37,7 @@ function SearchBar({ searchCallback }: SearchBarProps) {
     }, [searchOptions]);
     
     return (
-        <aside style={{padding: "0.5rem", display: "flex", flexDirection: "column"}}>
+        <aside style={{display: "flex", flexDirection: "column"}}>
             <InputWithIcon type="text" placeholder="Event name..." value={searchOptions.eventName} onChange={(e) => updateSearchOptKey("eventName", e.target.value)}>
                 <IoIosSearch className="icon" />
             </InputWithIcon>

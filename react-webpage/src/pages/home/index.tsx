@@ -93,7 +93,8 @@ export default function HomePage() {
 					style={{
 						display: "flex",
 						flexDirection: "column",
-						justifyContent: "space-between"
+						justifyContent: "space-between",
+						padding: "0.5rem",
 					}}
 				>
 					<SearchBar searchCallback={onSearchChanged}/>

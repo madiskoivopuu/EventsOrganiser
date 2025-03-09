@@ -16,7 +16,7 @@ export function loadSettings(settings: Partial<Settings>) {
         promises.push(prm);
     }
 
-    if(!settings.accountSettings) {
+    if(!settings.eventSettings) {
         let prm = getEventSettings()
         .then((eventSettings) => {
             return {

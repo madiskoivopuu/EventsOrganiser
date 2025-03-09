@@ -48,8 +48,8 @@ const useEventPagination = create<PaginationState>((set) => ({
         set((state) => ({
             ...state,
             [tab]: {
-                currPage: newCurrPage || state[tab].currPage,
-                maxPages: maxPages || state[tab].maxPages,
+                currPage: newCurrPage !== undefined ? newCurrPage : state[tab].currPage,
+                maxPages: maxPages !== undefined ? maxPages : state[tab].maxPages,
                 isBeingFetched: false
             }
         }));

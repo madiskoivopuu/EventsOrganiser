@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { Route, Routes, Navigate, Outlet, NavigateFunction } from 'react-router';
 import { useCookies } from 'react-cookie';
 import { jwtDecode } from "jwt-decode";
@@ -9,7 +9,6 @@ import HomePage from './pages/home';
 import { useNavigate } from "react-router";
 import { EventTag, JWTData } from './interfaces/global_interfaces';
 import { useEventsStore, useAccountDataStore } from './hooks';
-import { loadSettings } from './pages/settings/setting-helpers';
 
 import { getTags } from './apis/events';
 import LoginPage from './pages/login';

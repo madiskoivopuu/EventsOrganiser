@@ -1,5 +1,5 @@
 export function getMicrosoftLoginLink(timezone: string): Promise<string> {
-    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/auth/microsoft`, {
+    return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/auth/microsoft/`, {
         method: "POST",
         headers: {
             'Accept': 'application/json',

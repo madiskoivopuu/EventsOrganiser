@@ -96,6 +96,8 @@ export default function SettingsPage() {
             </div>
 
             <div style={{padding: "1rem"}}>
+                {refetchSettingsRow}
+                
                 <hr className="settings-cat-divider"/>
 
                 <SettingRow

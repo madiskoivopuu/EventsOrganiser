@@ -16,9 +16,13 @@ export default function MicrosoftButton() {
         getMicrosoftLoginLink(
             Intl.DateTimeFormat().resolvedOptions().timeZone
         ).then(link => {
-            setLoginInProgress(false);
             window.location.href = link;
+            setTimeout(() => {
+                setLoginInProgress(false);
+            }, 10000); // in case loading takes too long
+
         }).catch(err => {
+            setLoginInProgress(false);
             toast.error("Failed to log in using Microsoft, try again later."); 
             console.error("MS login error: ", err);
         })
@@ -31,6 +35,7 @@ export default function MicrosoftButton() {
 
             <SpinnerCircular 
                 enabled={loginInProgress}
+                color="white"
                 size="1.25em"
                 style={{marginLeft: "1em"}}
             />

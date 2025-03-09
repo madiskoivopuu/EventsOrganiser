@@ -42,7 +42,7 @@ export const editableEventToEventDetails = (origEvent: EventDetails, event: Edit
         id: origEvent.id,
         event_name: event.event_name,
         start_date: event.start_date ? event.start_date.toISOString() : null,
-        end_date: event.end_date.toISOString(),
+        end_date: event.end_date!.toISOString(),
         address: event.address,
         tags: event.tags
     };

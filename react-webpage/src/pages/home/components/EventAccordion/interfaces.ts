@@ -13,7 +13,7 @@ export interface EditableEventDetails {
     address: string,
     start_date: Date | null,
     start_time: string,
-    end_date: Date,
+    end_date: Date | null,
     end_time: string,
     tags: EventTag[]
 };

@@ -40,7 +40,7 @@ input {
     border-style: solid;
     border-color: var(--color-border);
     border-width: 1px;
-    border-radius: 10rem;
+    border-radius: 1rem;
 
     font-size: 1rem;
 

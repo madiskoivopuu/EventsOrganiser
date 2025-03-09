@@ -1,8 +1,6 @@
-import { useAccountDataStore } from "@/hooks";
 import MicrosoftButton from "./components/MicrosoftButton";
 import "./login.css";
-import { useNavigate } from "react-router";
-import { useEffect } from "react";
+
 
 export default function LoginPage() {
     /*const navigate = useNavigate();

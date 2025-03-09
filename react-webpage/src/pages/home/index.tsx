@@ -1,4 +1,4 @@
-import { EventDetails, EventTag, ActiveTab } from "@/interfaces/global_interfaces";
+import { ActiveTab } from "@/interfaces/global_interfaces";
 import { EventsList } from "./components";
 import { useEffect, useState } from "react";
 import { useEventPaginationStore, useEventsStore } from '@/hooks';

@@ -28,7 +28,7 @@ export function getEvents(
     from_time: string, // ISO8601 date
     page: number = 1,
 ): Promise<EventsGetResponse> {
-    var url = new URL(`${import.meta.env.VITE__DOMAIN_URL}/api/events`);
+    var url = new URL(`${import.meta.env.VITE__DOMAIN_URL}/api/events/`);
     url.searchParams.append("direction", direction);
     url.searchParams.append("from_time", from_time);
     url.searchParams.append("page", page.toString());

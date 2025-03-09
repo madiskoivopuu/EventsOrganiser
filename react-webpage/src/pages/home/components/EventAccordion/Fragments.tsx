@@ -23,7 +23,7 @@ export function EventDetailColumn({ header, text }: EventDetailProps) {
 }
 
 interface DateFragmentProps {
-    date: string | null,
+    date?: string | null,
     threeDots?: boolean
 }
 

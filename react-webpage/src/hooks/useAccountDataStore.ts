@@ -1,4 +1,4 @@
-import { AccountSettings, Settings } from "@/interfaces/global_interfaces";
+import { Settings } from "@/interfaces/global_interfaces";
 import { create } from "zustand";
 
 interface AccountData {
@@ -11,28 +11,7 @@ interface AccountData {
 
 const useAccountDataStore = create<AccountData>((set) => ({
     authenticated: false,
-    settings: {
-        accountSettings: {
-            auto_fetch_emails: true,
-            timezone: "Europe/Tallinn",
-        },
-        eventSettings: {
-            categories: [
-                {
-                    id: 1,
-                    name: "abc"
-                },
-                {
-                    id: 2,
-                    name: "abcd"
-                },
-                {
-                    id: 3,
-                    name: "abcde"
-                }
-            ]
-        }
-    },
+    settings: {},
     
     setAuthenticated: (val) => {
         set((state) => ({

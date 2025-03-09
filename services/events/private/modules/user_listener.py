@@ -23,10 +23,6 @@ import db, server_config
 
 from common import models
 
-def get_account_type(routing_key: str) -> models.AccountType:
-    parts = routing_key.split(".")
-    return models.AccountType(parts[1])
-
 class UserListener(threading.Thread):
     """
     Listens for logins and creates necessary SQL tables that are necessary for 
@@ -50,7 +46,7 @@ class UserListener(threading.Thread):
         """
         Create queues where the notifications exchange shall send user login notifications
         """
-        self.mq_channel.queue_declare(queue='user_logins_events_listener')
+        self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
         self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
 
     def _on_user_login(self, channel: pika.channel.Channel, 
@@ -68,7 +64,7 @@ class UserListener(threading.Thread):
             query = select(tables.EventSettingsTable) \
                     .where(
                         tables.EventSettingsTable.user_id == user_data["account_id"],
-                        tables.EventSettingsTable.user_acc_type == get_account_type(method.routing_key)
+                        tables.EventSettingsTable.user_acc_type == models.AccountType(user_data["account_type"])
                     )
             query_result = db_session.execute(query)
             settings_row = query_result.scalar_one_or_none()
@@ -77,7 +73,7 @@ class UserListener(threading.Thread):
             
             settings_row = tables.EventSettingsTable()
             settings_row.user_id = user_data["account_id"]
-            settings_row.user_acc_type = get_account_type(method.routing_key)
+            settings_row.user_acc_type = models.AccountType(user_data["account_type"])
             # tags/categories, default to having everything
             categories_query = db_session.execute(select(tables.TagsTable))
             for (category_tag, ) in categories_query.all():

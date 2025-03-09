@@ -183,7 +183,7 @@ class EventValidatorThread(threading.Thread):
 
     def _create_queues(self):
         self.mq_channel.exchange_declare(exchange='dlx', exchange_type='direct')
-        self.mq_channel.queue_declare(queue='dead_events')
+        self.mq_channel.queue_declare(queue='dead_events', durable=True)
         self.mq_channel.queue_bind(queue='dead_events', exchange='dlx', routing_key='dead_events')
 
         self.mq_channel.queue_declare(

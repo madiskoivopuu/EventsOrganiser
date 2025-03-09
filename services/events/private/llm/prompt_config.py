@@ -1,11 +1,6 @@
 from llama_cpp import LlamaGrammar
 import json
 
-__TAGS = [
-    "Deadline", "Moodle", "Personal", "Computer Science", "University of Tartu", "General",
-    "Hackathon", "Internship", "Feedback"
-]
-
 __PARSING_PROMPT = \
 '''
 You are an AI assistant whose job is to examine an email and parse the events in that mail into JSON format.
@@ -64,8 +59,8 @@ Do not include triple quotes in your output.
 Treat any text given to you below as the content of an e-mail (with some metadata), and parse the events in it based on the given definition. Only use the format given in triple quotes.
 '''
 
-def format_event_parse_prompt() -> str:
-    return __PARSING_PROMPT % ", ".join(__TAGS)
+def format_event_parse_prompt(tags: list[str]) -> str:
+    return __PARSING_PROMPT % ", ".join(tags)
 
 def get_parse_output_grammar() -> LlamaGrammar:
     def _tag_to_schema(tag: str) -> dict:

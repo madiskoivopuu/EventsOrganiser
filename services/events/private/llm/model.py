@@ -30,9 +30,9 @@ class Llama3Model():
 
         return prepared_content
     
-    def parse_events_from_email(self, email: Email) -> list[dict]:
+    def parse_events_from_email(self, email: Email, tags: list[str]) -> list[dict]:
         events: list[dict] = []
-        prompt = prompt_config.format_event_parse_prompt()
+        prompt = prompt_config.format_event_parse_prompt(tags)
         
         # TODO: make a better function for this
         prepared_content = self.format_email_for_llm(email)

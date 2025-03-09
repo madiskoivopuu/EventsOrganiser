@@ -14,3 +14,8 @@ MYSQL_EVENTS_PASSWORD = os.getenv("MYSQL_EVENTS_PASSWORD")
 MYSQL_EVENTS_DB = os.getenv("MYSQL_EVENTS_DB")
 
 LLM_PATH = os.getenv("LLM_PATH")
+
+DEFAULT_EVENT_CATEGORIES = [
+    "Deadline", "Moodle", "Personal", "Computer Science", "University of Tartu", "General",
+    "Hackathon", "Internship", "Feedback"
+]

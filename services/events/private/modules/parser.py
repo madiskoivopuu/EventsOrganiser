@@ -1,11 +1,12 @@
-from helpers.email_data import Email
-from llm.model import Llama3Model 
-
+from sqlalchemy import select, delete, update
 import threading, json
 import pika, pika.spec, pika.channel
 import logging
 
-import server_config
+from common import tables, models
+from helpers.email_data import Email
+from llm.model import Llama3Model 
+import server_config, db
 
 # This should still work fine with pika andmost LLM libraries, since 
 # most of them release the GIL when it comes time to run the LLM with a prompt
@@ -59,9 +60,25 @@ class ParserThread(threading.Thread):
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
-        
+        msg_with_email: dict[str] = json.loads(body)
+
+        user_event_categories = []
+        with db.start_session() as db_session:
+            query = select(tables.EventSettingsTable) \
+                    .where(
+                        tables.EventSettingsTable.user_id == msg_with_email["user_id"],
+                        tables.EventSettingsTable.user_acc_type == models.AccountType(msg_with_email["account_type"])
+                    )
+            settings_row = db_session.execute(query).unique().scalar_one_or_none()
+
+            if(settings_row == None):
+                self.logger.warning(f"Settings do not exist for user {msg_with_email["user_id"]}, defaulting to all tags")
+                user_event_categories += server_config.DEFAULT_EVENT_CATEGORIES
+            else:
+                for category in settings_row.categories:
+                    user_event_categories.append(category.name)
+
         try:
-            msg_with_email: dict[str] = json.loads(body)
             email: Email = self.to_email_obj(msg_with_email)
             events = self.llm.parse_events_from_email(email)
         except:

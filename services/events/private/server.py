@@ -22,6 +22,9 @@ THREADS: list[ThreadModule] = [
     ThreadModule(None, user_listener.UserListener),
 ]
 
+def create_default_tags():
+    pass
+
 class PrivateEventsServer():
     def __init__(self):
         self.__logger = logging.getLogger(__name__ + "." + type(self).__name__)

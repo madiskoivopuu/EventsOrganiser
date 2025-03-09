@@ -40,7 +40,7 @@ async def get_settings(
     
     query_result = await db_session.execute(query)
 
-    settings_row = query_result.scalar_one_or_none()
+    settings_row = query_result.unique().scalar_one_or_none()
     if(settings_row == None):
         raise HTTPException(status_code=404, detail="Settings have not been created for some reason")
     
@@ -62,7 +62,7 @@ async def update_settings(
             )
     
     query_result = await db_session.execute(query)
-    settings_row = query_result.scalar_one()
+    settings_row = query_result.unique().scalar_one()
 
     new_categories_ids = [cat.id for cat in new_settings.categories]
     categories_query = select(tables.TagsTable) \

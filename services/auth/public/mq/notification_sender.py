@@ -64,7 +64,7 @@ class NotificationMQ:
         self.mq_channel = await self.mq_connection.channel()
         await self.mq_channel.set_qos(prefetch_count=10)
 
-        self.notification_exchange = await self.mq_channel.declare_exchange(name="notifications", type=aio_pika.ExchangeType.TOPIC)
+        self.notification_exchange = await self.mq_channel.declare_exchange(name="notifications", type=aio_pika.ExchangeType.TOPIC, durable=True)
         for listener in self.listeners:
             queue = await self.mq_channel.declare_queue(
                 name=listener.queue_name,
@@ -117,6 +117,7 @@ class NotificationMQ:
                                  user_timezone: ZoneInfo, access_token: str, refresh_token: str):        
         await self.send_notification({
                 "account_id": account_id,
+                "account_type": "outlook",
                 "email": email,
                 "user_timezone": str(user_timezone),
                 "access_token": access_token,

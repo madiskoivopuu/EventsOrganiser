@@ -5,7 +5,7 @@ from datetime import datetime, tzinfo
 from sqlalchemy import DateTime, ForeignKey, String, event, DDL
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.orm import DeclarativeBase, relationship, MappedAsDataclass
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 from typing import Optional
 
@@ -75,7 +75,7 @@ class EmailSubscriptionsTable(Base):
     subscription_id: Mapped[str] = mapped_column(String(256))
     expires_at: Mapped[datetime] = mapped_column(_UTCDateTimeSQLType())
 
-class SettingsTable(MappedAsDataclass, Base):
+class SettingsTable(Base):
     __tablename__ = "settings"
 
     user_id: Mapped[str] = mapped_column(String(256), primary_key=True, unique=True)

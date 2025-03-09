@@ -98,25 +98,33 @@ async def update_settings(
     return
 
 async def process_login_notification(message: dict) -> bool:
-    results = await asyncio.gather(
-        merge_user_info(message),
-        create_settings(message),
-        return_exceptions=True
-    )
-    
-    return all(results)
+    tasks: list[asyncio.Task] = []
+    try:
+        async with asyncio.TaskGroup() as tg:
+            tasks.append(
+                tg.create_task(merge_user_info(message))
+            )
+            tasks.append(
+                tg.create_task(create_settings(message))
+            )
+    except ExceptionGroup :
+        __logger.warning("process_login_notification: Failed to finish all tasks for some reason", exc_info=True)
+
+    return all([t.result() for t in tasks])
 
 async def create_settings(data: dict) -> bool:
     async with db.async_session() as db_session:
+        db_session = cast(AsyncSession, db_session)
         q = select(tables.SettingsTable) \
             .where(tables.SettingsTable.user_id == data["account_id"])
-        user_settings = (await db_session.execute(q)).scalar_one_or_none()
+        user_settings = (await db_session.execute(q)).unique().scalar_one_or_none()
         if(user_settings != None): # user already has settings...
             return True
 
         settings_row = tables.SettingsTable()
         settings_row.user_id = data["account_id"]
         settings_row.timezone = await query_helpers.get_or_create_timezone(db_session, ZoneInfo(data["user_timezone"]))
+        settings_row.auto_fetch_emails = False
 
         db_session.add(settings_row)
 

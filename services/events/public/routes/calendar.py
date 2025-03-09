@@ -20,7 +20,7 @@ calendar_router = APIRouter(
     prefix="/api/events/calendar"
 )
 
-@calendar_router.get("/api/events/calendar/link")
+@calendar_router.get("/link")
 async def get_link(
     request: Request,
     user: UserData = Depends(auth.authenticate_user),
@@ -45,7 +45,7 @@ async def get_link(
         link=helpers.format_calendar_link(link_row.calendar_identifier, request)
     )
 
-@calendar_router.post("/api/events/calendar/link")
+@calendar_router.post("/link")
 async def generate_link(
     request: Request,
     user: UserData = Depends(auth.authenticate_user),
@@ -81,7 +81,7 @@ async def generate_link(
         link=helpers.format_calendar_link(calendar_identifier, request)
     )
 
-@calendar_router.delete("/api/events/calendar/link", status_code=204)
+@calendar_router.delete("/link", status_code=204)
 async def delete_calendar_link(
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session),
@@ -103,7 +103,7 @@ async def delete_calendar_link(
 
     return
 
-@calendar_router.get("/api/events/calendar/{calendar_id}")
+@calendar_router.get("/{calendar_id}")
 async def get_calendar_file(
     calendar_id: uuid.UUID,
     db_session: AsyncSession = Depends(db.start_session),

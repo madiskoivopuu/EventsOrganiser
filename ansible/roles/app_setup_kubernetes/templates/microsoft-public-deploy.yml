@@ -67,6 +67,9 @@ spec:
                   name: secrets
                   key: MICROSOFT_CALLBACK_SECRET
 
+            - name: DOMAIN_URL
+              value: "https://www.{{ domain_name }}"
+              
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

@@ -26,4 +26,4 @@
 - name: Deploy public Microsoft accounts microservice
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('ansible.builtin.file', 'microsoft-public-deploy.yml') | from_yaml_all }}"
+    definition: "{{ lookup('ansible.builtin.template', 'microsoft-public-deploy.yml') | from_yaml_all }}"

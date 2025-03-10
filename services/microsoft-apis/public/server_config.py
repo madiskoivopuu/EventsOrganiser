@@ -22,4 +22,4 @@ JWT_SECRET=os.getenv("JWT_SECRET")
 JWT_SESSION_COOKIE_NAME=os.getenv("JWT_SESSION_COOKIE_NAME")
 
 MAX_EMAIL_AGE = timedelta(days=31)
-DOMAIN_URL = "https://11072100.xyz"
+DOMAIN_URL = os.getenv("DOMAIN_URL")

@@ -112,6 +112,7 @@ class NotificationMQ:
                 await msg.nack(requeue=True)
         except Exception:
             self.__logger.warning("Error passing on notification to 'notification_callback'", exc_info=True)
+            await msg.nack(requeue=True)
 
     async def notify_of_ms_login(self, account_id: str, access_token_expiration: datetime, email: str,
                                  user_timezone: ZoneInfo, access_token: str, refresh_token: str):        

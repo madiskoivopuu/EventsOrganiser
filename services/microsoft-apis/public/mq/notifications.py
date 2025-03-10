@@ -30,6 +30,7 @@ class NotificationMQ:
         """
         self.__logger = logging.getLogger(__name__)
         self.__retry_conn_task = None
+        self._loop = asyncio.get_running_loop()
 
         self.host = host
         self.virtual_host = virtual_host
@@ -57,7 +58,8 @@ class NotificationMQ:
             host=self.host,
             virtualhost=self.virtual_host,
             login=self.username,
-            password=self.password
+            password=self.password,
+            loop=self._loop
         )
         self.mq_channel = await self.mq_connection.channel()
         await self.mq_channel.set_qos(prefetch_count=10)
@@ -110,3 +112,4 @@ class NotificationMQ:
                 await msg.nack(requeue=True)
         except Exception:
             self.__logger.warning("Error passing on notification to 'notification_callback'", exc_info=True)
+            await msg.nack(requeue=True)

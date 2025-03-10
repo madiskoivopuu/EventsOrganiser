@@ -99,22 +99,18 @@ async def update_settings(
 
 async def process_login_notification(message: dict) -> bool:
     tasks: list[asyncio.Task] = []
-    try:
-        async with asyncio.TaskGroup() as tg:
-            tasks.append(
-                tg.create_task(merge_user_info(message))
-            )
-            tasks.append(
-                tg.create_task(create_settings(message))
-            )
-    except ExceptionGroup :
-        __logger.warning("process_login_notification: Failed to finish all tasks for some reason", exc_info=True)
+    async with asyncio.TaskGroup() as tg:
+        tasks.append(
+            tg.create_task(merge_user_info(message))
+        )
+        tasks.append(
+            tg.create_task(create_settings(message))
+        )
 
     return all([t.result() for t in tasks])
 
 async def create_settings(data: dict) -> bool:
     async with db.async_session() as db_session:
-        db_session = cast(AsyncSession, db_session)
         q = select(tables.SettingsTable) \
             .where(tables.SettingsTable.user_id == data["account_id"])
         user_settings = (await db_session.execute(q)).unique().scalar_one_or_none()
@@ -144,9 +140,7 @@ async def merge_user_info(data: dict):
     """
     Creates or updates existing user info
     """
-
     async with db.async_session() as db_session:
-        db_session = cast(AsyncSession, db_session)
         user_info = tables.UserInfoTable()
         user_info.user_id = data["account_id"]
         user_info.user_email = data["email"]

@@ -5,7 +5,7 @@ if(os.getenv("DEV_MODE") == "1"):
 
 from fastapi import FastAPI
 
-import os, server_config
+import os
 from routes import settings_router, emails_router, subscriptions_router
 
 api = FastAPI(

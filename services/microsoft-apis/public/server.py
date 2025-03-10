@@ -1,4 +1,4 @@
-import os
+import os, server_config # necessary import
 if(os.getenv("DEV_MODE") == "1"):
     import sys
     sys.path.append('..')

@@ -23,7 +23,7 @@
     #- setup
     #- rabbitmq
     #- kubernetes
-    - mysql
+    #- mysql
     #- redis
     - app_setup_kubernetes
 

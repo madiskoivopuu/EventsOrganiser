@@ -36,7 +36,7 @@ async def get_unparsed_emails_after_date(access_token: str,
 async def fetch_emails_batched(
         ids_and_tokens: list[tuple[str, str]], 
         batch_size: int = 10,
-        filter_func: Callable[[dict], bool] = lambda d: True) -> list[dict]:
+        filter_func: Callable[[dict], bool] = lambda: True) -> list[dict]:
     """
     Sends batched requests to Microsoft Graph API /me/messages endpoint to fetch emails.
 
@@ -44,6 +44,8 @@ async def fetch_emails_batched(
     :param batch_size: Amount of asynchronous requests to send at a time
     :param filter_func: A callable that decides whether the email should be added to the list or not. 
         This function should return False if email should be ignored
+
+    :raises RuntimeWarning: When the function is unable to fully fetch all emails
 
     :return: A list of emails that were fetched, in the same JSON format as Microsoft Graph returned
     """

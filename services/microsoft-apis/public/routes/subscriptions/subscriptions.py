@@ -110,7 +110,7 @@ async def new_email(
             ParseMailsRequest(
                 user_id=user_data_per_email[i][0].user_id,
                 user_email=user_data_per_email[i][0].user_email,
-                timezone=user_data_per_email[i][1],
+                user_timezone=user_data_per_email[i][1],
                 email=email
             )
         )

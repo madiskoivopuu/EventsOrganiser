@@ -46,7 +46,9 @@ user_settings_selected_categories = Table(
     ForeignKeyConstraint(
         ["user_id", "acc_type"],
         ["event_settings.user_id", "event_settings.user_acc_type"],
-    )
+        ondelete="cascade",
+        onupdate="cascade"
+    ),
 )
 
 class TagsTable(Base):

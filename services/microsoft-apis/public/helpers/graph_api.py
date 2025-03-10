@@ -142,7 +142,8 @@ async def create_subscription(access_token: str, notification_url: str, lifecycl
         async with session.post(
             f"/v1.0/subscriptions",
             headers={
-                "Authorization": f"Bearer {access_token}"
+                "Authorization": f"Bearer {access_token}",
+                "Prefer": 'IdType="ImmutableId"',
             },
             json={
                 "changeType": "created",
@@ -200,7 +201,8 @@ async def extend_subscription(subscription_id: str, access_token: str, extend_by
         async with session.patch(
             f"/v1.0/subscriptions/{subscription_id}",
             headers={
-                "Authorization": f"Bearer {access_token}"
+                "Authorization": f"Bearer {access_token}",
+                "Prefer": 'IdType="ImmutableId"'
             },
             json={
                 "expirationDateTime": datetime.now(timezone.utc) + extend_by

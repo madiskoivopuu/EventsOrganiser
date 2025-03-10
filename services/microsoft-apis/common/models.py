@@ -2,7 +2,7 @@ import pydantic
 from pydantic import BaseModel, Field, ConfigDict
 from enum import Enum
 
-from typing import Literal, Optional
+from typing import Annotated, Optional
 from typing_extensions import Self
 
 from zoneinfo import ZoneInfo
@@ -23,8 +23,8 @@ class _NotificationData(BaseModel):
     change_type: str = Field(alias="changeType")
     client_state: str = Field(alias="clientState")
     subscription_id: str = Field(alias="subscriptionId")
-    resource_data: Optional[_ResourceData] = Field(alias="resourceData")
-    lifecycle_event: Optional[str] = Field(alias="lifecycleEvent")
+    resource_data: Annotated[Optional[_ResourceData], Field(alias="resourceData")] = None
+    lifecycle_event: Annotated[Optional[str], Field(alias="lifecycleEvent")] = None
 
 class SubscriptionPayload(BaseModel):
     value: list[_NotificationData]

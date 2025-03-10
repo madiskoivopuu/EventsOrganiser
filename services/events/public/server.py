@@ -7,7 +7,9 @@ import os
 import sys
 sys.path.append('..')
 
-api = FastAPI(debug=(os.getenv("DEV_MODE") == "1"))
+api = FastAPI(
+    debug=(os.getenv("DEV_MODE") == "1"),
+)
 add_pagination(api)
 
 if(os.getenv("DEV_MODE") == "1"):
@@ -17,6 +19,6 @@ if(os.getenv("DEV_MODE") == "1"):
         allow_origins=['*']
     )
 
-api.include_router(events_router)
 api.include_router(settings_router)
+api.include_router(events_router)
 api.include_router(calendar_router)

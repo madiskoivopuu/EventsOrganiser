@@ -48,7 +48,7 @@ async def get_settings(
     return models.Settings.model_validate(settings_row)
 
 @settings_router.patch("/", status_code=204, include_in_schema=False) # avoid stupid redirects
-@settings_router.patch("/", status_code=204)
+@settings_router.patch("", status_code=204)
 async def update_settings(
     new_settings: models.Settings,
     user: UserData = Depends(auth.authenticate_user),

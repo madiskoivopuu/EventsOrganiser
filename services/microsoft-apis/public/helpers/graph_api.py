@@ -97,7 +97,7 @@ async def get_message(id: str, access_token: str, select: list | None = None) ->
     """
     Gets the contents of a single email for a user from Microsoft Graph API
 
-    :return: a dictionary containing
+    :returns: a dictionary containing
         "resp" - the response object,
         "json_data" - response body as json
     """
@@ -133,7 +133,8 @@ async def create_subscription(access_token: str, notification_url: str, lifecycl
     :param expires_in: Expiration date for the subscription. Default value is fetched from Microsoft Graph API docs
 
     :return: Subscription ID and the expiration date if the request was successful, otherwise None
-        If a duplicate subscription already exists, then the ID of an already existing subscription is returned
+
+            If a duplicate subscription already exists, then the ID of an already existing subscription is returned
     """
 
     expiration_date = datetime.now(timezone.utc) + expires_in

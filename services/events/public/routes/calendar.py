@@ -17,11 +17,11 @@ import helpers
 import db
 
 calendar_router = APIRouter(
-    prefix="/api/events/calendar"
+    prefix="/api/events"
 )
 
-@calendar_router.get("/link/", include_in_schema=False) # avoid stupid redirects
-@calendar_router.get("/link")
+@calendar_router.get("/calendar/link/", include_in_schema=False) # avoid stupid redirects
+@calendar_router.get("/calendar/link")
 async def get_link(
     request: Request,
     user: UserData = Depends(auth.authenticate_user),
@@ -46,8 +46,8 @@ async def get_link(
         link=helpers.format_calendar_link(link_row.calendar_identifier, request)
     )
 
-@calendar_router.post("/link/", include_in_schema=False) # avoid stupid redirects
-@calendar_router.post("/link")
+@calendar_router.post("/calendar/link/", include_in_schema=False) # avoid stupid redirects
+@calendar_router.post("/calendar/link")
 async def generate_link(
     request: Request,
     user: UserData = Depends(auth.authenticate_user),
@@ -83,8 +83,8 @@ async def generate_link(
         link=helpers.format_calendar_link(calendar_identifier, request)
     )
 
-@calendar_router.delete("/link/", status_code=204, include_in_schema=False) # avoid stupid redirects
-@calendar_router.delete("/link", status_code=204)
+@calendar_router.delete("/calendar/link/", status_code=204, include_in_schema=False) # avoid stupid redirects
+@calendar_router.delete("/calendar/link", status_code=204)
 async def delete_calendar_link(
     user: UserData = Depends(auth.authenticate_user),
     db_session: AsyncSession = Depends(db.start_session),
@@ -106,8 +106,8 @@ async def delete_calendar_link(
 
     return
 
-@calendar_router.get("/{calendar_id}/", include_in_schema=False) # avoid stupid redirects
-@calendar_router.get("/{calendar_id}")
+@calendar_router.get("/calendar/{calendar_id}/", include_in_schema=False) # avoid stupid redirects
+@calendar_router.get("/calendar/{calendar_id}")
 async def get_calendar_file(
     calendar_id: uuid.UUID,
     db_session: AsyncSession = Depends(db.start_session),

@@ -62,7 +62,7 @@ Treat any text given to you below as the content of an e-mail (with some metadat
 def format_event_parse_prompt(tags: list[str]) -> str:
     return __PARSING_PROMPT % ", ".join(tags)
 
-def get_parse_output_grammar() -> LlamaGrammar:
+def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
     def _tag_to_schema(tag: str) -> dict:
         return {
             "type": "string",
@@ -104,7 +104,7 @@ def get_parse_output_grammar() -> LlamaGrammar:
                 },
                 "tags": {
                     "type": "array",
-                    "items": list(map(_tag_to_schema, __TAGS))
+                    "items": list(map(_tag_to_schema, tags))
                 },
             },
             "required": ["event_name", "start_date", "end_date", "country", "city", "address", "room", "tags"]

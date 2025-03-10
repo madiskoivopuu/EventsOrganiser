@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends, Body, Query
 from fastapi.responses import PlainTextResponse
 from datetime import datetime, timezone
 import itertools
@@ -11,6 +11,7 @@ from sqlalchemy.orm import selectinload
 from contextlib import asynccontextmanager
 from zoneinfo import ZoneInfo
 from collections import defaultdict
+from typing import Annotated
 
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -60,12 +61,13 @@ subscriptions_router = APIRouter(
 @subscriptions_router.post("/subscriptions/new_email/", status_code=200, include_in_schema=False) # avoid stupid redirects
 @subscriptions_router.post("/subscriptions/new_email", status_code=200)
 async def new_email(
-    new_emails: models.SubscriptionPayload | None,
     request: Request,
+    validationToken: Annotated[str, Query()] = None,
+    new_emails: Annotated[models.SubscriptionPayload, Body()] = None,
     db_session: AsyncSession = Depends(db.start_session)
 ) -> str | None:
     # new subscription validation
-    if("validationToken" in request.query_params):
+    if(validationToken != None):
         return PlainTextResponse(
             content=request.query_params.get("validationToken")
         )
@@ -131,15 +133,19 @@ async def new_email(
 @subscriptions_router.post("/subscriptions/email_sub_lifecycle/", status_code=200, include_in_schema=False) # avoid stupid redirects
 @subscriptions_router.post("/subscriptions/email_sub_lifecycle", status_code=200)
 async def subscription_lifecycle(
-    lifecycle_notification: models.SubscriptionPayload | None,
-    request: Request
+    request: Request,
+    validationToken: Annotated[str, Query()] = None,
+    lifecycle_notification: Annotated[models.SubscriptionPayload, Body()] = None,
 ) -> str | None:
     # new subscription validation
-    if("validationToken" in request.query_params):
+    if(validationToken != None):
         return PlainTextResponse(
             content=request.query_params.get("validationToken")
         )
     
+    if(lifecycle_notification == None):
+        raise HTTPException(status_code=400)
+
     subscription_handler = cast(SubscriptionHandler, request.state.subscription_handler)
     async with asyncio.TaskGroup() as tg:
         for subscription_data in lifecycle_notification.value:

@@ -38,8 +38,8 @@ async def app_lifecycle(api: FastAPI):
     )
     subscription_handler = SubscriptionHandler(
         domain_url=server_config.DOMAIN_URL,
-        notification_path="/subscriptions/new_email",
-        notification_lifecycle_path="/subscriptions/email_sub_lifecycle",
+        notification_path="/api/microsoft/subscriptions/new_email",
+        notification_lifecycle_path="/api/microsoft/subscriptions/email_sub_lifecycle",
         secret=server_config.MICROSOFT_CALLBACK_SECRET,
         mail_sender_mq=mail_sender_mq
     )

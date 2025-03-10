@@ -36,7 +36,7 @@ async def get_unparsed_emails_after_date(access_token: str,
 async def fetch_emails_batched(
         ids_and_tokens: list[tuple[str, str]], 
         batch_size: int = 10,
-        filter_func: Callable[[dict], bool] = lambda: True) -> list[dict]:
+        filter_func: Callable[[dict], bool] = lambda _: True) -> list[dict]:
     """
     Sends batched requests to Microsoft Graph API /me/messages endpoint to fetch emails.
 

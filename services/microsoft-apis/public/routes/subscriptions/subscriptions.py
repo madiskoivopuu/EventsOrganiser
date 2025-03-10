@@ -116,7 +116,7 @@ async def new_email(
         )
 
     for user_id, emails in emails_for_user.items():
-        query_helpers.add_parsed_emails(
+        await query_helpers.add_parsed_emails(
             db_session,
             user_id,
             emails,

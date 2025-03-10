@@ -94,7 +94,7 @@ async def get_parsed_emails(db_session: AsyncSession | None, user_id: str) -> se
 
     return email_ids
 
-def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list[dict], expire_in: timedelta):
+async def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list[dict], expire_in: timedelta):
     """
     Adds a list of email IDs along with their cache expiration date into the database
     This function **does not autocommit**

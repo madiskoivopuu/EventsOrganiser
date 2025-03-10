@@ -112,6 +112,7 @@ async def add_parsed_emails(db_session: AsyncSession, user_id: str, emails: list
         parsed_email.expire_at = datetime.now(timezone.utc) + expire_in
 
         db_session.add(parsed_email)
+        await db_session.flush()
 
 async def update_token_db(db_session: AsyncSession, user_id: str) -> tables.UserInfoTable:
     """

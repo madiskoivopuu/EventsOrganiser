@@ -114,6 +114,7 @@ async def new_email(
                 email=email
             )
         )
+        emails_for_user[user_data_per_email[i][0].user_id].append(email)
 
     for user_id, emails in emails_for_user.items():
         await query_helpers.add_parsed_emails(

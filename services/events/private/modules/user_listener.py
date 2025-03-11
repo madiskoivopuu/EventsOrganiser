@@ -49,17 +49,7 @@ class UserListener(threading.Thread):
         self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
         self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
 
-    def _on_user_login(self, channel: pika.channel.Channel, 
-                    method: pika.spec.Basic.Deliver, 
-                    properties: pika.spec.BasicProperties, 
-                    body: bytes):
-        try:
-            user_data = json.loads(body)
-        except json.JSONDecodeError:
-            self.__logger.warning(f"Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
-            channel.basic_reject(method.delivery_tag, requeue=False)
-            return
-        
+    def _process_login_message(self, user_data: dict):
         with db.start_session() as db_session:
             query = select(tables.EventSettingsTable) \
                     .where(
@@ -69,7 +59,7 @@ class UserListener(threading.Thread):
             query_result = db_session.execute(query)
             settings_row = query_result.unique().scalar_one_or_none()
             if(settings_row != None):
-                return
+                return True
             
             settings_row = tables.EventSettingsTable()
             settings_row.user_id = user_data["account_id"]
@@ -89,10 +79,30 @@ class UserListener(threading.Thread):
                     self.__logger.warning(f"Event Settings for user {user_data['account_id']} already exist somehow (not overwritten by this notification)")
                 else:
                     self.__logger.warning("Unknown IntegrityError when trying to create new settings for user", exc_info=True)
-                    channel.basic_reject(method.delivery_tag, requeue=False)
-                    return
+                    return False
+                
+        return True
 
-        channel.basic_ack(method.delivery_tag)
+    def _on_user_login(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        try:
+            user_data = json.loads(body)
+        except json.JSONDecodeError:
+            self.__logger.warning(f"Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
+            channel.basic_reject(method.delivery_tag, requeue=False)
+            return
+        
+        try:
+            if(self._process_login_message(user_data)):
+                channel.basic_ack(method.delivery_tag)
+            else:
+                channel.basic_nack(method.delivery_tag)
+        except:
+            self.__logger.warning("_process_login_message() raised an exception", exc_info=True)
+            channel.basic_nack(method.delivery_tag)
+            return
 
     def run(self):
         self._create_queues()

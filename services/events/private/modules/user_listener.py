@@ -67,7 +67,7 @@ class UserListener(threading.Thread):
                         tables.EventSettingsTable.user_acc_type == models.AccountType(user_data["account_type"])
                     )
             query_result = db_session.execute(query)
-            settings_row = query_result.scalar_one_or_none()
+            settings_row = query_result.unique().scalar_one_or_none()
             if(settings_row != None):
                 return
             

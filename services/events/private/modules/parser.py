@@ -80,7 +80,7 @@ class ParserThread(threading.Thread):
 
         try:
             email: Email = self.to_email_obj(msg_with_email)
-            events = self.llm.parse_events_from_email(email)
+            events = self.llm.parse_events_from_email(email, user_event_categories)
         except:
             self.logger.warning("Unknown exception in email parsing function", exc_info=True)
             channel.basic_nack(method.delivery_tag)

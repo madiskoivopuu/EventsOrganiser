@@ -20,7 +20,12 @@ class Email:
         if(email_data["body"]["contentType"] != "text"):
             raise ValueError(f"email data for {email_data['id']} is {email_data['body']['contentType']}, but expected 'text'")
         
-        recipients: list[str] = [recipient["emailAddress"]["address"] for recipient in email_data["toRecipients"]]
+        recipients: list[str] = []
+        for recipient in email_data["toRecipients"]:
+            try:
+                recipients.append(recipient["emailAddress"]["address"])
+            except KeyError:
+                continue
         sender_email = None if email_data["isDraft"] else email_data["sender"]["emailAddress"]["address"]
         from_email = None if email_data["isDraft"] else email_data["from"]["emailAddress"]["address"]
 

@@ -84,6 +84,7 @@ class ParserThread(threading.Thread):
         except:
             self.logger.warning("Unknown exception in email parsing function", exc_info=True)
             channel.basic_nack(method.delivery_tag)
+            return
 
 
         self.mq_channel.basic_publish(

@@ -48,7 +48,7 @@ class Llama3Model():
                     "content": prepared_content
                 },
             ],
-            grammar=prompt_config.get_parse_output_grammar(),
+            grammar=prompt_config.get_parse_output_grammar(tags),
             max_tokens=self.MAX_GENERATED_TOKENS,
             temperature=0.6
         )

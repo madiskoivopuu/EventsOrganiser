@@ -1,5 +1,5 @@
 import pydantic
-from pydantic import BaseModel, Field, ConfigDict, AliasChoices
+from pydantic import BaseModel, Field, ConfigDict, AliasChoices, field_validator, model_validator
 import enum
 
 from typing import Literal, Optional
@@ -54,7 +54,6 @@ class EventsGetResponse(EventBase):
     id: int = Field(description="Event identifier in database")
     tags: list[Tag] = Field(description="Category tags for the event. Only tags from the /events/tags endpoint are listed.")
 
-
 class EventsUpdateRequest(EventBase):
     tags: list[Tag] = Field(description="Category tags for the event. Only tags from the /events/tags endpoint are going to be included. Tags that aren't defined there will be ignored.")
 
@@ -65,3 +64,13 @@ class Settings(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     categories: list[Tag]
+
+class ParsedEvent(BaseModel):
+    event_name: str
+    start_date: datetime | None
+    end_date: datetime
+    country: str
+    city: str
+    address: str
+    room: str
+    tags: list[str]

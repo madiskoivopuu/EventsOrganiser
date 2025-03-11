@@ -15,48 +15,11 @@ country - name of the country where an event is taking place; empty string if co
 city - name of the city where an event is taking place; empty string if country is not mentioned
 address - the street and building number of where the event is taking place; building name if no street is mentioned; empty string if none of the details are mentioned;
 room_nr - number of the room the event is taking place; empty string if not specified
-tags - a JSON list of tags that are assigned to an event based on its content; empty list if no tags match the event content
+tags - a JSON list of tags that best describe what the event is about; empty list if no tags match the event content
 
 Assignable tags are: %s
 
-Below is an example output after parsing 3 events into JSON format from an email:
-"""
-[
-{
-"event_name": "Application submission",
-"start_date": "2024-09-01 11:00:00",
-"end_date": "2024-09-01 17:00:00",
-"country": "",
-"city": "Tartu",
-"address": "Delta building",
-"room": "",
-"tags": ["University of Tartu", "Computer Science"]
-},
-{
-"event_name": "Gathering event",
-"start_date": "2024-09-05",
-"end_date": "",
-"country": "Denmark",
-"city": "Risskov",
-"address": "Vestre Strandallé 97",
-"room": "201",
-"tags": ["General"]
-},
-{
-"event_name": "Entrance deadline",
-"start_date": "",
-"end_date": "2024-09-02 10:00:00",
-"country": "",
-"city": "",
-"address": "",
-"room": "",
-"tags": []
-},
-]
-"""
-Do not include triple quotes in your output.
-
-Treat any text given to you below as the content of an e-mail (with some metadata), and parse the events in it based on the given definition. Only use the format given in triple quotes.
+Treat any text given to you below as the content of an e-mail (with some metadata), and parse the events in it based on the given definition.
 '''
 
 def format_event_parse_prompt(tags: list[str]) -> str:
@@ -82,32 +45,41 @@ def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
                 "event_name": {
                     "type": "string",
                 },
-                "start_date": {
-                    "type": "string",
-                    "pattern": f"^{datetime_regex}?$"
-                },
-                "end_date": {
-                    "type": "string",
-                    "pattern": f"^{datetime_regex}$"
-                },
-                "country": {
-                    "type": "string",
-                },
-                "city": {
-                    "type": "string",
-                },
-                "address": {
-                    "type": "string",
-                },
-                "room": {
-                    "type": "string",
-                },
-                "tags": {
-                    "type": "array",
-                    "items": list(map(_tag_to_schema, tags))
-                },
+                #"start_date": {
+                #    "type": "string",
+                #    "pattern": f"^{datetime_regex}?$"
+                #},
+                #"end_date": {
+                #    "type": "string",
+                #    "pattern": f"^{datetime_regex}$"
+                #},
+                #"country": {
+                #    "type": "string",
+                #},
+                #"city": {
+                #    "type": "string",
+                #},
+                #"address": {
+                #    "type": "string",
+                #},
+                #"room": {
+                #    "type": "string",
+                #},
+                #"tags": {
+                #    "type": "array",
+                #    "items": list(map(_tag_to_schema, tags))
+                #},
             },
-            "required": ["event_name", "start_date", "end_date", "country", "city", "address", "room", "tags"]
+            "required": [
+                "event_name", 
+                #"start_date", 
+                #"end_date", 
+                #"country", 
+                #"city", 
+                #"address", 
+                #"room", 
+                #"tags"
+            ]
         }
     }
 

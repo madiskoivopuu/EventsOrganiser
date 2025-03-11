@@ -26,6 +26,7 @@ class Email:
                 recipients.append(recipient["emailAddress"]["address"])
             except KeyError:
                 continue
+            
         sender_email = None if email_data["isDraft"] else email_data["sender"]["emailAddress"]["address"]
         from_email = None if email_data["isDraft"] else email_data["from"]["emailAddress"]["address"]
 

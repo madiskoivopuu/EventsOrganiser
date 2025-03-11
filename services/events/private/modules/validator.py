@@ -20,35 +20,12 @@ import pika, pika.spec, pika.channel
 
 import db, server_config
 
-class ParsedEvent(BaseModel):
-    event_name: str
-    start_date: datetime | None
-    end_date: datetime
-    country: str
-    city: str
-    address: str
-    room: str
-    tags: list[str]
-
-    @field_validator("start_date", "end_date", mode="before")
-    @classmethod
-    def empty_str_to_none(cls, value: str) -> str | None:
-        if(len(value) == 0):
-            return None
-        return value
-    
-    @model_validator(mode="after")
-    def both_dates_not_none(self) -> "ParsedEvent":
-        if(self.start_date == None and self.end_date == None):
-            raise ValueError("Both start date and end date are empty, which is not allowed")
-        return self
-
 class NewEvents(BaseModel):
     user_id: str
     account_type: str
     mail_link: str
     user_timezone: ZoneInfo
-    events: list[ParsedEvent]
+    events: list[models.ParsedEvent]
 
 
 class EventValidatorThread(threading.Thread):
@@ -70,7 +47,7 @@ class EventValidatorThread(threading.Thread):
         self.mq_channel = self.mq_connection.channel()
         self.mq_channel.basic_qos(prefetch_count=1)
 
-    def fix_and_combine_location(self, parsed_event: ParsedEvent) -> str:
+    def fix_and_combine_location(self, parsed_event: models.ParsedEvent) -> str:
         locations = []
         if(parsed_event.country != None and len(parsed_event.country)):
             locations.append(parsed_event.country.title())
@@ -125,7 +102,7 @@ class EventValidatorThread(threading.Thread):
 
         return start_date.astimezone(tz=ZoneInfo("UTC")), end_date.astimezone(tz=ZoneInfo("UTC"))
 
-    def validate_and_create_event_row(self, db_session: Session, parsed_event: ParsedEvent, user_timezone: ZoneInfo) -> tables.EventsTable:
+    def validate_and_create_event_row(self, db_session: Session, parsed_event: models.ParsedEvent, user_timezone: ZoneInfo) -> tables.EventsTable:
         """Fixes a few AI related issues & returns a new events row object"""
         event_row = tables.EventsTable()
         event_row.event_name = parsed_event.event_name

@@ -117,9 +117,19 @@ class EventValidatorThread(threading.Thread):
 
         return event_row
 
+    def should_ignore_event(parsed_event: models.ParsedEvent) -> bool:
+        """Checks whether this event should be added to the DB for a user"""
+        if(len(parsed_event.tags) == 0):
+            return True
+        
+        return False
+
     def add_events_to_db(self, new_events: NewEvents) -> None:
         with db.start_session() as db_session:
             for parsed_event in new_events.events:
+                if(self.should_ignore_event(parsed_event)):
+                    continue
+
                 try:
                     event_row = self.validate_and_create_event_row(db_session, parsed_event, new_events.user_timezone)
                 except ValueError:

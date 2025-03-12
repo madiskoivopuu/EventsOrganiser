@@ -80,7 +80,7 @@ class ParserThread(threading.Thread):
 
         try:
             email: Email = self.to_email_obj(msg_with_email)
-            events = self.llm.parse_events_from_email(email, user_event_categories, models.ParsedEvent)
+            events = self.llm.parse_events_from_email(email, user_event_categories)
         except:
             self.logger.warning("Unknown exception in email parsing function", exc_info=True)
             channel.basic_nack(method.delivery_tag)
@@ -94,7 +94,7 @@ class ParserThread(threading.Thread):
                 delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             ),
             body=json.dumps({
-                "events": events.model_dump_json(),
+                "events": events,
                 "user_id": msg_with_email["user_id"],
                 "account_type": msg_with_email["account_type"],
                 "mail_link": email.mail_link,

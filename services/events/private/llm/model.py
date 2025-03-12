@@ -1,16 +1,14 @@
 import json
 
 from pydantic import BaseModel
-import instructor
 from . import prompt_config
 from llama_cpp import Llama
-import llama_cpp
 
 from common import models
 from helpers.email_data import Email
 
 class Llama3Model():
-    MAX_GENERATED_TOKENS = 8192
+    MAX_GENERATED_TOKENS = 6000
 
     def __init__(self, model_location, **kwargs) -> None:
         self.model = Llama(
@@ -32,38 +30,12 @@ class Llama3Model():
 
         return prepared_content
     
-    def parse_events_from_email(self, email: Email, tags: list[str], response_model: BaseModel) -> BaseModel:
-        events: list[dict] = []
+    def parse_events_from_email(self, email: Email, tags: list[str]) -> list[dict[str]]:
+        events: list[dict[str]] = []
         prompt = prompt_config.format_event_parse_prompt(tags)
         prepared_content = self.format_email_for_llm(email)
 
-        create_chat = instructor.patch(
-            create=self.model.create_chat_completion_openai_v1,
-            mode=instructor.Mode.JSON_SCHEMA,
-        )
-
-        #chat_output = self.model.create_chat_completion(
-        #    messages = [
-        #        {
-        #            "role": "system",
-        #            "content": prompt
-        #        },
-        #        {
-        #            "role": "user",
-        #            "content": prepared_content
-        #        },
-        #    ],
-        #    #grammar=prompt_config.get_parse_output_grammar(tags),
-        #    max_tokens=self.MAX_GENERATED_TOKENS,
-        #    temperature=0.8
-        #)
-        #print(chat_output)
-        #try:
-        #    events = json.loads(chat_output["choices"][0]["message"]["content"], strict=False)
-        #except json.decoder.JSONDecodeError:
-        #    raise ValueError(f'Error decoding AI generated string {chat_output["choices"][0]["message"]["content"]}')
-        
-        events = create_chat(
+        chat_output = self.model.create_chat_completion(
             messages = [
                 {
                     "role": "system",
@@ -74,7 +46,14 @@ class Llama3Model():
                     "content": prepared_content
                 },
             ],
-            response_model=list[response_model]
+            grammar=prompt_config.get_parse_output_grammar(tags),
+            max_tokens=self.MAX_GENERATED_TOKENS,
+            temperature=0.6
         )
+
+        try:
+            events = json.loads(chat_output["choices"][0]["message"]["content"], strict=False)
+        except json.decoder.JSONDecodeError:
+            raise ValueError(f'Error decoding AI generated string {chat_output["choices"][0]["message"]["content"]}')
 
         return events

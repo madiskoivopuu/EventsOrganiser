@@ -125,7 +125,7 @@ export default function HomePage() {
 
 					<EventsList events={searchFilteredEvents} tab={activeTab} style={{overflowY: "auto", height: "30rem", padding: "0.5rem"}} />
 			
-					<div style={{display: "flex", alignItems: "center"}}>
+					<div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
 						{loadMoreButton}
 
 						<button 

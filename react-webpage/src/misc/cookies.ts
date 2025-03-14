@@ -18,10 +18,10 @@ export function getCookie(name: string): string | undefined {
 export function removeCookie(name: string, opts: CookieOpts = {}) {
     let newValue = `${name}=; expires=Thu, 01 Jan 1970 00:00:01 GMT`;
     if(opts.domain)
-        newValue += `; ${encodeURIComponent(opts.domain)}`;
+        newValue += `; Domain=${opts.domain}`;
 
     if(opts.path)
-        newValue += `; ${encodeURIComponent(opts.path)}`;
+        newValue += `; Path=${opts.path}`;
 
     if(opts.secure)
         newValue += "; Secure";

@@ -18,6 +18,10 @@ spec:
       containers:
         - name: events-private
           image: madiskoivopuu/events-private
+          resources:
+            limits:
+              memory: "8192Mi"
+              cpu: "4.0"
           ports:
             - containerPort: 80
           env:

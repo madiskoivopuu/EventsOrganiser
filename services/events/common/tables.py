@@ -33,8 +33,8 @@ class Base(DeclarativeBase):
 tags_to_events = Table(
     "tags_to_events",
     Base.metadata,
-    Column("event_id", ForeignKey("events.id"), primary_key=True),
-    Column("tag_id", ForeignKey("tags.id"), primary_key=True),
+    Column("event_id", ForeignKey("events.id", ondelete="cascade", onupdate="cascade"), primary_key=True),
+    Column("tag_id", ForeignKey("tags.id", ondelete="cascade", onupdate="cascade"), primary_key=True),
 )
 
 user_settings_selected_categories = Table(

@@ -29,7 +29,8 @@ async def router_lifespan(app: FastAPI):
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
         username=server_config.RABBITMQ_USERNAME,
         password=server_config.RABBITMQ_PASSWORD,
-        queue_name=server_config.RABBITMQ_EMAILS_QUEUE
+        queue_name=server_config.RABBITMQ_EMAILS_QUEUE,
+        enc_key=server_config.EMAIL_ENCRYPTION_SECRET
     )
     t1 = asyncio.create_task(mail_sender_mq.try_open_conn_indefinite())
 

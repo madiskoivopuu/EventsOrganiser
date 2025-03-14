@@ -25,6 +25,7 @@ stringData:
   MICROSOFT_CALLBACK_SECRET: "{{ events_org_secret.microsoft_callback_secret | mandatory }}"
   RABBITMQ_PASSWORD: "{{ events_org_secret.rabbitmq_password | mandatory }}"
   JWT_SECRET: "{{ events_org_secret.jwt_secret | mandatory }}"
+  EMAIL_ENCRYPTION_SECRET: "{{ events_org_secret.email_encryption_secret | mandatory }}"
 
   events.MYSQL_EVENTS_PASSWORD: "{{ events_org_secret.mysql_user_events_password | mandatory }}"
   events.RABBITMQ_PASSWORD: "{{ events_org_secret.events_parser_rabbitmq_password | mandatory }}"

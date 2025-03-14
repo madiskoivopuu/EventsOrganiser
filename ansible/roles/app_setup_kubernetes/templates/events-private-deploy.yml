@@ -60,6 +60,12 @@ spec:
               value: "parsed_events_queue"
             - name: LLM_PATH
               value: "/llm/llama.gguf"
+
+            - name: EMAIL_ENCRYPTION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: EMAIL_ENCRYPTION_SECRET
           volumeMounts:
           - name: llm-dir
             mountPath: /llm

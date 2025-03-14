@@ -70,6 +70,11 @@ spec:
             - name: DOMAIN_URL
               value: "https://www.{{ domain_name }}"
               
+            - name: EMAIL_ENCRYPTION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: secrets
+                  key: EMAIL_ENCRYPTION_SECRET
             - name: JWT_SECRET
               valueFrom:
                 secretKeyRef:

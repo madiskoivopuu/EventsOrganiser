@@ -34,7 +34,8 @@ async def app_lifecycle(api: FastAPI):
         virtual_host=server_config.RABBITMQ_VIRTUALHOST,
         username=server_config.RABBITMQ_USERNAME,
         password=server_config.RABBITMQ_PASSWORD,
-        queue_name=server_config.RABBITMQ_EMAILS_QUEUE
+        queue_name=server_config.RABBITMQ_EMAILS_QUEUE,
+        enc_key=server_config.EMAIL_ENCRYPTION_SECRET
     )
     subscription_handler = SubscriptionHandler(
         domain_url=server_config.DOMAIN_URL,

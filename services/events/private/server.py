@@ -21,8 +21,8 @@ class ThreadModule:
 
 THREADS: list[ThreadModule] = [
     ThreadModule(None, parser.ParserThread),
-    ThreadModule(None, validator.EventValidatorThread),
-    ThreadModule(None, user_listener.UserListener),
+    #ThreadModule(None, validator.EventValidatorThread),
+    #ThreadModule(None, user_listener.UserListener),
 ]
 
 def create_default_categories():

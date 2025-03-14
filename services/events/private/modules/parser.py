@@ -3,6 +3,7 @@ import threading, json
 import pika, pika.spec, pika.channel
 import logging
 import functools
+from cryptography.fernet import Fernet
 
 from common import tables, models
 from helpers.email_data import Email
@@ -61,6 +62,9 @@ class ParserThread(threading.Thread):
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
+        f = Fernet(server_config.EMAIL_ENCRYPTION_SECRET)
+        body = f.decrypt(body)
+
         msg_with_email: dict[str] = json.loads(body)
 
         user_event_categories = []

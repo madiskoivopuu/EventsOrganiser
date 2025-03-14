@@ -1,5 +1,5 @@
 import asyncio, json
-import sqlalchemy.exc
+from cryptography.fernet import Fernet
 from sqlalchemy import select
 from zoneinfo import ZoneInfo
 from dataclasses import dataclass
@@ -19,7 +19,17 @@ class ParseMailsRequest:
     email: dict[str]
 
 class MailSenderMQ:
-    def __init__(self, host: str, virtual_host: str, username: str, password: str, queue_name: str):
+    def __init__(self, host: str, virtual_host: str, username: str, password: str, queue_name: str, enc_key: str):
+        """
+        Creates an instance of a mail sender MQ client sending new mail to 'queue_name'
+
+        :param host: IP of the broker
+        :param virtual_host: Virtual host name
+        :param username: Broker login username
+        :param password: Broker login password
+        :queue_name: Queue to directly send emails to
+        :param enc_key: A base64 encoded Fernet encryption key to encrypt the MQ message content with
+        """
         self.__logger = logging.getLogger(__name__)
         self.__retry_conn_task = None
 
@@ -28,6 +38,7 @@ class MailSenderMQ:
         self.virtual_host = virtual_host
         self.username = username
         self.password = password
+        self.enc_key = enc_key
 
         self.mq_connection = None
         self.mq_channel = None
@@ -65,17 +76,22 @@ class MailSenderMQ:
         self,
         requests: list[ParseMailsRequest]
     ):
+        f = Fernet(self.enc_key)
+
         async with self.mq_channel.transaction():
             for data in requests:
+                encrypted_body = f.encrypt(
+                    json.dumps({
+                        "user_id": data.user_id,
+                        "account_type": "outlook",
+                        "user_timezone": str(data.user_timezone),
+                        "email_data": data.email,
+                        "reader_email": data.user_email
+                    }).encode()
+                )
                 await self.mq_channel.default_exchange.publish(
                     message=aio_pika.Message(
-                        body=json.dumps({
-                            "user_id": data.user_id,
-                            "account_type": "outlook",
-                            "user_timezone": str(data.user_timezone),
-                            "email_data": data.email,
-                            "reader_email": data.user_email
-                        }).encode(),
+                        body=encrypted_body,
                         delivery_mode=aio_pika.DeliveryMode.PERSISTENT
                     ),
                     routing_key=self.email_parsing_queue

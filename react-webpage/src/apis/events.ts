@@ -17,8 +17,12 @@ export interface CalendarLinkGetResponse {
 export function getTags(): Promise<EventTag[]> {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/tags`, {
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then(resp => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then(resp => {
         return resp as EventTag[]
     })
 }
@@ -35,8 +39,12 @@ export function getEvents(
 
     return fetch(url, {
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then(resp => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then(resp => {
         return resp as EventsGetResponse;
     })
 }
@@ -49,7 +57,9 @@ export function updateEvent(event: EventDetails) {
         },
         body: JSON.stringify({ ...event }),
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((_) => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
         return;
     })
 }
@@ -58,7 +68,9 @@ export function deleteEvent(event: EventDetails) {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/event/${event.id}`, {
         method: "DELETE",
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((_) => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
         return;
     })
 }
@@ -66,8 +78,12 @@ export function deleteEvent(event: EventDetails) {
 export function getCalendarLink(): Promise<string> {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then((resp) => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then((resp) => {
         return (resp as CalendarLinkGetResponse).link;
     })
 }
@@ -76,8 +92,12 @@ export function changeCalendarLink(): Promise<string> {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
         method: "POST",
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then((resp) => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then((resp) => {
         return (resp as CalendarLinkGetResponse).link;
     })
 }
@@ -86,7 +106,9 @@ export function deleteCalendarLink() {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/calendar/link`, {
         method: "DELETE",
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((_) => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
         return;
     });
 }
@@ -95,8 +117,12 @@ export function getEventSettings(): Promise<EventSettings> {
     return fetch(`${import.meta.env.VITE__DOMAIN_URL}/api/events/settings`, {
         method: "GET",
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then(resp => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then(resp => {
         return resp as EventSettings;
     })
 }
@@ -109,7 +135,9 @@ export function updateEventSettings(newSettings: EventSettings) {
         },
         body: JSON.stringify(newSettings),
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then(_ => {
+    }).then(resp => {
+        if(!resp.ok)
+            throw resp;
         return;
     })
 }

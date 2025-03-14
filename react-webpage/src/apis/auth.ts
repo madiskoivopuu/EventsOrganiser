@@ -7,8 +7,12 @@ export function getMicrosoftLoginLink(timezone: string): Promise<string> {
         },
         body: JSON.stringify({ timezone }),
         credentials: import.meta.env.VITE__CREDENTIALS_SETTING
-    }).then((resp) => resp.json()
-    ).then(resp => {
+    }).then((resp) => {
+        if(!resp.ok)
+            throw resp;
+        
+        return resp.json();
+    }).then(resp => {
         return resp as string;
     })
 }

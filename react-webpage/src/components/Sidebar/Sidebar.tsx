@@ -4,13 +4,30 @@ import { IoMenu, IoSettingsOutline } from "react-icons/io5";
 import { MdLogout } from "react-icons/md";
 import useFitText from "use-fit-text";
 import { NavLink } from "react-router";
+import { useCookies } from 'react-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 import "./sidebar.scss"
 import "./sidebar-nav.scss";
+import { JWTData } from '@/interfaces/global_interfaces';
+import { useAccountDataStore } from '@/hooks';
 
 function Sidebar() {
 	const { fontSize, ref } = useFitText();
+	const { setAuthenticated} = useAccountDataStore();
 	const [isClosed, setIsClosed] = useState<Boolean>(true);
+	const [cookies, _, removeCookie] = useCookies([import.meta.env.VITE__JWT_COOKIE_NAME]);
+
+	const logOut = () => {
+		removeCookie(import.meta.env.VITE__JWT_COOKIE_NAME, {path: "/"});
+		setAuthenticated(false);
+	}
+
+	let userEmail = "";
+	try {
+		const decoded: JWTData = jwtDecode(cookies[import.meta.env.VITE__JWT_COOKIE_NAME]);
+		userEmail = decoded.sub;
+	} catch(e) {} // this isn't supposed to happen unless the JWT has been tampered with
 
 	let sidebarClassname: string = "sidebar";
 	if(isClosed)
@@ -44,9 +61,9 @@ function Sidebar() {
 
 					<div className="sidebar-footer" style={{padding: "1rem"}}>
 						<div ref={ref} style={{ fontSize }}>
-							<b>lorem.ipsum@ut.ee</b>
+							<b>{userEmail}</b>
 						</div>
-						<a href="#" className="logout-btn">
+						<a href="#" className="logout-btn" onClick={logOut}>
 							<MdLogout />
 							Log out
 						</a>

@@ -107,7 +107,7 @@ export default function CalendarLinkBox() {
     }
 
     return (
-        <div style={{display: "inline-flex", alignItems: "center"}}>
+        <div style={{display: "inline-flex", alignItems: "center", justifyContent: "center"}}>
             {calendarLinkActions}
 
             <AiOutlineInfoCircle 

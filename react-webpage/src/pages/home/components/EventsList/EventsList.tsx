@@ -45,7 +45,6 @@ interface EventsListProps extends ComponentProps<"div"> {
 function EventsList({ events, tab, ...props }: EventsListProps) {
     events = sortEvents(events, tab);
     var groupedEvents = groupEventsByYearAndMonth(events);
-
     var headerAndEvents: JSX.Element[] = Object.entries(groupedEvents).map(([header, events]) => {
         return (
             <>
@@ -54,6 +53,11 @@ function EventsList({ events, tab, ...props }: EventsListProps) {
             </>
         );
     });
+
+    if(headerAndEvents.length === 0)
+        headerAndEvents[0] = (
+            <div style={{textAlign: "center"}}>No events found</div>
+        );
 
     return (
         <div {...props}>

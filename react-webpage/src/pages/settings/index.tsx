@@ -10,11 +10,13 @@ import { SettingRow } from "./components";
 import "./settings.css";
 import * as settingHelpers from "./setting-helpers";
 import { toast } from "react-toastify";
+import { SpinnerCircular } from "spinners-react";
 
 export default function SettingsPage() {
     const { settings, updateSettings } = useAccountDataStore();
     const { tags } = useEventsStore();
     const [changedSettings, setChangedSettings] = useState<Partial<Settings>>(settings);
+    const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
 
     useEffect(() => {
         reloadSettings();
@@ -39,12 +41,17 @@ export default function SettingsPage() {
     }
 
     const saveSettings = () => {
+        setSavingInProgress(true);
+
         settingHelpers.updateSettings(changedSettings as Settings).then((results) => {
             if(results.some(result => result.status === "rejected")) {
                 toast.error("Failed to update settings, try again later");
             } else {
+                toast.success("Updated settings!")
                 updateSettings(changedSettings);
             }
+        }).finally(() => {
+            setSavingInProgress(false);
         })
     }
 
@@ -82,7 +89,7 @@ export default function SettingsPage() {
     if(!settingHelpers.areSettingsFullyLoaded(settings))
         refetchSettingsRow = (
             <>
-                <p>Could not load all settings related to the account.</p>
+                <p>All settings need to be loaded before modifications can be made.</p>
                 <button onClick={reloadSettings}>
                     Load settings
                 </button>
@@ -149,11 +156,14 @@ export default function SettingsPage() {
                     />
                     <div style={{display: "inline-flex"}}>
                         <button
+                            disabled={!settings.eventSettings}
                             onClick={() => updateParseableEventCats(tags)}
                         >
                             Select all
                         </button>
                         <button 
+                            disabled={!settings.eventSettings}
+                            
                             className="warning"
                             onClick={() => updateParseableEventCats([])}
                         >
@@ -163,11 +173,16 @@ export default function SettingsPage() {
                 </SettingRow>
 
                 <hr className="settings-cat-divider"/>
-
                 <button
-                    disabled={!settingHelpers.areSettingsFullyLoaded(settings)}
+                    disabled={!settingHelpers.areSettingsFullyLoaded(settings) || savingInProgress}
                     onClick={saveSettings}
                 >
+                    <SpinnerCircular 
+                        enabled={savingInProgress}
+                        color="white"
+                        size="1.25em"
+                        style={{marginLeft: "1em"}}
+                    />
                     Save settings
                 </button>
             </div>

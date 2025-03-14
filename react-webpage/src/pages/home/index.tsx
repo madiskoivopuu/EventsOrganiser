@@ -15,6 +15,7 @@ import { EventChangerFunc } from "@/hooks/useEventsStore";
 import { useShallow } from 'zustand/react/shallow'
 import { CalendarLinkBox } from "./components/CalendarLinkBox";
 import { SpinnerCircular } from 'spinners-react';
+import { fetchNewEmails } from "@/apis/microsoft";
 
 let pageLoadTime = new Date().toISOString();
 
@@ -48,6 +49,7 @@ function loadMoreEvents(
 export default function HomePage() {	
 	const [activeTab, setActiveTab] = useState<ActiveTab>(ActiveTab.ONGOING);
 	const [cachedSearchOpts, setCachedSearchOpts] = useState<SearchOptions>({});
+	const [newEmailsBeingFetched, setNewEmailsBeingFetched] = useState<boolean>(false);
 
 	const {events, addOrUpdate} = useEventsStore();
 	const [currTabPagination, paginationData, startFetching, finishedFetching] = useEventPaginationStore(useShallow((state) => [state[activeTab], state, state.startFetching, state.finishedFetching]));
@@ -55,6 +57,19 @@ export default function HomePage() {
 	const onSearchChanged = (opts: SearchOptions) => {
 		setCachedSearchOpts(opts);
 	};
+
+	const startFetchingNewMail = () => {
+		setNewEmailsBeingFetched(true);
+
+		fetchNewEmails().then((resp) => {
+			toast.success(`Found ${resp.count} new emails.`)
+		}).catch((e) => {
+			console.error("New mail fetching error ", e);
+			toast.error("Could not fetch new mail.");
+		}).finally(() => {
+			setNewEmailsBeingFetched(false);
+		})
+	}
 
 	useEffect(() => {
 		pageLoadTime = new Date().toISOString();
@@ -108,9 +123,22 @@ export default function HomePage() {
 						<li className={"tab-item" + (activeTab === ActiveTab.UPCOMING ? " active" : "") } onClick={() => setActiveTab(ActiveTab.UPCOMING)}>UPCOMING EVENTS</li>
 					</ul>
 
-					<EventsList events={searchFilteredEvents} tab={activeTab} style={{overflowY: "auto", height: "30rem"}} />
+					<EventsList events={searchFilteredEvents} tab={activeTab} style={{overflowY: "auto", height: "30rem", padding: "0.5rem"}} />
 			
-					{loadMoreButton}
+					<div style={{display: "flex", alignItems: "center"}}>
+						{loadMoreButton}
+
+						<button 
+							disabled={newEmailsBeingFetched}
+							onClick={startFetchingNewMail}
+						>
+							<SpinnerCircular
+								enabled={newEmailsBeingFetched}
+								size="1.5em"
+							/>
+							Find more events from new mail
+						</button>
+					</div>
 				</div>
             </div>
         </div>

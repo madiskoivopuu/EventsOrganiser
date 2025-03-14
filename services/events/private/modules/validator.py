@@ -117,7 +117,7 @@ class EventValidatorThread(threading.Thread):
 
         return event_row
 
-    def should_ignore_event(parsed_event: models.ParsedEvent) -> bool:
+    def should_ignore_event(self, parsed_event: models.ParsedEvent) -> bool:
         """Checks whether this event should be added to the DB for a user"""
         if(len(parsed_event.tags) == 0):
             return True

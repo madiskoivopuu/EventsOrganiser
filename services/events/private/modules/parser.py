@@ -2,6 +2,7 @@ from sqlalchemy import select, delete, update
 import threading, json
 import pika, pika.spec, pika.channel
 import logging
+import functools
 
 from common import tables, models
 from helpers.email_data import Email
@@ -78,6 +79,18 @@ class ParserThread(threading.Thread):
                 for category in settings_row.categories:
                     user_event_categories.append(category.name)
 
+        t = threading.Thread(
+            target=self._start_parsing, 
+            args=(channel, method, properties, msg_with_email, user_event_categories)
+        )
+        t.daemon = True
+        t.start()
+
+    def _start_parsing(self, channel: pika.channel.Channel, 
+                       method: pika.spec.Basic.Deliver, 
+                       properties: pika.spec.BasicProperties, 
+                       msg_with_email: dict[str],
+                       user_event_categories: list[str]):
         try:
             email: Email = self.to_email_obj(msg_with_email)
             events = self.llm.parse_events_from_email(email, user_event_categories)
@@ -85,8 +98,17 @@ class ParserThread(threading.Thread):
             self.logger.warning("Unknown exception in email parsing function", exc_info=True)
             channel.basic_nack(method.delivery_tag)
             return
+        
+        cb = functools.partial(self._parsing_complete, channel, method, properties, email, msg_with_email, events)
+        channel.connection.add_callback_threadsafe(cb)
 
 
+    def _parsing_complete(self, channel: pika.channel.Channel, 
+                          method: pika.spec.Basic.Deliver, 
+                          properties: pika.spec.BasicProperties, 
+                          email: Email, 
+                          msg_with_email: dict[str],
+                          events: list[dict]):
         self.mq_channel.basic_publish(
             exchange="",
             routing_key=server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE,

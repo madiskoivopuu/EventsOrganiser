@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 import { Route, Routes, Navigate, Outlet, NavigateFunction } from 'react-router';
-import { useCookies } from 'react-cookie';
 import { jwtDecode } from "jwt-decode";
 import { ToastContainer } from 'react-toastify';
 
@@ -13,6 +12,7 @@ import { useEventsStore, useAccountDataStore } from './hooks';
 import { getTags } from './apis/events';
 import LoginPage from './pages/login';
 import SettingsPage from './pages/settings';
+import { getCookie, removeCookie } from './misc/cookies';
 
 async function fetchTags(setTags: (t: EventTag[]) => void, retryAttempt: number = 0) {
 	getTags().then(result => {
@@ -32,11 +32,12 @@ function init(
 	setTags: (t: EventTag[]) => void, 
 	setAuthenticated: (a: boolean) => void,
 	navigate: NavigateFunction,
-	jwt: string,
-	removeCookie: (name: any) => void
 ) {
 		fetchTags(setTags);
 		
+		const jwt = getCookie(import.meta.env.VITE__JWT_COOKIE_NAME);
+		if(!jwt) return;
+
 		try {
 			const decoded: JWTData = jwtDecode(jwt);
 			if(Date.now() > decoded.exp * 1000)
@@ -47,14 +48,14 @@ function init(
 
 			const autoLogout = setTimeout(() => {
 				setAuthenticated(false);
-				removeCookie(import.meta.env.JWT_COOKIE_NAME);
+				removeCookie(import.meta.env.VITE__JWT_COOKIE_NAME);
 			}, decoded.exp*1000-Date.now());
 
 			return () => {
 				clearTimeout(autoLogout);
 			}
 		} catch(e) {
-			removeCookie(import.meta.env.JWT_COOKIE_NAME);
+			removeCookie(import.meta.env.VITE__JWT_COOKIE_NAME);
 			navigate("/login");
 		}
 }
@@ -70,7 +71,6 @@ const ProtectedRoute = () => {
 function App() {
 	const {authenticated, setAuthenticated} = useAccountDataStore();
 	const {setTags} = useEventsStore();
-	const [cookies, _, removeCookie] = useCookies([import.meta.env.VITE__JWT_COOKIE_NAME]);
 	const navigate = useNavigate();
 
 	useEffect(() => {
@@ -78,8 +78,6 @@ function App() {
 			setTags, 
 			setAuthenticated, 
 			navigate, 
-			cookies[import.meta.env.VITE__JWT_COOKIE_NAME], 
-			removeCookie
 		);
 	}, []);
 

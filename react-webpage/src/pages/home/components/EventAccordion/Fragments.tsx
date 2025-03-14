@@ -4,7 +4,7 @@ import DatePicker from "react-datepicker";
 import { InputWithIcon } from '@/components';
 import { EventType, EditableEventDetails } from "./interfaces";
 import { EventDetails } from "@/interfaces/global_interfaces";
-import * as helpers from "./helpers";
+import * as helpers from "./eventAccordionHelpers";
 
 interface EventDetailProps {
     header: string,

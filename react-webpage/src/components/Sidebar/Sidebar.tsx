@@ -4,29 +4,35 @@ import { IoMenu, IoSettingsOutline } from "react-icons/io5";
 import { MdLogout } from "react-icons/md";
 import useFitText from "use-fit-text";
 import { NavLink } from "react-router";
-import { useCookies } from 'react-cookie';
 import { jwtDecode } from 'jwt-decode';
 
 import "./sidebar.scss"
 import "./sidebar-nav.scss";
 import { JWTData } from '@/interfaces/global_interfaces';
 import { useAccountDataStore } from '@/hooks';
+import { getCookie, removeCookie } from '@/misc/cookies';
 
 function Sidebar() {
 	const { fontSize, ref } = useFitText();
 	const { setAuthenticated} = useAccountDataStore();
 	const [isClosed, setIsClosed] = useState<Boolean>(true);
-	const [cookies, _, removeCookie] = useCookies([import.meta.env.VITE__JWT_COOKIE_NAME]);
+	const jwt = getCookie(import.meta.env.VITE__JWT_COOKIE_NAME);
 
 	const logOut = () => {
-		removeCookie(import.meta.env.VITE__JWT_COOKIE_NAME, {path: "/"});
+		removeCookie(import.meta.env.VITE__JWT_COOKIE_NAME, {
+			path: "/",
+			secure: true,
+			samesite: "Lax"
+		});
 		setAuthenticated(false);
 	}
 
 	let userEmail = "";
 	try {
-		const decoded: JWTData = jwtDecode(cookies[import.meta.env.VITE__JWT_COOKIE_NAME]);
-		userEmail = decoded.sub;
+		if(jwt) {
+			const decoded: JWTData = jwtDecode(jwt);
+			userEmail = decoded.sub;
+		}
 	} catch(e) {} // this isn't supposed to happen unless the JWT has been tampered with
 
 	let sidebarClassname: string = "sidebar";

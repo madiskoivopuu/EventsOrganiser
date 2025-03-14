@@ -5,7 +5,7 @@ import {EventAccordionEditableHeader, EventAccordionHeader, EventDetailColumn} f
 import { StyledSelect } from '@/components';
 import { EventDetails, EventTag } from "@/interfaces/global_interfaces";
 import { EditableEventDetails } from "./interfaces";
-import * as helpers from "./helpers";
+import * as helpers from "./eventAccordionHelpers";
 import { useEventsStore } from "@/hooks";
 import { SpinnerCircular } from 'spinners-react';
 

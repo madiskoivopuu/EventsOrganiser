@@ -92,7 +92,7 @@ tuuli.tudeng@ut.ee
         ]
     },
     {
-        "event_name": "Sügiskool \"Tudengite toiduakadeemia\" (2. päev)",
+        "event_name": "Sügiskool \"Tudengite toiduakadeemia\" (3. päev)",
         "start_date": "2022-11-18T16:00:00",
         "end_date": "2022-11-18T18:30:00",
         "country": "Eesti",

@@ -73,7 +73,7 @@ reader-email@gmail.com
         "end_date": "",
         "country": "",
         "city": "",
-        "address":  "",
+        "address": "",
         "room": "",
         "tags": []
     }

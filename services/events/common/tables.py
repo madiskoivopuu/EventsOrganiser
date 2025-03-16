@@ -67,7 +67,7 @@ class EventsTable(Base):
     user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     user_id: Mapped[str] = mapped_column(UserIdType)
     
-    event_name: Mapped[str | None] = mapped_column(String(128))
+    event_name: Mapped[str] = mapped_column(String(128))
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
     end_date_utc: Mapped[datetime] # Always stores UTC ISO-8601 datetime
     address: Mapped[str] = mapped_column(String(256))

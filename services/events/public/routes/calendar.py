@@ -131,7 +131,11 @@ async def get_calendar_file(
     async for (event_row, ) in query_result.unique():
         calendar_event = icalendar.Event()
         calendar_event.add("NAME", event_row.event_name)
-        calendar_event.add("DTSTART", event_row.start_date_utc.replace(tzinfo=timezone.utc))
+        if(event_row.start_date is not None):
+            calendar_event.add("DTSTART", event_row.start_date_utc.replace(tzinfo=timezone.utc))
+        else:  # deadline
+            calendar_event.add("DTSTART", event_row.end_date_utc.replace(tzinfo=timezone.utc))
+
         calendar_event.add("DTEND", event_row.end_date_utc.replace(tzinfo=timezone.utc))
         calendar_event.add("LOCATION", event_row.address) # TODO: handle empty string cases
         calendar_event.add("CATEGORIES", ", ".join([tag_row.name for tag_row in event_row.tags]))

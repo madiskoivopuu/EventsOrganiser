@@ -20,7 +20,7 @@ class _ResourceData(BaseModel):
     id: str
 
 class _NotificationData(BaseModel):
-    change_type: str = Field(alias="changeType")
+    change_type: Annotated[Optional[str], Field(alias="changeType")] = None
     client_state: str = Field(alias="clientState")
     subscription_id: str = Field(alias="subscriptionId")
     resource_data: Annotated[Optional[_ResourceData], Field(alias="resourceData")] = None

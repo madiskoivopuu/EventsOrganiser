@@ -1,43 +1,81 @@
 import dotenv
 dotenv.load_dotenv(".env")
+import json
 
+from dataclasses import dataclass
 import torch, os, datasets
 from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModelForCausalLM, TrainingArguments, DataCollatorForLanguageModeling
 from trl import SFTTrainer
 from peft import LoraConfig
 
+import email_data
+from email_data import Email
+
 DATASET_LOC = "./training_data/"
 INPUT_OUTPUT_SEPARATOR = "!<--->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
 
-def read_prompts(dir):
-    prompts = []
-    for filename in os.listdir(dir):
-        f = open(f"{dir}/{filename}", "r", encoding="UTF-8")
-        content = f.read()
-        f.close()
+@dataclass
+class PromptMetadata:
+    comment: str
+    tags: list[str]
+    reader_email: str
+    mail_data: str
+    expected_output: dict[str]
 
-        llm_input, llm_output = content.split(INPUT_OUTPUT_SEPARATOR)
-        llm_input, llm_output = llm_input.rstrip(), llm_output.lstrip()
+def read_prompt_file(loc: str) -> PromptMetadata:
+    with open(f"{loc}", "r", encoding="UTF-8") as f:
+        content = f.read().split(INPUT_OUTPUT_SEPARATOR)
 
-        formatted_prompt = tokenizer.apply_chat_template(
-            [
-                {
-                    "role": "system",
-                    "content": "
-                }
-                {
-                    "role": "user",
-                    "content": llm_input
-                },
-                {
-                    "role": "assistant",
-                    "content": llm_output
-                }
-            ], tokenize=False, 
+        return PromptMetadata(
+            comment=content[0],
+            tags=[tag.strip() for tag in content[1].split(";") if len(tag.strip()) > 0],
+            reader_email=content[2],
+            mail_data=content[3],
+            expected_output=json.loads(content[4])
         )
 
-        formatted_prompt.replace("<bos>", f"<bos>{sys_prompt}")
-        prompts.append({"prompt": formatted_prompt})
+def read_all_prompts(dir: str) -> list[PromptMetadata]:
+    metadatas = []
+    for filename in os.listdir(dir):
+        metadatas.append(
+            read_prompt_file(f"{dir}/{filename}")
+        )
+
+    return metadatas
+
+def generate_chats_from_prompt(metadata: PromptMetadata) -> list[str]:
+    global sys_prompt, tokenizer
+    email = email_data.str_to_mail(metadata.mail_data)
+    chats = []
+    prompt_template = [
+        {
+            "role": "system",
+            "content": sys_prompt % ",".join(metadata.tags)
+        },
+        {
+            "role": "user",
+            "content": email_data.format_email_for_llm(email)
+        },
+        {
+            "role": "assistant",
+            "content": ""
+        }
+    ]
+
+    prompt_template[3]["content"] = json.dumps(metadata.expected_output)
+    chats.append(
+        tokenizer.apply_chat_template(prompt_template, tokenize=False)
+    )
+
+    prompt_template[3]["content"] = json.dumps(metadata.expected_output, indent=4)
+    chats.append(
+        tokenizer.apply_chat_template(prompt_template, tokenize=False)
+    )
+
+    prompt_template[3]["content"] = json.dumps(metadata.expected_output, indent="\t")
+    chats.append(
+        tokenizer.apply_chat_template(prompt_template, tokenize=False)
+    )
 
 bnb_conf = BitsAndBytesConfig(
     load_in_8bit=True,

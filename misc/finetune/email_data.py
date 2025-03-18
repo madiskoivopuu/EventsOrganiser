@@ -2,13 +2,17 @@ from dataclasses import dataclass
 from datetime import datetime
 import json
 
+import email
+import email.utils, email.policy
+import email.utils
+
 @dataclass
 class Email:
     id: str
     title: str
     content: str
     send_date: datetime
-    sender_email: str # Usually the same, but can be something different from the original sender, if that person is using a mailing list
+    sender_email: str # Usually the same as reader email, but can be something different from the original sender, if that person is using a mailing list
     from_email: str # Original sender's email
     recipient_emails: list[str]
     reader_email: str
@@ -42,13 +46,55 @@ class Email:
                     is_draft=email_data["isDraft"]
                     )
 
-def dict_to_mail(mail_data: dict[str], reader_email: str) -> Email:
+    @staticmethod
+    def from_raw_str(email_data: str, reader_email: str):
+        global email # py it thinks its some other variable if it isnt global
+        mail = email.message_from_string(email_data, policy=email.policy.default)
+
+        recipients: list[str] = []
+        for name, email in email.utils.getaddresses(mail.get_all("to", [])):
+            recipients.append(email)
+
+        
+        content = ""
+        if(mail.is_multipart()):
+            for part in mail.get_payload():
+                if(part.get_content_type() == "text/plain"):
+                    content += part.get_payload() + "\n"
+        else:
+            content = mail.get_payload()
+
+        return Email(
+            id=mail["Message-ID"],
+            title=mail["Subject"],
+            content=content,
+            send_date=email.utils.parsedate(mail["Date"]),
+            sender_email=email.utils.parseaddr(mail["From"]),
+            from_email=email.utils.parseaddr(mail["From"]),
+            recipient_emails=recipients,
+            reader_email=reader_email,
+            mail_link="",
+            is_draft=False
+        )
+
+def str_to_mail(mail_data: str, reader_email: str) -> Email:
     try:
-        return Email.from_outlook_json(mail_data, reader_email)
+        return Email.from_outlook_json(json.loads(mail_data), reader_email)
     except:
         pass
 
     raise ValueError("Unable to identify mail provider by dict data")
+
+def format_email_for_llm(self, email: Email) -> str:
+    prepared_content = f"Email reader: {email.reader_email}\n"
+    prepared_content += f"Email sender: {email.sender_email}\n"
+    prepared_content += f"Email from: {email.from_email}\n"
+    prepared_content += f"Email recipients: {', '.join(email.recipient_emails)}\n"
+    prepared_content += f"Send time: {email.send_date.isoformat()}\n"
+    prepared_content += f"Title: {email.title}\n"
+    prepared_content += f"Content:\n{email.content}"
+
+    return prepared_content
 
 def parse_outlook_emails_from_file(filename: str, reader_email: str) -> list[Email]:
     emails: list[Email] = []

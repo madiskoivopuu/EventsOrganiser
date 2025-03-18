@@ -4,7 +4,7 @@ import json
 
 import email
 import email.utils, email.policy
-import email.utils
+
 
 @dataclass
 class Email:
@@ -48,12 +48,12 @@ class Email:
 
     @staticmethod
     def from_raw_str(email_data: str, reader_email: str):
-        global email # py it thinks its some other variable if it isnt global
+        #global email # py it thinks its some other variable if it isnt global
         mail = email.message_from_string(email_data, policy=email.policy.default)
 
         recipients: list[str] = []
-        for name, email in email.utils.getaddresses(mail.get_all("to", [])):
-            recipients.append(email)
+        for name, email_addr in email.utils.getaddresses(mail.get_all("to", [])):
+            recipients.append(email_addr)
 
         
         content = ""
@@ -80,6 +80,11 @@ class Email:
 def str_to_mail(mail_data: str, reader_email: str) -> Email:
     try:
         return Email.from_outlook_json(json.loads(mail_data), reader_email)
+    except:
+        pass
+
+    try:
+        return Email.from_raw_str(mail_data, reader_email)
     except:
         pass
 

@@ -13,7 +13,7 @@ def get_languages(metadata: finetune.PromptMetadata) -> str:
     mail = email_data.str_to_mail(metadata.mail_data, "")
     detected_languages = langdetect.detect_langs(mail.content)
 
-    language_names = [lang.lang for lang in detected_languages if lang.prob > 0.1]
+    language_names = [lang.lang for lang in detected_languages if lang.prob > 0.2]
     language_names.sort()
     return ",".join(language_names)
 

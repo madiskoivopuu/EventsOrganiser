@@ -47,7 +47,7 @@ markus.mihkelson@ut.ee
         {
             "emailAddress": {
                 "name": "Markus Mihkelson",
-                "address": "markus.mihkelson@ut.ee
+                "address": "markus.mihkelson@ut.ee"
             }
         }
     ],

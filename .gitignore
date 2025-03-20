@@ -1,5 +1,6 @@
 *.env
 *.gguf
+*.safetensors
 *.rar
 *.zip
 emails.json

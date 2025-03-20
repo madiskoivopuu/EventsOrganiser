@@ -1,18 +1,20 @@
 import dotenv
 dotenv.load_dotenv(".env")
 import json
+import copy
 
 from dataclasses import dataclass
-import torch, os, datasets
-from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModelForCausalLM, TrainingArguments, DataCollatorForLanguageModeling
-from trl import SFTTrainer
-from peft import LoraConfig
+import torch, os, datasets, unsloth
+from transformers import TrainingArguments
+from trl import SFTTrainer, SFTConfig
+from unsloth import FastLanguageModel
 
 import email_data
 from email_data import Email
 
 DATASET_LOC = "./training_data/"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
+MAX_SEQ_LENGTH = 8192
 
 @dataclass
 class PromptMetadata:
@@ -27,119 +29,147 @@ def read_prompt_file(loc: str) -> PromptMetadata:
         content = f.read().split(INPUT_OUTPUT_SEPARATOR)
 
         return PromptMetadata(
-            comment=content[0],
+            comment=content[0].strip(),
             tags=[tag.strip() for tag in content[1].split(";") if len(tag.strip()) > 0],
             reader_email=content[2],
-            mail_data=content[3],
+            mail_data=content[3].strip(),
             expected_output=json.loads(content[4])
         )
 
 def read_all_prompts(dir: str) -> list[PromptMetadata]:
     metadatas = []
     for filename in os.listdir(dir):
-        metadatas.append(
-            read_prompt_file(f"{dir}/{filename}")
-        )
+        obj_loc = f"{dir}/{filename}"
+
+        if(not os.path.isfile(obj_loc)):
+            metadatas += read_all_prompts(obj_loc)
+        else:
+            metadatas.append(
+                read_prompt_file(f"{dir}/{filename}")
+            )
 
     return metadatas
 
-def generate_chats_from_prompt(metadata: PromptMetadata) -> list[str]:
-    global sys_prompt, tokenizer
-    email = email_data.str_to_mail(metadata.mail_data)
+def generate_chats_from_prompts(metadatas: list[PromptMetadata]) -> list[str]:
+    global sys_prompt
+
     chats = []
-    prompt_template = [
-        {
+    for metadata in metadatas:
+        email = email_data.str_to_mail(metadata.mail_data, metadata.reader_email)
+        sys_part = {
             "role": "system",
             "content": sys_prompt % ",".join(metadata.tags)
-        },
-        {
+        }
+        user_part = {
             "role": "user",
             "content": email_data.format_email_for_llm(email)
-        },
-        {
+        }
+        response_part = {
             "role": "assistant",
             "content": ""
         }
-    ]
 
-    prompt_template[3]["content"] = json.dumps(metadata.expected_output)
-    chats.append(
-        tokenizer.apply_chat_template(prompt_template, tokenize=False)
-    )
+        chat_ = {
+            "messages": [
+                sys_part,
+                user_part,
+                response_part
+            ]
+        }
 
-    prompt_template[3]["content"] = json.dumps(metadata.expected_output, indent=4)
-    chats.append(
-        tokenizer.apply_chat_template(prompt_template, tokenize=False)
-    )
+        chat_["messages"][2]["content"] = json.dumps(metadata.expected_output)
+        chats.append(
+            copy.deepcopy(chat_)
+        )
 
-    prompt_template[3]["content"] = json.dumps(metadata.expected_output, indent="\t")
-    chats.append(
-        tokenizer.apply_chat_template(prompt_template, tokenize=False)
-    )
+        chat_["messages"][2]["content"] = json.dumps(metadata.expected_output, indent=4)
+        chats.append(
+            copy.deepcopy(chat_)
+        )
 
+        chat_["messages"][2]["content"] = json.dumps(metadata.expected_output, indent="\t")
+        chats.append(
+            copy.deepcopy(chat_)
+        )
+
+    return chats
+
+# followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer
+# and https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
 if __name__ == "__main__":
-    bnb_conf = BitsAndBytesConfig(
+    def formatting_prompts_func(data):
+        global tokenizer 
+
+        convos = data["messages"]
+        texts = [tokenizer.apply_chat_template(convo, tokenize = False, add_generation_prompt = False) for convo in convos]
+        return { "text" : texts, }
+
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        "./llm",
+        max_seq_length=MAX_SEQ_LENGTH,
+        load_in_4bit=False,
         load_in_8bit=True,
-        bnb_8bit_compute_dtype=torch.bfloat16
+        dtype=torch.bfloat16
     )
 
-    tokenizer = AutoTokenizer.from_pretrained("google/gemma-2-9b-it", token=os.environ["HF_TOKEN"])
-    model = AutoModelForCausalLM.from_pretrained(
-        "google/gemma-2-9b-it", 
-        quantization_config=bnb_conf,
-        device_map="auto",
-        token=os.environ["HF_TOKEN"]
+    model = FastLanguageModel.get_peft_model(
+        model,
+        r = 16, # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
+        target_modules = ["q_proj", "k_proj", "v_proj", "o_proj",
+                        "gate_proj", "up_proj", "down_proj",],
+        lora_alpha = 16,
+        lora_dropout = 0, # Supports any, but = 0 is optimized
+        bias = "none",    # Supports any, but = "none" is optimized
+        # [NEW] "unsloth" uses 30% less VRAM, fits 2x larger batch sizes!
+        use_gradient_checkpointing = "unsloth", # True or "unsloth" for very long context
+        random_state = 3407,
+        use_rslora = False,  # We support rank stabilized LoRA
+        loftq_config = None, # And LoftQ
+    )
+    tokenizer = unsloth.chat_templates.get_chat_template(
+        tokenizer,
+        chat_template = "llama-3.1",
     )
 
     sys_prompt = ""
     with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
         sys_prompt = f.read()
 
-    training_dataset = datasets.Dataset.from_list(read_prompts(f"{DATASET_LOC}/train"))
-    training_dataset = training_dataset.map(lambda data: tokenizer(data["prompt"] + tokenizer.eos_token, max_length=8192, truncation=True), batched=False)
-    training_dataset = training_dataset.remove_columns(["prompt"])
+    training_prompts = read_all_prompts(f"{DATASET_LOC}/train")
+    validation_prompts = read_all_prompts(f"{DATASET_LOC}/train")
 
-    #val_dataset = datasets.Dataset.from_list(read_prompts(f"{DATASET_LOC}/val"))
-    #val_dataset = val_dataset.map(lambda data: tokenizer(data["prompt"] + tokenizer.eos_token, max_length=8192, truncation=True), batched=False)
-    #val_dataset = val_dataset.remove_columns(["prompt"])
-
-    # prepare peft model & train
-
-    peft_config = LoraConfig(
-        lora_alpha=16,
-        lora_dropout=0.1,
-        r=64,
-        bias="none",
-        task_type="CAUSAL_LM",
-        target_modules=["q_proj", "o_proj", "k_proj", "v_proj", "gate_proj", "up_proj", "down_proj"]  
-    )
-    model.add_adapter(peft_config)
+    training_ds = datasets.Dataset.from_list(generate_chats_from_prompts(training_prompts))
+    training_ds = training_ds.map(formatting_prompts_func, batched=True)
+    validation_ds = datasets.Dataset.from_list(generate_chats_from_prompts(validation_prompts))
+    validation_ds = validation_ds.map(formatting_prompts_func, batched=True)
 
     trainer = SFTTrainer(
-        model = model, 
-        tokenizer = tokenizer, 
-        train_dataset=training_dataset, 
-        peft_config=peft_config,
-        dataset_text_field="prompt",
+        model=model, 
+        tokenizer=tokenizer,
+        train_dataset=training_ds, 
+        eval_dataset=validation_ds,
+        args=TrainingArguments(
+            per_device_train_batch_size = 2,
+            gradient_accumulation_steps = 4,
+            warmup_steps = 5,
+            num_train_epochs = 2, # Set this for 1 full training run.
+            max_steps = 60,
+            learning_rate = 2e-4,
+            fp16 = not unsloth.is_bfloat16_supported(),
+            bf16 = unsloth.is_bfloat16_supported(),
+            logging_steps = 1,
+            optim = "adamw_8bit",
+            weight_decay = 0.01,
+            lr_scheduler_type = "linear",
+            seed = 3407,
+            output_dir = "outputs",
+            report_to = "none", # Use this for WandB etc
 
-        args = TrainingArguments(
-            output_dir="./training",
-            remove_unused_columns=False,
-            per_device_train_batch_size=2,
-            gradient_checkpointing=True,
-            gradient_accumulation_steps=4,
-            max_steps=400,
-            learning_rate=2.5e-5, 
-            logging_steps=5,
-            fp16=True,
-            optim="paged_adamw_8bit",
-            save_strategy="steps",     
-            save_steps=50,             
-    #                         evaluation_strategy="steps",
-    #                         eval_steps=5,              
-    #                         do_eval=True,
-            report_to = "none",
-        ),
-        data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+            fp16_full_eval = True,
+            per_device_eval_batch_size = 2,
+            eval_accumulation_steps = 4,
+            eval_strategy = "steps",
+            eval_steps = 20,
+        )
     )
     trainer.train()

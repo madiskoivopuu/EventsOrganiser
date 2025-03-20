@@ -30,7 +30,7 @@ reader-email@gmail.com
     "inferenceClassification": "focused",
     "body": {
         "contentType": "text",
-        "content": "Hea esmakursuslane!\r\n\r\nSinu õppekaval tegutses tänavu tuutor (või mitu), kelle ülesandeks oli aidata esmakursuslastel ülikoolellu sisse elada. Palume Sinu tagasisidet oma tuutorite tegevusele! Selleks tuleks täita lühike anonüümne küsimustik, mis võtab aega vaid paar minutit. Sinu arvamust saavad nii tuutorid kui ka tuutorite koolitajad edaspidi arvesse võtta. \r\nhttps://survey.ut.ee/index.php/185214?lang=et  \r\n\r\nHeade soovidega\r\n\r\nJaagup Raudvassar\r\nNõustamiskeskuse õppekorraldusnõustaja\r\nÕppeosakond\r\nTartu Ülikool\r\515 6674\r\nut.ee/noustamiskeskus\r\n\r\n"
+        "content": "Hea esmakursuslane!\r\n\r\nSinu õppekaval tegutses tänavu tuutor (või mitu), kelle ülesandeks oli aidata esmakursuslastel ülikoolellu sisse elada. Palume Sinu tagasisidet oma tuutorite tegevusele! Selleks tuleks täita lühike anonüümne küsimustik, mis võtab aega vaid paar minutit. Sinu arvamust saavad nii tuutorid kui ka tuutorite koolitajad edaspidi arvesse võtta. \r\nhttps://survey.ut.ee/index.php/185214?lang=et  \r\n\r\nHeade soovidega\r\n\r\nJaagup Raudvassar\r\nNõustamiskeskuse õppekorraldusnõustaja\r\nÕppeosakond\r\nTartu Ülikool\r\n515 6674\r\nut.ee/noustamiskeskus\r\n\r\n"
     },
     "sender": {
         "emailAddress": {

@@ -29,7 +29,7 @@ steven.jaagup.lepp@ut.ee
     "inferenceClassification": "focused",
     "body": {
         "contentType": "text",
-        "content": "Dear All,\r\n\r\n\r\nI wanted to inform you that the next lecture (Lecture 08) in the DevOps course, which covers CICD, will not be held in person. You do not need to come to the lecture room for this session.\r\n\r\nTo ensure smooth access without potential network interruptions, I have pre-recorded the lecture. The recording will be available on the course wiki page, which will be updated within a few hours.\r\n\r\nPlease note that the schedule for lab sessions remains unchanged. \r\n\r\n-Regards\r\Mihai\r\n\r\n"
+        "content": "Dear All,\r\n\r\n\r\nI wanted to inform you that the next lecture (Lecture 08) in the DevOps course, which covers CICD, will not be held in person. You do not need to come to the lecture room for this session.\r\n\r\nTo ensure smooth access without potential network interruptions, I have pre-recorded the lecture. The recording will be available on the course wiki page, which will be updated within a few hours.\r\n\r\nPlease note that the schedule for lab sessions remains unchanged. \r\n\r\n-Regards\r\nMihai\r\n\r\n"
     },
     "sender": {
         "emailAddress": {

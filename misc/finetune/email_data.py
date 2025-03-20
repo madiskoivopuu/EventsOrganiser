@@ -68,7 +68,7 @@ class Email:
             id=mail["Message-ID"],
             title=mail["Subject"],
             content=content,
-            send_date=email.utils.parsedate(mail["Date"]),
+            send_date=email.utils.parsedate_to_datetime(mail["Date"]),
             sender_email=email.utils.parseaddr(mail["From"]),
             from_email=email.utils.parseaddr(mail["From"]),
             recipient_emails=recipients,
@@ -88,9 +88,9 @@ def str_to_mail(mail_data: str, reader_email: str) -> Email:
     except:
         pass
 
-    raise ValueError("Unable to identify mail provider by dict data")
+    raise ValueError("Unable to identify mail provider by string, mail: ", mail_data)
 
-def format_email_for_llm(self, email: Email) -> str:
+def format_email_for_llm(email: Email) -> str:
     prepared_content = f"Email reader: {email.reader_email}\n"
     prepared_content += f"Email sender: {email.sender_email}\n"
     prepared_content += f"Email from: {email.from_email}\n"

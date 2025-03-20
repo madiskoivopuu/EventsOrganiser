@@ -98,7 +98,7 @@ def generate_chats_from_prompts(metadatas: list[PromptMetadata]) -> list[str]:
 # followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer
 # and https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
 if __name__ == "__main__":
-    """def formatting_prompts_func(data):
+    def formatting_prompts_func(data):
         global tokenizer 
 
         convos = data["messages"]
@@ -174,13 +174,6 @@ if __name__ == "__main__":
     )
     trainer.train()
 
-    unsloth.save.unsloth_save_pretrained_merged(model, "./outputs/merged_model", tokenizer)"""
+    unsloth.save.unsloth_save_pretrained_merged(model, "./outputs/merged_model", tokenizer)
 
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        "./outputs/checkpoint-100",
-        load_in_4bit=False,
-        load_in_8bit=True,
-        dtype=torch.bfloat16
-    )
-    print("aabb")
-    """nsloth.save.unsloth_save_pretrained_gguf(model, "./outputs/gguf", tokenizer)"""
+    #unsloth.save.unsloth_save_pretrained_gguf(model, "./outputs/gguf", tokenizer)

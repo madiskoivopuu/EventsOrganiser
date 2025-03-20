@@ -1,5 +1,6 @@
 aiohttp
 aiomysql
+cryptography
 fastapi[standard]==0.115.0
 msal
 python-dotenv

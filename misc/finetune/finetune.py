@@ -8,6 +8,7 @@ import torch, os, datasets, unsloth
 from transformers import TrainingArguments
 from trl import SFTTrainer, SFTConfig
 from unsloth import FastLanguageModel
+import unsloth.save
 
 import email_data
 from email_data import Email
@@ -97,7 +98,7 @@ def generate_chats_from_prompts(metadatas: list[PromptMetadata]) -> list[str]:
 # followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer
 # and https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
 if __name__ == "__main__":
-    def formatting_prompts_func(data):
+    """def formatting_prompts_func(data):
         global tokenizer 
 
         convos = data["messages"]
@@ -105,7 +106,7 @@ if __name__ == "__main__":
         return { "text" : texts, }
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        "./llm",
+        "./outputs/trainable_llm",
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=False,
         load_in_8bit=True,
@@ -130,7 +131,7 @@ if __name__ == "__main__":
         tokenizer,
         chat_template = "llama-3.1",
     )
-
+    
     sys_prompt = ""
     with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
         sys_prompt = f.read()
@@ -149,11 +150,10 @@ if __name__ == "__main__":
         train_dataset=training_ds, 
         eval_dataset=validation_ds,
         args=TrainingArguments(
-            per_device_train_batch_size = 2,
+            per_device_train_batch_size = 8,
             gradient_accumulation_steps = 4,
             warmup_steps = 5,
-            num_train_epochs = 2, # Set this for 1 full training run.
-            max_steps = 60,
+            max_steps = 100,
             learning_rate = 2e-4,
             fp16 = not unsloth.is_bfloat16_supported(),
             bf16 = unsloth.is_bfloat16_supported(),
@@ -166,10 +166,21 @@ if __name__ == "__main__":
             report_to = "none", # Use this for WandB etc
 
             fp16_full_eval = True,
-            per_device_eval_batch_size = 2,
+            per_device_eval_batch_size = 8,
             eval_accumulation_steps = 4,
             eval_strategy = "steps",
             eval_steps = 20,
         )
     )
     trainer.train()
+
+    unsloth.save.unsloth_save_pretrained_merged(model, "./outputs/merged_model", tokenizer)"""
+
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        "./outputs/checkpoint-100",
+        load_in_4bit=False,
+        load_in_8bit=True,
+        dtype=torch.bfloat16
+    )
+    print("aabb")
+    """nsloth.save.unsloth_save_pretrained_gguf(model, "./outputs/gguf", tokenizer)"""

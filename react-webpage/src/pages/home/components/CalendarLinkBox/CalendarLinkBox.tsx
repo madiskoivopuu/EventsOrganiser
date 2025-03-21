@@ -26,8 +26,12 @@ export default function CalendarLinkBox() {
             // link will be undefined if 404
             setCalendarLink(link);
         }).catch(e => {
-            console.error("Calendar link fetch error", e);
-            toast.error(`Failed to ${type} calendar link`)
+            if(e.status === 404) {
+                setCalendarLink(undefined);
+            } else {
+                console.error("Calendar link fetch error", e);
+                toast.error(`Failed to ${type} calendar link`)
+            }
         }).finally(() => {
             setLinkRequestActive(false);
         })

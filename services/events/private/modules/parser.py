@@ -9,6 +9,7 @@ from common import tables, models
 from helpers.email_data import Email
 from llm.model import Llama3Model 
 import server_config, db
+import os
 
 # This should still work fine with pika andmost LLM libraries, since 
 # most of them release the GIL when it comes time to run the LLM with a prompt
@@ -62,8 +63,9 @@ class ParserThread(threading.Thread):
                     method: pika.spec.Basic.Deliver, 
                     properties: pika.spec.BasicProperties, 
                     body: bytes):
-        f = Fernet(server_config.EMAIL_ENCRYPTION_SECRET)
-        body = f.decrypt(body)
+        if(os.getenv("DEV_MODE") != "1"):
+            f = Fernet(server_config.EMAIL_ENCRYPTION_SECRET)
+            body = f.decrypt(body)
 
         msg_with_email: dict[str] = json.loads(body)
 

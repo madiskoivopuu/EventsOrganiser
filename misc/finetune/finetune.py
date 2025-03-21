@@ -152,6 +152,7 @@ if __name__ == "__main__":
         args=TrainingArguments(
             per_device_train_batch_size = 8,
             gradient_accumulation_steps = 4,
+            num_train_epochs=5.0,
             warmup_steps = 5,
             max_steps = 100,
             learning_rate = 2e-4,

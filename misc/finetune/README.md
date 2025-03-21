@@ -9,11 +9,10 @@ Currently, training the model will require at least 20GB of VRAM, if you have le
 Unsloth most likely also has other types of optimizations to reduce the VRAM usage even further.
 
 ## Converting merged model to GGUF
-If you plan on using the *.gguf format of the model, you can use convert_hf_to_gguf.py to do so.
+You can change finetune.py to save the model directly to GGUF, editing the following line `unsloth.save.unsloth_save_pretrained_merged(model, "./outputs/merged_model", tokenizer)` to `unsloth.save.unsloth_save_pretrained_gguf(model, "./outputs/gguf", tokenizer)`
 
-Firstly, you need to clone the llama.cpp repository with `git clone https://github.com/ggml-org/llama.cpp`. After that, install gguf for Python with `pip install gguf`
-
-After those steps, you can convert the model to GGUF with the following command:
+If this method does not work (e.g there are some weird errors), then you can do the conversion manually with llama.cpp's hf to gguf converter using the following steps:
+1) clone the llama.cpp repository with `git clone https://github.com/ggml-org/llama.cpp`.
+2) install gguf for Python with `pip install gguf`
+3) convert the model to GGUF with the following command:
 `py ./llama.cpp/convert_hf_to_gguf.py ./outputs/merged_model --outfile ./outputs/gguf/llama3.2-3b-it-finetuned.gguf --outtype bf16`
-
-Another method to save to GGUF would be to update finetune.py to save the model directly to GGUF, changing `unsloth.save.unsloth_save_pretrained_merged(model, "./outputs/merged_model", tokenizer)` to `unsloth.save.unsloth_save_pretrained_gguf(model, "./outputs/gguf", tokenizer)`

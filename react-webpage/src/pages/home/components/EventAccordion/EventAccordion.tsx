@@ -165,6 +165,12 @@ function EventAccordion({ event }: EventAccordionProps) {
 					<div className="event-buttons-container">
 						<div className="event-buttons">
 							{eventButtons}
+
+							<button 
+								onClick={() => window.open(event.email_link, "_blank")?.focus()}
+							>
+								View e-mail
+							</button>
 						</div>
 					</div>
 				</div>

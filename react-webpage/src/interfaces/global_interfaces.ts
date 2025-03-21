@@ -4,7 +4,9 @@ export interface EventDetails {
     start_date?: string | null,
     end_date: string,
     address: string,
-    tags: EventTag[]
+    tags: EventTag[],
+
+    email_link: string
 }
 
 export interface JWTData {

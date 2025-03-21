@@ -101,18 +101,23 @@ async def finish_login(
     """
     response = RedirectResponse("/", status_code=303)
 
-    if(session == None):
-        raise HTTPException(status_code=400, detail="Auth flow not initiated prior to this request")
-    
     auth_flow = ms_app.acquire_token_by_auth_code_flow(auth_code_flow=session["ms_flow"], auth_response=dict(request.query_params))
     if "error" in auth_flow:
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
-        raise HTTPException(status_code=400, detail=f"Problem authenticating with Microsoft account: {error_str}")
+        raise RedirectResponse(
+            url="/login",
+            status_code=302, 
+            query_params={"error": f"Problem authenticating with Microsoft account: {error_str}"}
+        )
 
     decoded_token, err_msg = await auth.decode_jwt_token(auth_flow["id_token"], server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
         __logger.warning(f"Problem decoding JWT token after Microsoft login callback: {err_msg}")
-        raise HTTPException(status_code=400, detail=f"Unable to verify that the response token is issued by Microsoft")
+        raise RedirectResponse(
+            url="/login",
+            status_code=302, 
+            query_params={"error": f"Unable to verify that the response token is issued by Microsoft"}
+        )
 
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)
     auth.set_jwt_cookie(server_config.JWT_SESSION_COOKIE_NAME, token_data, response)

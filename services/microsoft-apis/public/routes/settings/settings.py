@@ -10,8 +10,7 @@ from datetime import timedelta
 
 import sqlalchemy.exc
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from contextlib import asynccontextmanager
@@ -46,6 +45,11 @@ async def app_lifespan(app: FastAPI):
                 queue_name="outlook_user_logins",
                 routing_key="notification.outlook.user_login",
                 notification_callback=process_login_notification
+            ),
+            NotificationListener(
+                queue_name="outlook_account_deletion_requests",
+                routing_key="notification.outlook.delete_Account",
+                notification_callback=delete_user_data
             )
         ]
     ) 
@@ -149,6 +153,30 @@ async def merge_user_info(data: dict):
         user_info.refresh_token = data["refresh_token"]
 
         await db_session.merge(user_info)
+        await db_session.commit()
+
+    return True
+
+async def delete_user_data(data: dict) -> bool:
+    user_id: str = data["user_id"]
+    async with db.async_session() as db_session:
+        db_session = cast(AsyncSession, db_session)
+        await db_session.execute(
+            delete(tables.UserInfoTable).where(tables.UserInfoTable.user_id == user_id)
+        )
+
+        await db_session.execute(
+            delete(tables.ParsedEmails).where(tables.ParsedEmails.user_id == user_id)
+        )
+
+        await db_session.execute(
+            delete(tables.SettingsTable).where(tables.SettingsTable.user_id == user_id)
+        )
+
+        await db_session.execute(
+            delete(tables.EmailSubscriptionsTable).where(tables.EmailSubscriptionsTable.user_id == user_id)
+        )
+
         await db_session.commit()
 
     return True

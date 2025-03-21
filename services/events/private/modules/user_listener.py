@@ -25,7 +25,7 @@ from common import models
 
 class UserListener(threading.Thread):
     """
-    Listens for logins and creates necessary SQL tables that are necessary for 
+    Listens to user authentication notifications & user deletion notifications
     """
     def __init__(self):
         super(UserListener, self).__init__()
@@ -49,7 +49,10 @@ class UserListener(threading.Thread):
         self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
         self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
 
-    def _process_login_message(self, user_data: dict):
+        self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
+        self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
+
+    def _process_login_message(self, user_data: dict) -> bool:
         with db.start_session() as db_session:
             query = select(tables.EventSettingsTable) \
                     .where(
@@ -82,6 +85,52 @@ class UserListener(threading.Thread):
                     return False
                 
         return True
+    
+    def _process_deletion_request(self, user_data: dict) -> bool:
+        user_id, account_type = user_data["user_id"], models.AccountType(user_data["account_type"])
+        with db.start_session() as db_session:
+            db_session.execute(
+                delete(tables.EventsTable).where(
+                    tables.EventsTable.user_id == user_id, tables.EventsTable.user_acc_type == account_type
+                )
+            )
+
+            db_session.execute(
+                delete(tables.CalendarLinksTable).where(
+                    tables.CalendarLinksTable.user_id == user_id, tables.CalendarLinksTable.user_acc_type == account_type
+                )
+            )
+
+            db_session.execute(
+                delete(tables.EventSettingsTable).where(
+                    tables.EventSettingsTable.user_id == user_id, tables.EventSettingsTable.user_acc_type == account_type
+                )
+            )
+
+            db_session.commit()
+
+        return True
+
+    def _on_deletion_request(self, channel: pika.channel.Channel, 
+                    method: pika.spec.Basic.Deliver, 
+                    properties: pika.spec.BasicProperties, 
+                    body: bytes):
+        try:
+            user_data = json.loads(body)
+        except json.JSONDecodeError:
+            self.__logger.warning(f"_on_deletion_request: Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
+            channel.basic_reject(method.delivery_tag, requeue=False)
+            return
+        
+        try:
+            if(self._process_deletion_request(user_data)):
+                channel.basic_ack(method.delivery_tag)
+            else:
+                channel.basic_nack(method.delivery_tag)
+        except:
+            self.__logger.warning("_process_deletion_request() raised an exception", exc_info=True)
+            channel.basic_nack(method.delivery_tag)
+            return
 
     def _on_user_login(self, channel: pika.channel.Channel, 
                     method: pika.spec.Basic.Deliver, 
@@ -90,7 +139,7 @@ class UserListener(threading.Thread):
         try:
             user_data = json.loads(body)
         except json.JSONDecodeError:
-            self.__logger.warning(f"Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
+            self.__logger.warning(f"_on_user_login: Could not get user data for {method.delivery_tag}, deleting that message", exc_info=True)
             channel.basic_reject(method.delivery_tag, requeue=False)
             return
         

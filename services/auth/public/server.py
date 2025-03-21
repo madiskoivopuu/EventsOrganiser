@@ -7,7 +7,7 @@ __logger = logging.getLogger(__name__)
 import server_config
 import os
 
-from routes import microsoft_router
+from routes import microsoft_router, general_auth_router
 
 api = FastAPI(
     debug=(os.getenv("DEV_MODE") == "1")
@@ -17,3 +17,6 @@ if(server_config.MICROSOFT_APP_CLIENT_ID == None or server_config.MICROSOFT_APP_
     __logger.info("Microsoft authentication disabled due to missing app client id/app secret")
 else:
     api.include_router(microsoft_router)
+
+
+api.include_router(general_auth_router)

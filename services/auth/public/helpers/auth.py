@@ -1,14 +1,18 @@
 import aiohttp
 import jwt, jwt.exceptions
-from fastapi import Response
+from fastapi import Response, HTTPException, Cookie
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
 from enum import Enum
 from asyncache import cached
 from cachetools import TTLCache
 
+from pydantic import BaseModel, Field
+
 import certifi, ssl, os
 sslcontext = ssl.create_default_context(cafile=certifi.where())
+
+import server_config
 
 DEFAULT_EXPIRATION_TIME = timedelta(minutes=30)
 
@@ -28,6 +32,46 @@ def find_key(token: str, keys: list[dict]) -> str | None:
             break
 
     return decrypt_key
+
+class UserData(BaseModel):
+    email: str = Field(alias="sub")
+    account_type: str
+    account_id: str
+
+async def authenticate_user(
+    response: Response,
+    cookie_value: str = Cookie(
+        alias=server_config.JWT_SESSION_COOKIE_NAME,
+        title="JWT storage cookie",
+        description="A cookie that includes the encoded JWT token for any account type"
+    )
+) -> UserData:
+    """
+    Authenticates a user based on the session cookie contained JWT token.
+
+    Raises:
+        HTTPException when JWT fails validation.
+
+    Returns:
+        Returns the JWT data if it is valid.
+    """
+    if(cookie_value == None):
+        raise HTTPException(status_code=401, detail="This endpoint requires authentication")
+    
+    try:
+        decoded_data = jwt.decode(
+            jwt=cookie_value,
+            key=server_config.JWT_SECRET,
+            algorithms=["HS256"],
+            leeway=timedelta(seconds=10)
+        )
+
+        return UserData.model_validate(decoded_data)
+    except jwt.exceptions.ExpiredSignatureError:
+        response.delete_cookie(server_config.JWT_SESSION_COOKIE_NAME)
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.exceptions.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid authentication token")
 
 async def decode_jwt_token(id_token: str, audience: str) -> tuple[dict | None, str]:
     """Verifies that a JWT is signed by a valid (trusted) public key. Decodes the token

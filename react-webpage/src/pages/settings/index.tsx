@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TimezoneSelect, { ITimezoneOption } from "react-timezone-select";
 import Select from "react-select";
-
+import { toast } from "react-toastify";
+import { SpinnerCircular } from "spinners-react";
 
 import { EventTag, Settings } from "@/interfaces/global_interfaces";
 import { useAccountDataStore, useEventsStore } from "@/hooks";
@@ -9,14 +10,16 @@ import { SettingRow } from "./components";
 
 import "./settings.css";
 import * as settingHelpers from "./setting-helpers";
-import { toast } from "react-toastify";
-import { SpinnerCircular } from "spinners-react";
+import { deleteAccount } from "@/apis/auth";
 
 export default function SettingsPage() {
-    const { settings, updateSettings } = useAccountDataStore();
+    const { settings, updateSettings, setAuthenticated } = useAccountDataStore();
     const { tags } = useEventsStore();
+    const deleteAccountModal = useRef<HTMLDialogElement | null>(null);
+
     const [changedSettings, setChangedSettings] = useState<Partial<Settings>>(settings);
     const [savingInProgress, setSavingInProgress] = useState<boolean>(false);
+    const [deletionInProgress, setDeletionInProgress] = useState<boolean>(false);
 
     useEffect(() => {
         reloadSettings();
@@ -25,6 +28,19 @@ export default function SettingsPage() {
     useEffect(() => {
         setChangedSettings(settings);
     }, [settings]);
+
+    const requestAccountDeletion = () => {
+        setDeletionInProgress(true);
+
+        deleteAccount().then(() => {
+            setAuthenticated(false);
+            toast("Deletion started! It will take some time for all the data to be removed from the server")
+        }).catch((e) => {
+            toast.error("Failed to delete your account, try again later");
+        }).finally(() => {
+            setDeletionInProgress(false);
+        })
+    }
 
     const reloadSettings = () => {
         if(!settingHelpers.areSettingsFullyLoaded(settings))
@@ -173,18 +189,56 @@ export default function SettingsPage() {
                 </SettingRow>
 
                 <hr className="settings-cat-divider"/>
-                <button
-                    disabled={!settingHelpers.areSettingsFullyLoaded(settings) || savingInProgress}
-                    onClick={saveSettings}
-                >
-                    <SpinnerCircular 
-                        enabled={savingInProgress}
-                        color="white"
-                        size="1.25em"
-                        style={{marginLeft: "1em"}}
-                    />
-                    Save settings
-                </button>
+                <div>
+                    <button
+                        disabled={!settingHelpers.areSettingsFullyLoaded(settings) || savingInProgress}
+                        onClick={saveSettings}
+                    >
+                        <SpinnerCircular 
+                            enabled={savingInProgress}
+                            color="white"
+                            size="1.25em"
+                            style={{marginLeft: "1em"}}
+                        />
+                        Save settings
+                    </button>
+                </div>
+
+                <div style={{marginTop: "2em"}}>
+                    <button
+                        className="warning"
+                        onClick={() => deleteAccountModal.current?.showModal()}
+                    >
+                        Erase account & data
+                    </button>
+
+                    <dialog ref={deleteAccountModal}>
+                        <h2>Delete confirmation</h2>
+                        <p>Are you sure you want to delete your account? This will erase all found events and it cannot be undone!</p>
+
+                        <div style={{display: "flex", justifyContent: "flex-end"}}>
+                            <button 
+                                className="plain" 
+                                onClick={() => deleteAccountModal.current?.close()}
+                                disabled={deletionInProgress}
+                            >
+                                Cancel
+                            </button>
+                            <button 
+                                className="warning" 
+                                onClick={requestAccountDeletion}
+                                disabled={deletionInProgress}
+                            >
+                                <SpinnerCircular
+                                    size="1em"
+                                    color="white"
+                                    enabled={deletionInProgress}
+                                />
+                                Delete
+                            </button>
+                        </div>
+                    </dialog>
+                </div>
             </div>
         </>
     );

@@ -32,6 +32,7 @@ class EventBase(BaseModel):
     start_date: Optional[datetime] = Field(description="Timestamp for event start date. If no timezone is specified, the timestamp will be treated as UTC.", validation_alias=AliasChoices("start_date", "start_date_utc"))
     end_date: datetime = Field(description="Timestamp for event end date. If no timezone is specified, the timestamp will be treated as UTC.", validation_alias=AliasChoices("end_date", "end_date_utc"))
     address: str
+    email_link: str
 
     @pydantic.model_validator(mode="after")
     def validate_multiple_fields(self) -> Self:

@@ -49,8 +49,8 @@ class UserListener(threading.Thread):
         self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
         self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
 
-        self.mq_channel.queue_declare(queue='user_logins_events_listener', durable=True)
-        self.mq_channel.queue_bind(queue='user_logins_events_listener', exchange='notifications', routing_key='notification.*.user_login')
+        self.mq_channel.queue_declare(queue='user_deletions_events_listener', durable=True)
+        self.mq_channel.queue_bind(queue='user_deletions_events_listener', exchange='notifications', routing_key='notification.*.delete_account')
 
     def _process_login_message(self, user_data: dict) -> bool:
         with db.start_session() as db_session:
@@ -157,6 +157,7 @@ class UserListener(threading.Thread):
         self._create_queues()
 
         self.mq_channel.basic_consume('user_logins_events_listener', self._on_user_login)
+        self.mq_channel.basic_consume('user_deletions_events_listener', self._on_deletion_request)
 
         try:
             self.mq_channel.start_consuming()

@@ -5,12 +5,7 @@ from common import models, tables
 import logging
 logging.basicConfig(level=logging.INFO)
 
-from pydantic import BaseModel, field_validator, model_validator
-from datetime import datetime, tzinfo
-from zoneinfo import ZoneInfo
-from queue import Queue
 import sqlalchemy.exc
-import pydantic
 import json
 
 from sqlalchemy import select, delete, update

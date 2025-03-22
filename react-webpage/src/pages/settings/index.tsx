@@ -35,7 +35,7 @@ export default function SettingsPage() {
         deleteAccount().then(() => {
             setAuthenticated(false);
             toast("Deletion started! It will take some time for all the data to be removed from the server")
-        }).catch((e) => {
+        }).catch(() => {
             toast.error("Failed to delete your account, try again later");
         }).finally(() => {
             setDeletionInProgress(false);

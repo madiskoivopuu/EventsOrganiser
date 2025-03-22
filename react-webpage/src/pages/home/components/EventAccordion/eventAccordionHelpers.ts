@@ -44,7 +44,8 @@ export const editableEventToEventDetails = (origEvent: EventDetails, event: Edit
         start_date: event.start_date ? event.start_date.toISOString() : null,
         end_date: event.end_date!.toISOString(),
         address: event.address,
-        tags: event.tags
+        tags: event.tags,
+        email_link: origEvent.email_link
     };
 }
 

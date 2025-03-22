@@ -48,7 +48,7 @@ async def app_lifespan(app: FastAPI):
             ),
             NotificationListener(
                 queue_name="outlook_account_deletion_requests",
-                routing_key="notification.outlook.delete_Account",
+                routing_key="notification.outlook.delete_account",
                 notification_callback=delete_user_data
             )
         ]

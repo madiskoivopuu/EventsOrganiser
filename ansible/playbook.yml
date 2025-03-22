@@ -5,7 +5,6 @@
 
   vars:
     mysql_socket: "/var/lib/mysql/mysql.sock"
-    redis_config: "/etc/redis/redis.conf"
     domain_name: "11072100.xyz"
     is_kube_master_node: true
 
@@ -13,7 +12,7 @@
       microsoft_app_client_id: e7531514-8913-47a8-8cd2-b80dcef955b7
       mysql_host: 192.168.42.26
       rabbitmq_host: 192.168.42.26
-      llm_gguf_url: "https://filebin.net/kq3v0sbfnm964u08/Llama-3.2-3B-Instruct.gguf"
+      llm_gguf_url: "https://filebin.net/8to16e0982ddjtsf/llama3.2-3b-it-finetuned.gguf"
 
   vars_files:
     - vault.yml

@@ -38,7 +38,7 @@ async def router_lifespan(app: FastAPI):
     await notifications_mq.close_conn()
 
 general_auth_router = APIRouter(
-    prefix="/api/auth/",
+    prefix="/api/auth",
     lifespan=router_lifespan
 )
 

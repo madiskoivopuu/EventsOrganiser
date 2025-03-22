@@ -79,8 +79,8 @@ class ParserThread(threading.Thread):
             settings_row = db_session.execute(query).unique().scalar_one_or_none()
 
             if(settings_row == None):
-                self.logger.warning(f"Settings do not exist for user {msg_with_email["user_id"]}, defaulting to all tags")
-                user_event_categories += server_config.DEFAULT_EVENT_CATEGORIES
+                self.logger.warning(f"Settings do not exist for user {msg_with_email["user_id"]}, dropping this email since the account might be deleted")
+                return channel.basic_ack(method.delivery_tag)
             else:
                 for category in settings_row.categories:
                     user_event_categories.append(category.name)

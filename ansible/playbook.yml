@@ -4,7 +4,6 @@
   become: yes
 
   vars:
-    mysql_socket: "/var/lib/mysql/mysql.sock"
     domain_name: "11072100.xyz"
     is_kube_master_node: true
 

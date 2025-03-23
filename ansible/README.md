@@ -35,9 +35,12 @@ The list of required variables for each role is the following:
 ### Role - kubernetes
 | Variable name | Description |
 | - | - |
-| domain_name | domain where all the APIs can be accessed & where the website will be hosted |
 | is_kube_master_node | Boolean value that indicates whether the VM is a control plane or not |
+
+### Role - app_setup_kubernetes
+| domain_name | domain where all the APIs can be accessed & where the website will be hosted |
 | events_org_config.dockerhub_username | Docker Hub username to pull images from |
+| events_org_config.llm_gguf_url | URL to download the GGUF model from |
 | events_org_config.mysql_host | IP address of the MySQL database |
 | events_org_config.rabbitmq_host | IP address of the RabbitMQ broker |
 | events_org_config.microsoft_app_client_id | Microsoft Entra application ID |

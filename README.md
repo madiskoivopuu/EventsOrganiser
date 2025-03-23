@@ -81,11 +81,15 @@ Latest version of Docker.
     cd ../../services
     ```
 9. Create `.env` file and fill it out according to `.env.example`
-10. Build & push the containers to Docker Hub. For another container registry, you need to edit the `docker-compose.yml` file
+10. Log in to your Docker Hub account
+    ```
+    docker login
+    ```
+11. Build & push the containers to Docker Hub. For another container registry, you need to edit the `docker-compose.yml` file
     ```
     docker compose build --push
     ```
-11. For each server, add their hostnames along with internal IPs to /etc/hosts. An example is down below
+12. For each server, ssh into it add all the servers' hostnames along with internal IPs to /etc/hosts. An example is down below
     ```
     127.0.0.1 localhost
     192.168.42.60 events-org-controller
@@ -100,9 +104,9 @@ Latest version of Docker.
     ff02::2 ip6-allrouters
     ff02::3 ip6-allhosts
     ```
-12. Set up the servers using the Ansible playbook provided in `ansible` directory (README.md will explain what to do)
+13. Set up the servers using the Ansible playbook provided in `ansible` directory (README.md will explain what to do)
 
-13. (Informational) When using a domain name provider, change the A records for your domain to point to the controller's IP.
+14. (Informational) When using a domain name provider, change the A records for your domain to point to the controller's IP.
 
     You can find an example of how it was done for the test domain for this application.
     ![Cloudflare DNS setup for Events Organiser test](example-dns-cloudflare.png)

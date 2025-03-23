@@ -98,3 +98,7 @@
 
 - include_tasks: kube-control-plane.yml
   when: is_kube_master_node
+
+- name: Reboot server
+  ansible.builtin.reboot:
+    post_reboot_delay: 75

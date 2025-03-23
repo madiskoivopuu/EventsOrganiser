@@ -57,6 +57,8 @@ Latest version of Docker.
     ```
 4. Go into the `dist` directory, rename `index-prod.html` to `index.html` and run the following command
     ```
+    cd dist
+    mv index-prod.html index.html
     tar -cf website.zip .
     ```
 5. Open another terminal, ssh into the controller VM and run the following commands

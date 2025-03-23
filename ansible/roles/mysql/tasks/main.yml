@@ -23,7 +23,7 @@
 
 - name: Make MySQL bind to 0.0.0.0 (use external firewall to block connections from random IPs to 3306)
   ansible.builtin.lineinfile:
-    path: "{{ redis_config }}"
+    path: "{{ mysql_conf_file }}"
     regexp: "#?\\s*bind-address"
     line: "bind-address = 0.0.0.0"
   notify:

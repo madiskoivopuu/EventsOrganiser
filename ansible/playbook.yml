@@ -4,6 +4,7 @@
   become: yes
 
   vars:
+    mysql_conf_file: "/etc/mysql/mysql.conf.d/mysqld.cnf"
     domain_name: "11072100.xyz"
     is_kube_master_node: true
 

@@ -27,20 +27,20 @@
     - "kubelet"
     - "containerd"
 
-- name: Open kubernetes default ports and HTTP(s) ports
-  community.general.ufw:
-    state: enabled
-    rule: allow
-    port: "{{ item }}"
-    proto: tcp
-  with_items:
-    - "5473"
-    - "6443"
-    - "2379:2380"
-    - "10250"
-    - "10251"
-    - "10252"
-    - "10255"
+#- name: Open kubernetes default ports and HTTP(s) ports
+#  community.general.ufw:
+#    state: enabled
+#    rule: allow
+#    port: "{{ item }}"
+#    proto: tcp
+#  with_items:
+#    - "5473"
+#    - "6443"
+#    - "2379:2380"
+#    - "10250"
+#    - "10251"
+#    - "10252"
+#    - "10255"
 
 # This enables IP forwarding and allows iptables to see bridged traffic
 - name: Enable IP forwarding in sysctl

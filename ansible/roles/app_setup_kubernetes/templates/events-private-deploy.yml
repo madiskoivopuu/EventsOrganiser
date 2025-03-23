@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: events-private
-          image: madiskoivopuu/events-private
+          image: "{{ events_org_config.dockerhub_username }}/events-private"
           resources:
             limits:
               memory: "8192Mi"

@@ -72,6 +72,10 @@
     state: started
     enabled: true
 
+- name: Reboot server # sometimes RabbitMQ doesn't want to start up on ubuntu....
+  ansible.builtin.reboot:
+    post_reboot_delay: 75
+
 #- name: Open RabbitMQ related ports
 #  community.general.ufw:
 #    state: enabled

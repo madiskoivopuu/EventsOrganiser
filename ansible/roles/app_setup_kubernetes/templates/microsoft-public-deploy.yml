@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: microsoft-public
-          image: madiskoivopuu/microsoft-apis-public
+          image: "{{ events_org_config.dockerhub_username }}/microsoft-apis-public"
           ports:
             - containerPort: 80
           env:

@@ -13,17 +13,17 @@
       mysql_host: 192.168.42.26
       rabbitmq_host: 192.168.42.26
       llm_gguf_url: "https://filebin.net/8to16e0982ddjtsf/llama3.2-3b-it-finetuned.gguf"
+      dockerhub_username: "madiskoivopuu"
 
   vars_files:
     - vault.yml
 
   roles:
-    #- update_packages
-    #- setup
-    #- rabbitmq
-    #- kubernetes
-    #- mysql
-    #- redis
+    - update_packages
+    - setup
+    - rabbitmq
+    - kubernetes
+    - mysql
     - app_setup_kubernetes
 
 - hosts: workers
@@ -35,6 +35,6 @@
     - vault.yml
 
   roles:
-    #- update_packages
-    #- setup
-    #- kubernetes
+    - update_packages
+    - setup
+    - kubernetes

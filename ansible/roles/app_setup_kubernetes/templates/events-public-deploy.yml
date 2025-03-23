@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: events-public
-          image: madiskoivopuu/events-public
+          image: "{{ events_org_config.dockerhub_username }}/events-public"
           ports:
             - containerPort: 80
           env:

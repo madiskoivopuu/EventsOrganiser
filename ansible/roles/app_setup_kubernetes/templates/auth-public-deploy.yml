@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: auth-public
-          image: madiskoivopuu/auth-public
+          image: "{{ events_org_config.dockerhub_username }}/auth-public"
           ports:
             - containerPort: 80
           env:

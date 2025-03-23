@@ -74,6 +74,7 @@ Latest version of Docker.
 8. Use terminal 2 for the last time for these commands, which will unzip the website files
     ```
     cd /var/www/events-organiser
+    sudo rm -rf assets
     sudo tar -xvf website.zip
     sudo rm website.zip
     ```

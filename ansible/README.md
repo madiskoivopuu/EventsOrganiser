@@ -21,6 +21,7 @@ The list of required variables for each role is the following:
 ### Role - mysql
 | Variable name | Description |
 | - | - |
+| mysql_conf_file | Location of the MySQL configuration file |
 | mysql_root_password |  |
 | events_org_secret.mysql_user_events_password |  |
 | events_org_secret.mysql_user_microsoft_password |  |

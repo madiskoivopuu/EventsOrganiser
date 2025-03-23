@@ -44,4 +44,4 @@
 
 - name: "PAUSED | Manually install cilium"
   ansible.builtin.pause:
-    prompt: "Use 'cilium install --version 1.17.1' to install CNI"
+    prompt: "Use 'sudo cilium install --version 1.17.1' to install CNI"

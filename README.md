@@ -50,46 +50,47 @@ Latest version of Docker.
     ```
     cd react-webpage
     ```
-3. Install the project dependencies & build the React app
+3. Create `.env` and `.env.production` file and fill it out according to `.env.example`
+4. Install the project dependencies & build the React app
     ```
     npm install
     npm run build
     ```
-4. Go into the `dist` directory, rename `index-prod.html` to `index.html` and run the following command
+5. Go into the `dist` directory, rename `index-prod.html` to `index.html` and run the following command
     ```
     cd dist
     mv index-prod.html index.html
     tar -cf website.zip .
     ```
-5. Open another terminal, ssh into the controller VM and run the following commands
+6. Open another terminal, ssh into the controller VM and run the following commands
     ```
     sudo mkdir -p /var/www/events-organiser
     sudo chown -R ubuntu:ubuntu /var/www/events-organiser
     ```
-6. Go back onto the previous (old) terminal and copy the website.zip file over
+7. Go back onto the previous (old) terminal and copy the website.zip file over
     ```
     scp ./website.zip ubuntu@IP-ADDRESS:/var/www/events-organiser
     ```
-7. Use terminal 2 for the last time for these commands, which will unzip the website files
+8. Use terminal 2 for the last time for these commands, which will unzip the website files
     ```
     cd /var/www/events-organiser
     sudo tar -xvf website.zip
     sudo rm website.zip
     ```
-8. Go into the `services` folder
+9. Go into the `services` folder
     ```
     cd ../../services
     ```
-9. Create `.env` file and fill it out according to `.env.example`
-10. Log in to your Docker Hub account
+10. Create `.env` file and fill it out according to `.env.example`
+11. Log in to your Docker Hub account
     ```
     docker login
     ```
-11. Build & push the containers to Docker Hub. For another container registry, you need to edit the `docker-compose.yml` file
+12. Build & push the containers to Docker Hub. For another container registry, you need to edit the `docker-compose.yml` file
     ```
     docker compose build --push
     ```
-12. For each server, ssh into it add all the servers' hostnames along with internal IPs to /etc/hosts. An example is down below
+13. For each server, ssh into it add all the servers' hostnames along with internal IPs to /etc/hosts. An example is down below
     ```
     127.0.0.1 localhost
     192.168.42.60 events-org-controller
@@ -104,9 +105,9 @@ Latest version of Docker.
     ff02::2 ip6-allrouters
     ff02::3 ip6-allhosts
     ```
-13. Set up the servers using the Ansible playbook provided in `ansible` directory (README.md will explain what to do)
+14. Set up the servers using the Ansible playbook provided in `ansible` directory (README.md will explain what to do)
 
-14. (Informational) When using a domain name provider, change the A records for your domain to point to the controller's IP.
+15. (Informational) When using a domain name provider, change the A records for your domain to point to the controller's IP.
 
     You can find an example of how it was done for the test domain for this application.
     ![Cloudflare DNS setup for Events Organiser test](example-dns-cloudflare.png)

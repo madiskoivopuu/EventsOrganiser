@@ -39,6 +39,8 @@ The list of required variables for each role is the following:
 | is_kube_master_node | Boolean value that indicates whether the VM is a control plane or not |
 
 ### Role - app_setup_kubernetes
+| Variable name | Description |
+| - | - |
 | domain_name | domain where all the APIs can be accessed & where the website will be hosted |
 | events_org_config.dockerhub_username | Docker Hub username to pull images from |
 | events_org_config.llm_gguf_url | URL to download the GGUF model from |
@@ -46,12 +48,11 @@ The list of required variables for each role is the following:
 | events_org_config.rabbitmq_host | IP address of the RabbitMQ broker |
 | events_org_config.microsoft_app_client_id | Microsoft Entra application ID |
 | events_org_secret.microsoft_app_secret | Microsoft Entra application secret |
-| events_org_secret.rabbitmq_password | RabbitMQ user password for the events-parser user |
 | events_org_secret.microsoft_callback_secret | your own randomly generated string to verify that webhook notifications from Graph API are from Microsoft |
 | events_org_secret.jwt_secret | random secret string that the auth microservice will generate JWTs with |
-| events_org_secret.email_encryption_secret | a URL-safe base64-encoded 32-byte key for use with Fernet |
+| events_org_secret.email_encryption_secret | a URL-safe base64-encoded 32-byte key for use with Fernet (use Fernet.generate_key() to create one) |
 | events_org_secret.mysql_user_events_password | |
-| events_org_secret.events_parser_rabbitmq_password | |
+| events_org_secret.events_parser_rabbitmq_password | RabbitMQ user password for the events-parser user |
 | events_org_secret.mysql_user_microsoft_password | |
 | events_org_secret.mysql_user_auth_password | |
 
@@ -62,6 +63,6 @@ Controller is the control-plane for kubernetes and workers are VMs that join a k
 Based on what you want each VM to do, put the server IPs either under `[controller]` or `[worker]` inside the hosts file. An example exists inside the `hosts` file
 
 ## Running the playbook
-After setting up the hosts, you can run the following command with the playbook (if you used Ansible Vault): `ansible-playbook --ask-vault-password -i inventory/hosts playbook.yml`
+After setting up the hosts & variables, you can run the following command with the playbook (if you used Ansible Vault): `ansible-playbook --ask-vault-password -i inventory/hosts playbook.yml`
 
 Some manual intervention is required for the `kubernetes` role

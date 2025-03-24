@@ -25,9 +25,11 @@ This guide explains how to set the application up using mostly Ansible with some
 
 ## Prerequisites
 ### At least two VMs
-Both VMs will need to have Ubuntu 24.04 installed. Other Debian based distributions might work, but the application has not been tested on those.
-
-These VMs will also need to have default ports open for MySQL, RabbitMQ, HTTP(s) and Kubernetes.
+Requirements for these VMs: 
+1. at least 4 cores
+2. 8GB of RAM
+3. Ubuntu 22.04 (other distros might work, but this app hasn't been tested on them)
+4. default ports for MySQL, RabbitMQ, HTTP(s) and Kubernetes are open
 
 If you can't have two VMs, then you will need to use the following command after setting up kubernetes: `kubectl taint node mymasternode node-role.kubernetes.io/master:NoSchedule-`. This will allow pods to be ran on that VM.
 
@@ -91,7 +93,7 @@ Latest version of Docker.
     ```
     docker compose build --push
     ```
-13. For each server, ssh into it add all the servers' hostnames along with internal IPs to /etc/hosts. An example is down below
+13. For each VM, ssh into it add all the servers' hostnames along with internal IPs to `/etc/hosts`. An example is down below
     ```
     127.0.0.1 localhost
     192.168.42.60 events-org-controller

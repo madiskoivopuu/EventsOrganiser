@@ -94,7 +94,7 @@
 
 - name: "PAUSED | Set up kubernetes cluster"
   ansible.builtin.pause:
-    prompt: "Use 'sudo kubeadm init' to create a cluster on the main VM, or 'kubeadm join ...' command worker nodes. Follow the instructions that command gives you. After that is done, press ENTER"
+    prompt: "Use 'sudo kubeadm init' to create a cluster on the main VM, or 'sudo kubeadm join ...' command worker nodes. Follow the instructions that command gives you. After that is done, press ENTER"
 
 - include_tasks: kube-control-plane.yml
   when: is_kube_master_node

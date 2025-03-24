@@ -52,12 +52,14 @@
 
 - name: Enable event scheduler for MySQL
   community.mysql.mysql_variables:
+    config_file: /etc/mysql/debian.cnf
     mode: persist
     variable: event_scheduler
     value: 1
 
 - name: Create necessary databases for Events Organiser
   community.mysql.mysql_db:
+    config_file: /etc/mysql/debian.cnf
     name: "{{ item }}"
   with_items:
     - "microsoft"
@@ -66,6 +68,7 @@
 
 - name: Create MySQL user "events"
   community.mysql.mysql_user:
+    config_file: /etc/mysql/debian.cnf
     name: events
     host: "{{ item }}"
     password: "{{ events_org_secret.mysql_user_events_password | mandatory }}"
@@ -78,6 +81,7 @@
 
 - name: Create MySQL user "msmicroservice" # if name = microsoft then mysql just doesn't want to allow any connections to that user.....
   community.mysql.mysql_user:
+    config_file: /etc/mysql/debian.cnf
     name: msmicroservice
     host: "{{ item }}"
     password: "{{ events_org_secret.mysql_user_microsoft_password | mandatory }}"
@@ -90,6 +94,7 @@
 
 - name: Create MySQL user "auth"
   community.mysql.mysql_user:
+    config_file: /etc/mysql/debian.cnf
     name: auth
     host: "{{ item }}"
     password: "{{ events_org_secret.mysql_user_auth_password | mandatory }}"

@@ -130,7 +130,7 @@ async def get_calendar_file(
     calendar: icalendar.Calendar = icalendar.Calendar()
     async for (event_row, ) in query_result.unique():
         calendar_event = icalendar.Event()
-        calendar_event.add("NAME", event_row.event_name)
+        calendar_event.add("SUMMARY", event_row.event_name)
         if(event_row.start_date_utc is not None):
             calendar_event.add("DTSTART", event_row.start_date_utc.replace(tzinfo=timezone.utc))
         else:  # deadline

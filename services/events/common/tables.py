@@ -3,10 +3,11 @@ import enum
 from zoneinfo import ZoneInfo
 from datetime import datetime
 
-from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint, Enum, ForeignKeyConstraint
+from sqlalchemy import Column, Table, ForeignKey, String, CheckConstraint, Enum, ForeignKeyConstraint, DDL, event
 import sqlalchemy.types as types
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.sql import func
 
 from typing import Optional
 
@@ -66,7 +67,8 @@ class EventsTable(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, unique=True)
     user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     user_id: Mapped[str] = mapped_column(UserIdType)
-    
+    parsed_at: Mapped[datetime] = mapped_column(nullable=False, default=func.current_timestamp)
+
     event_name: Mapped[str] = mapped_column(String(128))
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime
     end_date_utc: Mapped[datetime] # Always stores UTC ISO-8601 datetime
@@ -89,3 +91,12 @@ class EventSettingsTable(Base):
     user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     
     categories: Mapped[list[TagsTable]] = relationship(secondary=user_settings_selected_categories, lazy="joined")
+
+# A scheduled event that automatically deletes events older than 6 months
+remove_old_events = DDL(
+    "CREATE EVENT IF NOT EXISTS remove_old_events"
+    "   ON SCHEDULE EVERY 4 HOUR"
+    "   DO"
+    "       DELETE FROM events WHERE parsed_at < CURRENT_TIMESTAMP() - INTERVAL 6 MONTH"
+)
+event.listen(Base.metadata, "after_create", remove_old_events)

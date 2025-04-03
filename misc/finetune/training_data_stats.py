@@ -3,13 +3,14 @@
 
 # Useful to try and balance out the dataset
 
-import finetune, email_data
+import email_data
+from finetune import read_prompt_file, TrainingData
 
 from collections import defaultdict
 import os
 import langdetect
 
-def get_languages(metadata: finetune.PromptMetadata) -> str:
+def get_languages(metadata: TrainingData) -> str:
     mail = email_data.str_to_mail(metadata.mail_data, "")
     detected_languages = langdetect.detect_langs(mail.content)
 
@@ -27,8 +28,11 @@ def get_language_stats(dir: str) -> defaultdict:
             for key in dir_stats.keys():
                 stats[key] += dir_stats[key]
         else:
-           language = get_languages(finetune.read_prompt_file(obj_path))
-           stats[language] += 1
+            language = get_languages(read_prompt_file(obj_path))
+            if(language == "en,et" or language == "et,en"):
+                print(obj_path)
+
+            stats[language] += 1
 
     return stats
 

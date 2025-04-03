@@ -18,26 +18,26 @@ INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which cont
 MAX_SEQ_LENGTH = 8192
 
 @dataclass
-class PromptMetadata:
+class TrainingData:
     comment: str
-    tags: list[str]
+    categories: list[str]
     reader_email: str
     mail_data: str
     expected_output: dict[str]
 
-def read_prompt_file(loc: str) -> PromptMetadata:
+def read_prompt_file(loc: str) -> TrainingData:
     with open(f"{loc}", "r", encoding="UTF-8") as f:
         content = f.read().split(INPUT_OUTPUT_SEPARATOR)
 
-        return PromptMetadata(
+        return TrainingData(
             comment=content[0].strip(),
-            tags=[tag.strip() for tag in content[1].split(";") if len(tag.strip()) > 0],
+            categories=[category.strip() for category in content[1].split(";") if len(category.strip()) > 0],
             reader_email=content[2],
             mail_data=content[3].strip(),
             expected_output=json.loads(content[4])
         )
 
-def read_all_prompts(dir: str) -> list[PromptMetadata]:
+def read_all_prompts(dir: str) -> list[TrainingData]:
     metadatas = []
     for filename in os.listdir(dir):
         obj_loc = f"{dir}/{filename}"
@@ -51,7 +51,7 @@ def read_all_prompts(dir: str) -> list[PromptMetadata]:
 
     return metadatas
 
-def generate_chats_from_prompts(metadatas: list[PromptMetadata]) -> list[str]:
+def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
     global sys_prompt
 
     chats = []
@@ -59,7 +59,7 @@ def generate_chats_from_prompts(metadatas: list[PromptMetadata]) -> list[str]:
         email = email_data.str_to_mail(metadata.mail_data, metadata.reader_email)
         sys_part = {
             "role": "system",
-            "content": sys_prompt % ",".join(metadata.tags)
+            "content": sys_prompt % ",".join(metadata.categories)
         }
         user_part = {
             "role": "user",

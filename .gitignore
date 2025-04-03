@@ -16,3 +16,4 @@ _unsloth_sentencepiece_temp/
 flask_session/
 __pycache__/
 .venv/
+.idea

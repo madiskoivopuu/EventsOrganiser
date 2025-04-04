@@ -83,16 +83,6 @@ def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
             copy.deepcopy(chat_)
         )
 
-        chat_["messages"][2]["content"] = json.dumps(metadata.expected_output, indent=4)
-        chats.append(
-            copy.deepcopy(chat_)
-        )
-
-        chat_["messages"][2]["content"] = json.dumps(metadata.expected_output, indent="\t")
-        chats.append(
-            copy.deepcopy(chat_)
-        )
-
     return chats
 
 # followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer

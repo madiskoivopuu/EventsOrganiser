@@ -74,5 +74,9 @@ export const validateEditableEvent = (event: EditableEventDetails): string[] => 
     if(event.end_date && event.start_date && event.end_date < event.start_date)
         errors.push("End date must be after start date"); 
 
+    // direct string comparision works since the times are in 00:00 24h format
+    if(event.end_time && event.start_time && event.end_time < event.start_time)
+        errors.push("End date must be after start date"); 
+
     return errors;
 }

@@ -7,7 +7,7 @@ from zoneinfo import ZoneInfo
 from contextlib import asynccontextmanager
 from typing import cast
 import msal
-import aiohttp
+import urllib.parse
 import logging
 logging.basicConfig(level=logging.INFO)
 import aiomysql
@@ -105,18 +105,16 @@ async def finish_login(
     if "error" in auth_flow:
         error_str = auth_flow["error_description"] if "error_description" in auth_flow else auth_flow["error"]
         raise RedirectResponse(
-            url="/login",
+            url=f"/login?error={urllib.parse.quote_plus('Problem authenticating with Microsoft account: {}'.format(error_str))}",
             status_code=302, 
-            query_params={"error": f"Problem authenticating with Microsoft account: {error_str}"}
         )
 
     decoded_token, err_msg = await auth.decode_jwt_token(auth_flow["id_token"], server_config.MICROSOFT_APP_CLIENT_ID)
     if(decoded_token == None):
         __logger.warning(f"Problem decoding JWT token after Microsoft login callback: {err_msg}")
         raise RedirectResponse(
-            url="/login",
-            status_code=302, 
-            query_params={"error": f"Unable to verify that the response token is issued by Microsoft"}
+            url=f"/login?error={urllib.parse.quote_plus('Unable to verify that the response token is issued by Microsoft')}",
+            status_code=302
         )
 
     token_data = auth.create_jwt_from_microsoft(decoded_token, server_config.JWT_SECRET)

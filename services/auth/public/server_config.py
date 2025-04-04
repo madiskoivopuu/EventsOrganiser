@@ -3,7 +3,7 @@ dotenv.load_dotenv() # only for local testing, the docker container will already
 
 MICROSOFT_APP_CLIENT_ID = os.getenv("MICROSOFT_APP_CLIENT_ID")
 MICROSOFT_APP_SECRET = os.getenv("MICROSOFT_APP_SECRET")
-MICROSOFT_SCOPES=["Mail.Read"]
+MICROSOFT_SCOPES=["Mail.Read", "email"]
 
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 RABBITMQ_VIRTUALHOST = os.getenv("RABBITMQ_VIRTUALHOST") or "/"

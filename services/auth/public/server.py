@@ -13,6 +13,13 @@ api = FastAPI(
     debug=(os.getenv("DEV_MODE") == "1")
 )
 
+if(os.getenv("DEV_MODE") == "1"):
+    from fastapi.middleware.cors import CORSMiddleware
+    api.add_middleware(
+        CORSMiddleware,
+        allow_origins=['*']
+    )
+
 if(server_config.MICROSOFT_APP_CLIENT_ID == None or server_config.MICROSOFT_APP_SECRET == None):
     __logger.info("Microsoft authentication disabled due to missing app client id/app secret")
 else:

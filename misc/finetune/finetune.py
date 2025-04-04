@@ -23,7 +23,7 @@ class TrainingData:
     categories: list[str]
     reader_email: str
     mail_data: str
-    expected_output: dict[str]
+    expected_output: list[dict[str]]
 
 def read_prompt_file(loc: str) -> TrainingData:
     with open(f"{loc}", "r", encoding="UTF-8") as f:

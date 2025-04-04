@@ -15,7 +15,7 @@ from email_data import Email
 
 DATASET_LOC = "./training_data/"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
-MAX_SEQ_LENGTH = 8192
+MAX_SEQ_LENGTH = 32768
 
 @dataclass
 class TrainingData:

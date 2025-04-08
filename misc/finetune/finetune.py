@@ -6,7 +6,7 @@ import copy
 from dataclasses import dataclass
 import torch, os, datasets, unsloth
 from transformers import TrainingArguments
-from trl import SFTTrainer, SFTConfig
+from trl import SFTTrainer
 from unsloth import FastLanguageModel
 import unsloth.save
 
@@ -16,6 +16,8 @@ from email_data import Email
 DATASET_LOC = "./training_data/"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
 MAX_SEQ_LENGTH = 32768
+with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
+    SYS_PROMPT = f.read()
 
 @dataclass
 class TrainingData:
@@ -52,14 +54,14 @@ def read_all_prompts(dir: str) -> list[TrainingData]:
     return metadatas
 
 def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
-    global sys_prompt
+    global SYS_PROMPT
 
     chats = []
     for metadata in metadatas:
         email = email_data.str_to_mail(metadata.mail_data, metadata.reader_email)
         sys_part = {
             "role": "system",
-            "content": sys_prompt % ",".join(metadata.categories)
+            "content": SYS_PROMPT % ",".join(metadata.categories)
         }
         user_part = {
             "role": "user",
@@ -90,7 +92,7 @@ def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
 if __name__ == "__main__":
     def formatting_prompts_func(data):
         global tokenizer 
-
+    
         convos = data["messages"]
         texts = [tokenizer.apply_chat_template(convo, tokenize = False, add_generation_prompt = False) for convo in convos]
         return { "text" : texts, }
@@ -122,9 +124,9 @@ if __name__ == "__main__":
         chat_template = "llama-3.1",
     )
     
-    sys_prompt = ""
+    SYS_PROMPT = ""
     with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
-        sys_prompt = f.read()
+        SYS_PROMPT = f.read()
 
     training_prompts = read_all_prompts(f"{DATASET_LOC}/train")
     validation_prompts = read_all_prompts(f"{DATASET_LOC}/train")
@@ -142,9 +144,7 @@ if __name__ == "__main__":
         args=TrainingArguments(
             per_device_train_batch_size = 8,
             gradient_accumulation_steps = 4,
-            num_train_epochs=5.0,
-            warmup_steps = 5,
-            max_steps = 100,
+            num_train_epochs=20.0,
             learning_rate = 2e-4,
             fp16 = not unsloth.is_bfloat16_supported(),
             bf16 = unsloth.is_bfloat16_supported(),

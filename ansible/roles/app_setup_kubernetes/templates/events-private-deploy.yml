@@ -6,7 +6,7 @@ metadata:
   labels:
     app: events-private
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: events-private
@@ -20,8 +20,8 @@ spec:
           image: "{{ events_org_config.dockerhub_username }}/events-private"
           resources:
             limits:
-              memory: "8192Mi"
-              cpu: "4.0"
+              memory: "10240Mi"
+              cpu: "6.0"
           ports:
             - containerPort: 80
           env:

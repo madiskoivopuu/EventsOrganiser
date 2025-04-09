@@ -67,7 +67,7 @@ class EventsTable(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, unique=True)
     user_acc_type: Mapped[models.AccountType] = mapped_column(nullable=False, primary_key=True)
     user_id: Mapped[str] = mapped_column(UserIdType)
-    parsed_at: Mapped[datetime] = mapped_column(nullable=False, default=func.current_timestamp)
+    parsed_at: Mapped[datetime] = mapped_column(nullable=False, default=func.CURRENT_TIMESTAMP())
 
     event_name: Mapped[str] = mapped_column(String(128))
     start_date_utc: Mapped[Optional[datetime]] # Always stores UTC ISO-8601 datetime

@@ -40,7 +40,7 @@ def run_test():
         )
     ]
     logging.basicConfig(handlers=handlers, 
-                        level=logging.DEBUG, 
+                        level=logging.INFO, 
                         format='%(levelname)s %(asctime)s %(message)s', 
                         datefmt='%m/%d/%Y%I:%M:%S %p')
         

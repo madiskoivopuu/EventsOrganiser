@@ -69,7 +69,7 @@ def run_test():
                 json.dumps({
                     "user_id": "00000000-0000-0000-82a0-946cac1dbac9",
                     "account_type": "outlook",
-                    "user_timezone": "Europe/Tallinn",
+                    "user_timezone": "Europe/Kyiv",
                     "email_data": new_email,
                     "reader_email": "madisman5@outlook.com"
                 }).encode()
@@ -81,3 +81,5 @@ def run_test():
         time.sleep(delay_between_mail_seconds)
 
     print("testing finished")
+
+run_test()

@@ -6,7 +6,7 @@ metadata:
   labels:
     app: events-private
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: events-private

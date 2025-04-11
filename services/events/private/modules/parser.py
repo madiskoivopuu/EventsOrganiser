@@ -99,6 +99,7 @@ class ParserThread(threading.Thread):
                        user_event_categories: list[str]):
         try:
             email: Email = self.to_email_obj(msg_with_email)
+            self.logger.info(f"New e-mail: {email.id}")
             events = self.llm.parse_events_from_email(email, user_event_categories)
         except:
             self.logger.warning("Unknown exception in email parsing function", exc_info=True)
@@ -107,6 +108,7 @@ class ParserThread(threading.Thread):
         
         cb = functools.partial(self._parsing_complete, channel, method, properties, email, msg_with_email, events)
         channel.connection.add_callback_threadsafe(cb)
+        self.logger.info(f"E-mail parsing finished: {email.id}")
 
 
     def _parsing_complete(self, channel: pika.channel.Channel, 
@@ -115,6 +117,8 @@ class ParserThread(threading.Thread):
                           email: Email, 
                           msg_with_email: dict[str],
                           events: list[dict]):
+        self.logger.debug("_parsing_complete called")
+        
         self.mq_channel.basic_publish(
             exchange="",
             routing_key=server_config.RABBITMQ_EVENTS_OUTPUT_QUEUE,

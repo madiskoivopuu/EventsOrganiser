@@ -2,10 +2,12 @@
 
 
 import logging
+logging.basicConfig(level=logging.INFO, 
+                format='%(levelname)s %(asctime)s %(message)s', 
+                datefmt='%m/%d/%Y %I:%M:%S %p %Z')
 import time
 import threading
 from sqlalchemy import select, func
-logging.basicConfig(level=logging.INFO)
 from typing import Callable
 from dataclasses import dataclass
 

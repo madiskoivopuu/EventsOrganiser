@@ -42,7 +42,7 @@ def run_test():
     logging.basicConfig(handlers=handlers, 
                         level=logging.INFO, 
                         format='%(levelname)s %(asctime)s %(message)s', 
-                        datefmt='%m/%d/%Y%I:%M:%S %p')
+                        datefmt='%m/%d/%Y %I:%M:%S %p %Z')
         
     logger = logging.getLogger('my_logger')
     mq_connection = pika.BlockingConnection(

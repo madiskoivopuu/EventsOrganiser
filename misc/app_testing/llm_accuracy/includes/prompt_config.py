@@ -65,7 +65,7 @@ def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
                     "items": {
                         "enum": tags
                     },
-                    "maxItems": len(tags)
+                    "maxItems": len(tags)+1
                 },
             },
             "required": [

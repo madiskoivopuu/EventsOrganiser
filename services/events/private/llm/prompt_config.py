@@ -31,7 +31,6 @@ def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
     time_regex = "([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]"
     timezone_regex = "(Z|(\\+|-)([01][0-9]|2[0-3]):[0-5][0-9])"
     datetime_regex = f"({date_regex}(T{time_regex}({timezone_regex})?)?)"
-
     grammar_obj = {
         "type": "array",
         "items": {
@@ -64,7 +63,8 @@ def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
                     "type": "array",
                     "items": {
                         "enum": tags
-                    }
+                    },
+                    "maxItems": len(tags)
                 },
             },
             "required": [
@@ -79,7 +79,6 @@ def get_parse_output_grammar(tags: list[str]) -> LlamaGrammar:
             ]
         }
     }
-
     return LlamaGrammar.from_string(
         json_schema_to_grammar.generate(grammar_obj)
     )

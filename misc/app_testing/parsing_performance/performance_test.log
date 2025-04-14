@@ -1,0 +1,107 @@
+INFO 04/09/202505:27:36 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/09/202505:27:46 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/09/202505:27:46 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/09/202505:27:46 PM Socket connected: <socket.socket fd=820, family=2, type=1, proto=6, laddr=('127.0.0.1', 58241), raddr=('127.0.0.1', 5672)>
+INFO 04/09/202505:27:46 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001D412A208C0>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001D412A208C0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/09/202505:27:46 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001D412A208C0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:27:46 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001D412A208C0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:27:46 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001D412A208C0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:27:46 PM Created channel=1
+INFO 04/09/202505:27:46 PM 429d0175-5aa9-4968-89aa-982a02aeba04; https://outlook.office365.com/owa/?ItemID=429d0175-5aa9-4968-89aa-982a02aeba04&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:28:03 PM 0c58a6f2-6031-49b4-8e2d-6ea1fedc1146; https://outlook.office365.com/owa/?ItemID=0c58a6f2-6031-49b4-8e2d-6ea1fedc1146&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:28:21 PM aa8ae9b1-8f95-40dc-aa81-842f463fc625; https://outlook.office365.com/owa/?ItemID=aa8ae9b1-8f95-40dc-aa81-842f463fc625&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:28:38 PM 8fb9e1ae-1e2b-457c-a7d8-e437252f3d05; https://outlook.office365.com/owa/?ItemID=8fb9e1ae-1e2b-457c-a7d8-e437252f3d05&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:28:55 PM 6bc95a41-16fb-4717-911c-144f568eab7f; https://outlook.office365.com/owa/?ItemID=6bc95a41-16fb-4717-911c-144f568eab7f&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:29:13 PM 17e24bab-d44d-4049-bdfd-8716ecda414c; https://outlook.office365.com/owa/?ItemID=17e24bab-d44d-4049-bdfd-8716ecda414c&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:29:30 PM 6636a9c4-d763-4268-98b5-3beff6c535e1; https://outlook.office365.com/owa/?ItemID=6636a9c4-d763-4268-98b5-3beff6c535e1&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:29:47 PM 73fdaa85-91bb-47d6-8e56-f3ca852bd199; https://outlook.office365.com/owa/?ItemID=73fdaa85-91bb-47d6-8e56-f3ca852bd199&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:30:04 PM 8d2a4f06-2c91-46a3-8a5f-b87ef7ff824d; https://outlook.office365.com/owa/?ItemID=8d2a4f06-2c91-46a3-8a5f-b87ef7ff824d&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:30:22 PM 046c7d88-2dac-4bba-982b-da5efc02c98f; https://outlook.office365.com/owa/?ItemID=046c7d88-2dac-4bba-982b-da5efc02c98f&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:30:39 PM 4e2347e0-4ee1-4440-852c-010ebedf7808; https://outlook.office365.com/owa/?ItemID=4e2347e0-4ee1-4440-852c-010ebedf7808&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:30:56 PM f6517ddf-432d-487e-890a-0fa18d36d064; https://outlook.office365.com/owa/?ItemID=f6517ddf-432d-487e-890a-0fa18d36d064&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:31:13 PM c81991ed-19be-4ed7-ab12-d1fb9f70acc0; https://outlook.office365.com/owa/?ItemID=c81991ed-19be-4ed7-ab12-d1fb9f70acc0&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:31:31 PM 7899a88e-75b1-4561-9390-a19d46d50bf8; https://outlook.office365.com/owa/?ItemID=7899a88e-75b1-4561-9390-a19d46d50bf8&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:31:48 PM 8f6abb38-9a6a-4eaf-b9b9-e6e45d5f6d17; https://outlook.office365.com/owa/?ItemID=8f6abb38-9a6a-4eaf-b9b9-e6e45d5f6d17&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:32:05 PM c88fd1fd-0542-42e0-b230-ef0fbf00e048; https://outlook.office365.com/owa/?ItemID=c88fd1fd-0542-42e0-b230-ef0fbf00e048&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:32:23 PM 79e20d71-d9a1-487f-882f-150f3488aedd; https://outlook.office365.com/owa/?ItemID=79e20d71-d9a1-487f-882f-150f3488aedd&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:43:06 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/09/202505:43:16 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/09/202505:43:16 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/09/202505:43:16 PM Socket connected: <socket.socket fd=808, family=2, type=1, proto=6, laddr=('127.0.0.1', 59014), raddr=('127.0.0.1', 5672)>
+INFO 04/09/202505:43:16 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000206083AD070>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000206083AD070> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/09/202505:43:16 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000206083AD070> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:43:16 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000206083AD070> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:43:16 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000206083AD070> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:43:16 PM Created channel=1
+INFO 04/09/202505:43:16 PM 65bea782-d03f-4bfc-958f-d2d203ea70e6; https://outlook.office365.com/owa/?ItemID=65bea782-d03f-4bfc-958f-d2d203ea70e6&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:43:34 PM ecd88fad-020e-4402-a5c7-d32df4038f4a; https://outlook.office365.com/owa/?ItemID=ecd88fad-020e-4402-a5c7-d32df4038f4a&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:43:51 PM ac73ea24-18fc-42d7-ac83-5234793af62f; https://outlook.office365.com/owa/?ItemID=ac73ea24-18fc-42d7-ac83-5234793af62f&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:44:08 PM 92843453-f217-4ab6-9ed6-14c7f4a54685; https://outlook.office365.com/owa/?ItemID=92843453-f217-4ab6-9ed6-14c7f4a54685&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:44:25 PM a7a348a6-4195-4731-8de8-0502e71b88ad; https://outlook.office365.com/owa/?ItemID=a7a348a6-4195-4731-8de8-0502e71b88ad&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:44:43 PM 50afa81f-879d-43ad-8dac-bc0bb820ec59; https://outlook.office365.com/owa/?ItemID=50afa81f-879d-43ad-8dac-bc0bb820ec59&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:45:00 PM a9ca10ef-c24a-4011-82d0-897d77c453ac; https://outlook.office365.com/owa/?ItemID=a9ca10ef-c24a-4011-82d0-897d77c453ac&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:45:17 PM 14cb6be2-27cb-4585-8572-145a18c68b62; https://outlook.office365.com/owa/?ItemID=14cb6be2-27cb-4585-8572-145a18c68b62&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:45:35 PM 72563b0f-24d6-42e9-9c3e-2ab533a5bb3d; https://outlook.office365.com/owa/?ItemID=72563b0f-24d6-42e9-9c3e-2ab533a5bb3d&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:45:52 PM eb1d4da4-38a3-4a7f-b691-3f760f3dbf3c; https://outlook.office365.com/owa/?ItemID=eb1d4da4-38a3-4a7f-b691-3f760f3dbf3c&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:46:09 PM 93ac79d4-f536-49a7-85ac-7a1cc37fe591; https://outlook.office365.com/owa/?ItemID=93ac79d4-f536-49a7-85ac-7a1cc37fe591&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:46:26 PM 4edc8661-ceac-42df-b638-7d4529682719; https://outlook.office365.com/owa/?ItemID=4edc8661-ceac-42df-b638-7d4529682719&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:46:44 PM 14a11297-41ee-4e38-8d44-4f131b1a6146; https://outlook.office365.com/owa/?ItemID=14a11297-41ee-4e38-8d44-4f131b1a6146&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:47:27 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/09/202505:47:37 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/09/202505:47:37 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/09/202505:47:37 PM Socket connected: <socket.socket fd=752, family=2, type=1, proto=6, laddr=('127.0.0.1', 59162), raddr=('127.0.0.1', 5672)>
+INFO 04/09/202505:47:37 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001EFCCFEE1E0>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001EFCCFEE1E0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/09/202505:47:37 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001EFCCFEE1E0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:47:37 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001EFCCFEE1E0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:47:37 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000001EFCCFEE1E0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202505:47:37 PM Created channel=1
+INFO 04/09/202505:47:37 PM b90ea1c9-b29c-4df7-9ccc-cdf4164cdadb; https://outlook.office365.com/owa/?ItemID=b90ea1c9-b29c-4df7-9ccc-cdf4164cdadb&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:47:55 PM 2e687e4f-a1d2-4a7b-940f-61e7599a21e0; https://outlook.office365.com/owa/?ItemID=2e687e4f-a1d2-4a7b-940f-61e7599a21e0&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:48:12 PM ec851928-f000-4757-bee2-21331f3e9be8; https://outlook.office365.com/owa/?ItemID=ec851928-f000-4757-bee2-21331f3e9be8&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:48:29 PM 73641405-2014-4223-8f42-17a5fc4bbfea; https://outlook.office365.com/owa/?ItemID=73641405-2014-4223-8f42-17a5fc4bbfea&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202505:48:47 PM 83c4f22d-68d8-4938-b96d-34ade81cb264; https://outlook.office365.com/owa/?ItemID=83c4f22d-68d8-4938-b96d-34ade81cb264&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:00:54 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/09/202506:01:04 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/09/202506:01:04 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/09/202506:01:04 PM Socket connected: <socket.socket fd=940, family=2, type=1, proto=6, laddr=('127.0.0.1', 59725), raddr=('127.0.0.1', 5672)>
+INFO 04/09/202506:01:04 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000024D3640F470>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000024D3640F470> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/09/202506:01:04 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000024D3640F470> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:01:04 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000024D3640F470> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:01:04 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000024D3640F470> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:01:04 PM Created channel=1
+INFO 04/09/202506:01:04 PM 48f7b937-642c-48d8-8d65-f85189e23f11; https://outlook.office365.com/owa/?ItemID=48f7b937-642c-48d8-8d65-f85189e23f11&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:01:21 PM 59224d2c-faf0-4e90-8c6a-8912f9428cff; https://outlook.office365.com/owa/?ItemID=59224d2c-faf0-4e90-8c6a-8912f9428cff&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:01:39 PM 697e018f-7f7f-4960-927b-20c2243346d0; https://outlook.office365.com/owa/?ItemID=697e018f-7f7f-4960-927b-20c2243346d0&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:15:16 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/09/202506:15:26 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/09/202506:15:26 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/09/202506:15:26 PM Socket connected: <socket.socket fd=980, family=2, type=1, proto=6, laddr=('127.0.0.1', 60947), raddr=('127.0.0.1', 5672)>
+INFO 04/09/202506:15:26 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000002437D85D6A0>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000002437D85D6A0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/09/202506:15:26 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000002437D85D6A0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:15:26 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000002437D85D6A0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:15:26 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x000002437D85D6A0> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/09/202506:15:26 PM Created channel=1
+INFO 04/09/202506:15:26 PM 589e6516-2e41-4f2e-b5a4-ed26c2bc5632; https://outlook.office365.com/owa/?ItemID=589e6516-2e41-4f2e-b5a4-ed26c2bc5632&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:15:43 PM e387ff71-0d27-4ec9-8180-cc3aad44e021; https://outlook.office365.com/owa/?ItemID=e387ff71-0d27-4ec9-8180-cc3aad44e021&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:16:01 PM 61e60543-6d81-4bb0-8d20-5ca56b92c446; https://outlook.office365.com/owa/?ItemID=61e60543-6d81-4bb0-8d20-5ca56b92c446&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/09/202506:16:18 PM b304aaaa-e1ae-48a5-b239-57a10035874b; https://outlook.office365.com/owa/?ItemID=b304aaaa-e1ae-48a5-b239-57a10035874b&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/10/202512:15:58 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/10/202512:16:08 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/10/202512:16:08 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/10/202512:16:08 PM Socket connected: <socket.socket fd=824, family=2, type=1, proto=6, laddr=('127.0.0.1', 51230), raddr=('127.0.0.1', 5672)>
+INFO 04/10/202512:16:08 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000019D935C5490>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000019D935C5490> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/10/202512:16:08 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000019D935C5490> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:16:08 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000019D935C5490> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:16:08 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x0000019D935C5490> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:16:08 PM Created channel=1
+INFO 04/10/202512:16:08 PM 11dc039d-e6da-4e0d-92e0-0279ac4d12e2; https://outlook.office365.com/owa/?ItemID=11dc039d-e6da-4e0d-92e0-0279ac4d12e2&exvsurl=1&viewmodel=ReadMessageItem
+INFO 04/10/202512:17:31 PM Pika version 1.3.2 connecting to ('::1', 5672, 0, 0)
+ERROR 04/10/202512:17:41 PM AMQPConnector - reporting failure: AMQPConnectorSocketConnectError: TimeoutError("TCP connection attempt timed out: 'localhost'/(<AddressFamily.AF_INET6: 23>, <SocketKind.SOCK_STREAM: 1>, 6, '', ('::1', 5672, 0, 0))")
+INFO 04/10/202512:17:41 PM Pika version 1.3.2 connecting to ('127.0.0.1', 5672)
+INFO 04/10/202512:17:41 PM Socket connected: <socket.socket fd=708, family=2, type=1, proto=6, laddr=('127.0.0.1', 51360), raddr=('127.0.0.1', 5672)>
+INFO 04/10/202512:17:41 PM Streaming transport linked up: (<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000143896B5190>, _StreamingProtocolShim: <SelectConnection PROTOCOL transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000143896B5190> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>).
+INFO 04/10/202512:17:41 PM AMQPConnector - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000143896B5190> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:17:41 PM AMQPConnectionWorkflow - reporting success: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000143896B5190> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:17:41 PM Connection workflow succeeded: <SelectConnection OPEN transport=<pika.adapters.utils.io_services_utils._AsyncPlaintextTransport object at 0x00000143896B5190> params=<ConnectionParameters host=localhost port=5672 virtual_host=/events-parser ssl=False>>
+INFO 04/10/202512:17:41 PM Created channel=1
+INFO 04/10/202512:17:41 PM 8d98a2fb-7106-4334-8bff-3202f2e85d91; https://outlook.office365.com/owa/?ItemID=8d98a2fb-7106-4334-8bff-3202f2e85d91&exvsurl=1&viewmodel=ReadMessageItem

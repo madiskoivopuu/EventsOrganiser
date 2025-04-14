@@ -98,7 +98,7 @@ if __name__ == "__main__":
         return { "text" : texts, }
 
     model, tokenizer = FastLanguageModel.from_pretrained(
-        "./outputs/trainable_llm",
+        "./trainable_llm/llama3.2-3b-instruct",
         max_seq_length=MAX_SEQ_LENGTH,
         load_in_4bit=False,
         load_in_8bit=True,

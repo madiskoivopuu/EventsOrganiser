@@ -2,6 +2,7 @@ import dotenv
 dotenv.load_dotenv(".env")
 import json
 import copy
+import random
 
 from dataclasses import dataclass
 import torch, os, datasets, unsloth
@@ -58,7 +59,8 @@ def get_all_unique_categories(metadatas: list[TrainingData]) -> list[str]:
     categories = set()
     for metadata in metadatas:
         for tag in metadata.categories:
-            categories.add(tag)
+            if(tag.strip() != ""):
+                categories.add(tag)
 
     return list(categories)
 
@@ -70,14 +72,17 @@ def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
     chats = []
     for metadata in metadatas:
         email = email_data.str_to_mail(metadata.mail_data, metadata.reader_email)
+
         sys_part = {
             "role": "system",
             "content": ""
         }
-        if(len(metadata.categories) == 0):
-            sys_part["content"] = SYS_PROMPT % ",".join(default_categories)
-        else:
-            sys_part["content"] = SYS_PROMPT % ",".join(metadata.categories)
+        categories = metadata.categories.copy()
+        if(len(categories) == 0):
+            categories = default_categories.copy()
+        random.shuffle(categories)
+
+        sys_part["content"] = SYS_PROMPT % ",".join(categories)
 
         user_part = {
             "role": "user",

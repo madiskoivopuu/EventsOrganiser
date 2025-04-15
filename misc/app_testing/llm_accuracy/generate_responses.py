@@ -2,7 +2,7 @@
 # from the LLM output, which are used to compare the LLM's accuracy
 # against expected responses
 
-import os, json
+import os, json, random
 from dataclasses import dataclass
 from includes.model import Llama3Model
 from includes.email_data import str_to_mail
@@ -60,7 +60,8 @@ def get_all_unique_categories(metadatas: list[TrainingData]) -> list[str]:
     categories = set()
     for metadata in metadatas:
         for tag in metadata.categories:
-            categories.add(tag)
+            if(tag.strip() != ""):
+                categories.add(tag)
 
     return list(categories)
 
@@ -74,9 +75,13 @@ for data in dataset:
         f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
         f.write(json.dumps(data.expected_output, indent="\t"))
 
-        categories = data.categories
+        categories = data.categories.copy()
         if(len(categories) == 0):
-            categories = all_categories
+            categories = all_categories.copy()
+
+        f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
+        f.write(json.dumps(categories, indent="\t"))
+        random.shuffle(categories) # for LLM to get a different order of categories every time
 
         for _ in range(ANSWERS_TO_GENERATE):
             f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")

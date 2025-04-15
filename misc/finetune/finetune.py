@@ -16,6 +16,7 @@ from email_data import Email
 DATASET_LOC = "./training_data/"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
 MAX_SEQ_LENGTH = 32768
+BATCH_SIZE = 8
 with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
     SYS_PROMPT = f.read()
 
@@ -53,16 +54,31 @@ def read_all_prompts(dir: str) -> list[TrainingData]:
 
     return metadatas
 
+def get_all_unique_categories(metadatas: list[TrainingData]) -> list[str]:
+    categories = set()
+    for metadata in metadatas:
+        for tag in metadata.categories:
+            categories.add(tag)
+
+    return list(categories)
+
 def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
     global SYS_PROMPT
+
+    default_categories = get_all_unique_categories(metadatas)
 
     chats = []
     for metadata in metadatas:
         email = email_data.str_to_mail(metadata.mail_data, metadata.reader_email)
         sys_part = {
             "role": "system",
-            "content": SYS_PROMPT % ",".join(metadata.categories)
+            "content": ""
         }
+        if(len(metadata.categories) == 0):
+            sys_part["content"] = SYS_PROMPT % ",".join(default_categories)
+        else:
+            sys_part["content"] = SYS_PROMPT % ",".join(metadata.categories)
+
         user_part = {
             "role": "user",
             "content": email_data.format_email_for_llm(email)
@@ -160,7 +176,7 @@ if __name__ == "__main__":
             per_device_eval_batch_size = 8,
             eval_accumulation_steps = 4,
             eval_strategy = "steps",
-            eval_steps = 20,
+            eval_steps = BATCH_SIZE / len(training_ds),
         )
     )
     trainer.train()

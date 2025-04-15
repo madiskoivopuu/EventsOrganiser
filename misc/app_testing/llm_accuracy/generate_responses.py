@@ -56,7 +56,17 @@ def read_all_prompts(dir: str) -> list[TrainingData]:
 
     return metadatas
 
+def get_all_unique_categories(metadatas: list[TrainingData]) -> list[str]:
+    categories = set()
+    for metadata in metadatas:
+        for tag in metadata.categories:
+            categories.add(tag)
+
+    return list(categories)
+
 dataset = read_all_prompts(DATASET_LOC)
+all_categories = get_all_unique_categories(dataset)
+
 for data in dataset:
     with open(f"{OUTPUT_LOC}/{data.filename}", "w", encoding="UTF-8") as f:
         f.write(data.mail_data)
@@ -64,13 +74,17 @@ for data in dataset:
         f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
         f.write(json.dumps(data.expected_output, indent="\t"))
 
+        categories = data.categories
+        if(len(categories) == 0):
+            categories = all_categories
+
         for _ in range(ANSWERS_TO_GENERATE):
             f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
 
             while True:
                 try:
                     email = str_to_mail(data.mail_data, data.reader_email)
-                    response = LLM.parse_events_from_email(email, data.categories)
+                    response = LLM.parse_events_from_email(email, categories)
                     f.write(json.dumps(response, indent="\t"))
                     break
                 except KeyboardInterrupt:

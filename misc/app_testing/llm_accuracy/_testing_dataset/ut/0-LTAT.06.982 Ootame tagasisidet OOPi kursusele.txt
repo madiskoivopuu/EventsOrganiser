@@ -1,4 +1,5 @@
-comment
+in Estonian;
+technically has a questionnaire event, but we don't know the end time for it and thus LLM can't really parse it
 !<-=->!
 
 !<-=->!
@@ -59,15 +60,4 @@ august.kiipus@ut.ee
     }
 }
 !<-=->!
-[
-    {
-        "event_name": "",
-        "start_date": "",
-        "end_date": "",
-        "country": "",
-        "city": "",
-        "address": "",
-        "room": "",
-        "tags": []
-    }
-]
+[]

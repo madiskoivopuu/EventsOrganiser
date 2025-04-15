@@ -8,15 +8,10 @@ from includes.model import Llama3Model
 from includes.email_data import str_to_mail
 import traceback, sys
 
-LLM = Llama3Model("./llm/Llama-3.2-3B-Instruct.gguf")
-DATASET_LOC = "./_testing_dataset"
-OUTPUT_LOC = "./_before_finetune_responses"
+RESPONSES_LOCATION = "./_before_finetune_responses"
+GRADED_RESPONSES_LOCATION = "./_graded_before_finetune_responses"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
                                    # this will also be the exact same separator for output, which contains generated stuff
-MAX_SEQ_LENGTH = 32768
-ANSWERS_TO_GENERATE = 3 # how many times should the LLM use the same email to find events
-with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
-    SYS_PROMPT = f.read()
 
 @dataclass
 class TrainingData:
@@ -70,17 +65,17 @@ all_categories = get_all_unique_categories(dataset)
 
 for data in dataset:
     with open(f"{OUTPUT_LOC}/{data.filename}", "w", encoding="UTF-8") as f:
-        categories = data.categories.copy()
-        if(len(categories) == 0):
-            categories = all_categories.copy()
-
         f.write(data.mail_data)
-        f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
-        f.write(json.dumps(categories, indent="\t"))
 
         f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
         f.write(json.dumps(data.expected_output, indent="\t"))
 
+        categories = data.categories.copy()
+        if(len(categories) == 0):
+            categories = all_categories.copy()
+
+        f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
+        f.write(json.dumps(categories, indent="\t"))
         random.shuffle(categories) # for LLM to get a different order of categories every time
 
         for _ in range(ANSWERS_TO_GENERATE):

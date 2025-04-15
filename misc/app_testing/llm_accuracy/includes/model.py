@@ -34,9 +34,6 @@ class Llama3Model():
         prompt = prompt_config.format_event_parse_prompt(tags)
         prepared_content = self.format_email_for_llm(email)
 
-        print(prompt)
-        print(prepared_content)
-
         chat_output = self.model.create_chat_completion(
             messages = [
                 {

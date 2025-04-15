@@ -1,5 +1,5 @@
 in English; 
-a good example for the LLM to NOT find all events, only output 1 since they all refer to the same newspaper
+no events, only a notification about news
 !<-=->!
 Newsletter; News
 !<-=->!
@@ -213,17 +213,4 @@ If you have been forwarded this email and wish to subscribe visit http://opinion
 Copyright 2001 Dow Jones & Company, Inc. All Rights Reserved.
 
 !<-=->!
-[
-    {
-        "event_name": "New newspaper releases - Opinionjournal and WSJ",
-        "start_date": "2001-12-21T00:00:00",
-        "end_date": "2001-12-21T00:01:00",
-        "country": "",
-        "city": "",
-        "address": "",
-        "room": "",
-        "tags": [
-            "News", "Newsletter"
-        ]
-    }
-]
+[]

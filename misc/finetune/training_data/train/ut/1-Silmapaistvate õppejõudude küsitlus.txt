@@ -1,7 +1,7 @@
 in Estonian & English
 expected response is in Estonian
 !<-=->!
-Survey; Deadline; Institute of Computer Science; University of Tartu
+Survey; Deadline; Institute of Computer Science; University of Tartu; Lecture; Internship; Networking; Workshop
 !<-=->!
 kalle.kull@ut.ee
 !<-=->!

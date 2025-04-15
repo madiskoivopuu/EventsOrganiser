@@ -3,7 +3,7 @@ since the e-mail is only in Estonian, the expected response should show only one
 because the reader is most likely estonian;
 maybe in the future it would be a nice addition to add a language preference setting
 !<-=->!
-Internship; Introduction; Course Advertisement
+Internship; Introduction; Course Advertisement; UI/UX workshop; Workshop; Volunteer day; Coaching
 !<-=->!
 joonas.salo@ut.ee
 !<-=->!

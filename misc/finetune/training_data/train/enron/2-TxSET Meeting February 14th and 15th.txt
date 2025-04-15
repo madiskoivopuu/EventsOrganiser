@@ -1,7 +1,7 @@
 in English;
 two events on different days (word 'and' denotes that they are separate), LLM should figure out there are 2
 !<-=->!
-Meeting; Transaction needs
+Meeting; Transaction needs; UX/UI workshop; Peer mentoring
 !<-=->!
 set@ercot.com
 !<-=->!

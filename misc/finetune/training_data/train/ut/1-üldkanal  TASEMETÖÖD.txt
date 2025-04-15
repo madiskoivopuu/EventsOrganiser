@@ -1,7 +1,7 @@
 in Estonian;
 LLM can infer the location from email by knowing that the 1037 room is in Delta
 !<-=->!
-Resit; Algorithms and Data Structures
+Resit test; Algorithms and Data Structures; Movie; Presentation; Festival; Music festival; Presentation
 !<-=->!
 karlis.karu@ut.ee
 !<-=->!
@@ -77,7 +77,7 @@ karlis.karu@ut.ee
         "address": "Narva mnt 18 (Delta keskus)",
         "room": "ruum 1037 (suur auditoorium)",
         "tags": [
-            "Resit", "Algorithms and Data Structures"
+            "Resit test", "Algorithms and Data Structures"
         ]
     }
 ]

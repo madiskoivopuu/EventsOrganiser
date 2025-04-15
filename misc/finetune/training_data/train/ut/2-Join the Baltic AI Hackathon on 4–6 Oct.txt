@@ -1,7 +1,7 @@
 in English;
 good example for LLM since dates should have timezone attached, even though times aren't mentioned in the mail
 !<-=->!
-Hackathon; AI; Machine Learning; Deadline; Registration
+Hackathon; AI; Machine Learning; Deadline; Registration; Coding bootcamp; Mentorship; UI/UX workshop; Poster session; Scholarship; Book club; Fundraiser
 !<-=->!
 joonas.salo@ut.ee
 !<-=->!

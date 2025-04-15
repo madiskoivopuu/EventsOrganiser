@@ -3,7 +3,7 @@ has events, where the LLM has to understand by context (ut.ee domain, autonomous
 that the thing is about ADL;
 3 events, because the drives will be done for 3 weeks
 !<-=->!
-Autonomous Driving Lab; Institute of Computer Science; Demo
+Autonomous Driving Lab; Institute of Computer Science; Demo; AI ethics; UI/UX workshop
 !<-=->!
 madis.koivopuu@ut.ee
 !<-=->!

@@ -2,7 +2,7 @@ in English;
 a good example for the LLM since this e-mail specifies a timezone for the event
 the LLM also has to realize that 0900 signifies 9 AM and not 9 PM, that would be 2100
 !<-=->!
-Testing; Trading; Trade system; UBSWenergy; Online
+Testing; Exhibition; Training; Trading; Trade system; UBSWenergy; Online; Party; Cinema
 !<-=->!
 narasim.kasaru@enron.com
 !<-=->!

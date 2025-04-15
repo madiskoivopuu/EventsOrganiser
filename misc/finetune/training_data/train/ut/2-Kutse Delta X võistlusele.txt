@@ -1,7 +1,7 @@
 in Estonian;
 another multi-day event that should be split into multiple 1 day events, due to location differences
 !<-=->!
-University of Tartu; Competition; Exhibit; Robotics;
+University of Tartu; Competition; Exhibit; Robotics; Workshop; Finance; Psychology; Exercise
 !<-=->!
 onne.opilane@ut.ee
 !<-=->!
@@ -77,7 +77,7 @@ onne.opilane@ut.ee
         "address": "Narva mnt 18 (Delta keskus)",
         "room": "",
         "tags": [
-            "University of Tartu", "Competition"
+            "University of Tartu", "Competition", "Workshop"
         ]
     },
     {
@@ -89,7 +89,7 @@ onne.opilane@ut.ee
         "address": "F. R. Kreutzwaldi tn 3 (Eesti Maaülikooli spordihoone)",
         "room": "",
         "tags": [
-            "University of Tartu", "Competition", "Exhibit", "Robotics"
+            "University of Tartu", "Competition", "Exhibit", "Robotics", "Workshop"
         ]
     }
 ]

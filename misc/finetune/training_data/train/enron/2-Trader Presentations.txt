@@ -2,7 +2,7 @@ in English;
 2 events, the last one does not have an explicit end date but the LLM should infer that it lasts 30 min
 LLM also has to deduce that tomorrow is 7th Feb, which is why this email is a pretty good example
 !<-=->!
-Presentation
+Presentation; Policy talk; Fundraiser; Career fair; Demo day; Ethics;
 !<-=->!
 reader-email@gmail.com
 !<-=->!

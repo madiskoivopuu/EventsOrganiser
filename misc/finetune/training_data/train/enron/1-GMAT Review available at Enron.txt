@@ -2,7 +2,7 @@ in English;
 has an event that happens (for the user) conditionally, registration is required beforehand
 we will still add it the first session to the calendar with registration notice
 !<-=->!
-Course; Graduate Management Admission Test; Registration
+Course; Graduate Management Admission Test; Registration; Sports; Concert; Music festival
 !<-=->!
 shaman.sharon@enron.com
 !<-=->!

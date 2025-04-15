@@ -1,7 +1,7 @@
 in English;
 has a timezone specifically mentioned, which the LLM needs to put into start and end date
 !<-=->!
-Deadline; Application; Webinar
+Deadline; Application; Webinar; UI/UX workshop; AI ethics; Bioinformatics
 !<-=->!
 andres.adamson@ut.ee
 !<-=->!

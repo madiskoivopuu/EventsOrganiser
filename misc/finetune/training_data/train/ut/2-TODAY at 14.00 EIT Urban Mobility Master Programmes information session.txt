@@ -4,7 +4,7 @@ real end dates are used in the parsed events though
 
 location for 2nd event can be deduced, since 1st event is a part of the 2nd one
 !<-=->!
-Urban mobility; Master's programme; Presentation
+Urban mobility; Master's programme; Presentation; Finance; Mentoring; Data science
 !<-=->!
 kaur.soomets@ut.ee
 !<-=->!

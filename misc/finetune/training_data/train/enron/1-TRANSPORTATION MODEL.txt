@@ -1,6 +1,6 @@
-comment
+in English; has events
 !<-=->!
-Meeting; Discussion; Transportation model
+Meeting; Discussion; Transportation model; Course; Registration; Application
 !<-=->!
 keith.holst@enron.com
 !<-=->!

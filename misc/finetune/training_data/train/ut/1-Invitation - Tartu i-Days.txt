@@ -2,7 +2,7 @@ in English;
 an example where there are 2 events, but one of them is conditional (winners only) so that one shouldn't be parsed
 response is in English
 !<-=->!
-Hackathon; Deadline; Registration; Biotechnology; Health
+Hackathon; Deadline; Registration; Biotechnology; Health; Workshop; UI/UX workshop; Psychology; Finance
 !<-=->!
 joonas.salo@ut.ee
 !<-=->!

@@ -1,6 +1,6 @@
 in English
 !<-=->!
-Seminar
+Seminar; Data science;
 !<-=->!
 reader-email@gmail.com
 !<-=->!
@@ -76,7 +76,7 @@ reader-email@gmail.com
         "address": "Narva mnt 18 (Delta centre)",
         "room": "room 1037, auditorium",
         "tags": [
-            "Seminar"
+            "Seminar", "Data science"
         ]
     }
 ]

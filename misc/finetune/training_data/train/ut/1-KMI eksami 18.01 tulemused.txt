@@ -1,7 +1,7 @@
 in Estonian;
  has some events related to viewing your exam
 !<-=->!
-Tag1; Tag2; Tag3
+Exam paper review; 
 !<-=->!
 elmo.sepp@ut.ee
 !<-=->!
@@ -62,13 +62,15 @@ elmo.sepp@ut.ee
 !<-=->!
 [
     {
-        "event_name": "",
-        "start_date": "",
-        "end_date": "",
-        "country": "",
-        "city": "",
-        "address": "",
-        "room": "",
-        "tags": []
+        "event_name": "KMi eksamitöö üle vaatamine",
+        "start_date": "2023-01-23T12:00:00",
+        "end_date": "2023-01-23T13:00:00",
+        "country": "Eesti",
+        "city": "Tartu",
+        "address": "Narva mnt 18 (Delta keskus)",
+        "room": "ruum 4059",
+        "tags": [
+            "Exam paper review"
+        ]
     }
 ]

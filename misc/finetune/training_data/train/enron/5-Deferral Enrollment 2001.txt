@@ -1,7 +1,7 @@
 in English;
 has a deadline & a timezone along with it, which other events imo should not have
 !<-=->!
-Deadline; Form submission; Compensation; Meeting
+Deadline; Form submission; Climate workshop; Networking; Compensation; Robotics; Meeting
 !<-=->!
 monika.causholli@enron.com
 !<-=->!

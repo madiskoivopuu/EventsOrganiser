@@ -1,7 +1,7 @@
 in English;
 has one event related to a conference
 !<-=->!
-Conference; Registration; Energy
+Registration; Conference; Energy
 !<-=->!
 kyle.kitagawa@enron.com
 !<-=->!

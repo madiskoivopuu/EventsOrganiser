@@ -1,7 +1,7 @@
 in Estonian;
 has timezone info too in the form of "PM Helsinki"
 !<-=->!
-Lesson; Online
+Lesson; Online; Bioinformatics; Mentoring; Thesis meeting; AI ethics; Coding bootcamp
 !<-=->!
 madis.koivopuu@ut.ee
 !<-=->!

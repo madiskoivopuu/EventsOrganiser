@@ -1,6 +1,6 @@
 in Estonian;
 !<-=->!
-Moodle; Test; Online
+Moodle; Test; Online; UI/UX workshop; Digiral marketing; Career coaching; Thesis meeting; Climate; Cybersecurity; Bioinformatics
 !<-=->!
 liisa.kivikas@ut.ee
 !<-=->!

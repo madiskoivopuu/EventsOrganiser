@@ -1,7 +1,7 @@
 in Estonian & English;
 expected response is in Estonian
 !<-=->!
-Cybersecurity; Presentation; University of Tartu; Institute of Computer Science
+Cybersecurity; Presentation; University of Tartu; Institute of Computer Science; Poster session; Thesis defense; Community service; Innovation day; Mentoring; Science fair; Party; Birthday; Volunteer day; Bioinformatics
 !<-=->!
 sander.peterson@ut.ee
 !<-=->!

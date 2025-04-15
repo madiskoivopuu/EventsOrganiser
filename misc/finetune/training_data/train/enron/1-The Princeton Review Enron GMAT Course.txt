@@ -1,7 +1,7 @@
 in English;
 has an event related to enrolling in a course
 !<-=->!
-Course; Enrollment notice; Graduate Management Admission Test
+Course; Workshop; Enrollment notice; Theatre play; Graduate Management Admission Test; Survey; Application; Registration
 !<-=->!
 monika.causholli@enron.com
 !<-=->!

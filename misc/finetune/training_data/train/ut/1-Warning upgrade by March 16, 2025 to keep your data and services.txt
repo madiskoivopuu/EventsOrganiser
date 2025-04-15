@@ -1,6 +1,6 @@
 in English; only one event notifying of data deletion deadline (probably something worth considering an event)
 !<-=->!
-Deadline; Notification; Microsoft Azure
+Deadline; Notification; Microsoft Azure; Finance; Psychology; AI ethics; Mentorship; Hackathon; Robotics; Cybersecurity; Lecture; Internship; Demo day; Coding challenge; Movie; Exhibition; Debate
 !<-=->!
 madis.koivopuu@ut.ee
 !<-=->!

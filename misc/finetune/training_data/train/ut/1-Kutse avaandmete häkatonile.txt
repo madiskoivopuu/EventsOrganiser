@@ -1,7 +1,7 @@
 in Estonian and English; 
 expected output is in Estonian
 !<-=->!
-Hackathon
+Hackathon; Book club; Movie night; Theatre; Cinema; Debate; Gaming
 !<-=->!
 steven.jaagup.lepp@ut.ee
 !<-=->!

@@ -2,7 +2,7 @@ in Estonian;
 has a deadline, good example for the LLM since it has to figure out 
 the end date by the email sending date & the phrase 'today's the last chance'
 !<-=->!
-Student council; University of Tartu; Deadline; Application
+Student council; University of Tartu; Deadline; Application; Dance night; Coding bootcamp; Mentoring; Internship; Astronomy; Chemistry; Cybersecurity; Poster session; AI ethics; Debate club; Workshop; Hackathon; Scholarship
 !<-=->!
 uno.muurissepp@ut.ee
 !<-=->!

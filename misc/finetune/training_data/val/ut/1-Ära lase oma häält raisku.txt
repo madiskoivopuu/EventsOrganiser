@@ -1,6 +1,6 @@
 in Estonian; has events
 !<-=->!
-Elections; Student union; University of Tartu
+Elections; Student union; University of Tartu; Business Pitch; Internship; Lecture; Hackathon; Scholarship; AI ethics; Cybersecurity
 !<-=->!
 greete-liis.luik@ut.ee
 !<-=->!

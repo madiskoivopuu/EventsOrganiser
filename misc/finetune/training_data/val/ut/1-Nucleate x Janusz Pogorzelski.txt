@@ -1,6 +1,6 @@
 in English; has events
 !<-=->!
-AI; Medicine; Biotech; Registration
+AI; Medicine; Biotech; Registration; Stipend; Thesis defense; Climate workshop; Coding bootcamp; Painting; Drawing
 !<-=->!
 robin.kool@ut.ee
 !<-=->!

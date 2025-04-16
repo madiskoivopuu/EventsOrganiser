@@ -2,7 +2,7 @@ in Estonian;
 has events, but the LLM must guess the end date, the event ended in 20:30 in reality
 but the LLM should by default make events with only a start date defined 1h long
 !<-=->!
-Habits;
+Habits; Cybersecurity; Technology; Philosophy; Art exhibition; Abstract art; Painting; Fundraiser
 !<-=->!
 andrus.kivirahk@ut.ee
 !<-=->!

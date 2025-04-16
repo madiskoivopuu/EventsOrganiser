@@ -24,13 +24,25 @@ class ResponseData:
     expected_response: list[dict]
     llm_responses: list[list[dict]]
 
+@dataclass 
+class GradeForSingleEvent:
+    llm_generated_event: dict
+    event_name_grade: float = 0.0
+    country_grade: float = 0.0
+    city_grade: float = 0.0
+    address_grade: float = 0.0
+    room_grade: float = 0.0
+
 @dataclass
 class GradeForResponse:
     llm_response: list[dict]
-    event_name_grade: float = 0.0
+
+    grades_for_each_event: list[GradeForSingleEvent]
+    event_finding_grade: float = 0.0
 
 @dataclass
 class ManualGradingData:
+    expected_response: list[dict]
     exemplars: list[GradeForResponse]
 
 def read_response_file(loc: str) -> ResponseData:
@@ -67,30 +79,45 @@ def print_response(custom_text: str, events_response: list[dict]):
     print(f"---------------{custom_text} END-------------------")
 
 def manually_grade(response_data: ResponseData) -> ManualGradingData:
-    grading = ManualGradingData([])
+    grading = ManualGradingData(
+        expected_response=response_data.expected_response,
+        exemplars=[]
+    )
 
     for i, llm_response in enumerate(response_data.llm_responses):
-        grade = GradeForResponse(llm_response)
+        response_grade = GradeForResponse(
+            llm_response,
+            grades_for_generated_events=[]
+        )
 
         if(len(response_data.expected_response) == 0 and len(llm_response) != 0
            or len(response_data.expected_response) > 0 and len(llm_response) == 0
            ):
             print(f"Skipping exemplar {i+1} for {response_data.filename} because LLM generated events when none are supposed to be there (or vice versa)")
-            grade.event_name_grade = 0.0
-        else:
-            print_response("EXPECTED RESULT", response_data.expected_response)
-            print_response("GENERATED TEXT", llm_response)
+        
+        else:            
+            for i, event in enumerate(llm_response):
+                print_response("EXPECTED RESULT", response_data.expected_response)
+                print_response(f"GENERATED EVENT ({i+1}/{len(llm_response)})", response_data.expected_response)
 
-            while True:
-                try:
-                    grade.event_name_grade = input("Grade the accuracy of 'event_name' (0.0 -> 1.0): ")
-                    break
-                except KeyboardInterrupt:
-                    raise KeyboardInterrupt
-                except:
-                    continue
+                event_grade = GradeForSingleEvent(event)
+                while True:
+                    try:
+                        event_grade.event_name_grade = float(input("Grade the accuracy of 'event_name' (0.0 -> 1.0): "))
+                        event_grade.country_grade = float(input("Grade the accuracy of 'country' (0.0 -> 1.0): "))
+                        event_grade.city_grade = float(input("Grade the accuracy of 'city' (0.0 -> 1.0): "))
+                        event_grade.address_grade = float(input("Grade the accuracy of 'address' (0.0 -> 1.0): "))
+                        event_grade.room_grade = float(input("Grade the accuracy of 'room' (0.0 -> 1.0): "))
+                        
+                        break
+                    except KeyboardInterrupt:
+                        raise KeyboardInterrupt
+                    except:
+                        continue
 
-        grading.exemplars.append(grade)
+                response_grade.grades_for_each_event.append(event_grade)
+    
+        grading.exemplars.append(response_grade)
     
     return grading
 

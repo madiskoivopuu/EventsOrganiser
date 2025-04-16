@@ -78,7 +78,7 @@
 !<-=->!
 [
 	{
-		"event_name": "Webinar - Technology as a Driver for Solution Design",
+		"event_name": "[REGISTRATION REQUIRED] Webinar - Technology as a Driver for Solution Design",
 		"start_date": "2024-09-16T00:00:00",
 		"end_date": "2024-09-17T23:59:00",
 		"country": "",

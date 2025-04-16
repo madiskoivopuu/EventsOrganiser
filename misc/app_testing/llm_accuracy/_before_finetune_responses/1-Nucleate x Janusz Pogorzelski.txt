@@ -82,8 +82,8 @@
 [
 	{
 		"event_name": "[REGISTRATION REQUIRED] Nucleate - fireside chat about new lecture series",
-		"start_date": "2024-06-13T19:00:00",
-		"end_date": "2024-06-13T21:00:00",
+        "start_date": "2024-06-18T19:00:00",
+        "end_date": "2024-06-18T21:00:00",
 		"country": "Estonia",
 		"city": "Tallinn",
 		"address": "Telliskivi street 57 (Palo Alto Club)",

@@ -2,12 +2,10 @@
 # from the LLM output, which are used to compare the LLM's accuracy
 # against expected responses
 
-import os, json, random
+import os, json
 import dataclasses
 from dataclasses import dataclass
-from includes.model import Llama3Model
-from includes.email_data import str_to_mail
-import traceback, sys
+import statistics
 from typing import TypeVar, Callable
 
 RESPONSES_LOCATION = "./_before_finetune_responses"
@@ -30,6 +28,8 @@ class ResponseData:
 @dataclass 
 class GradeForSingleEvent:
     llm_generated_event: dict
+
+    should_be_graded: bool = True
     event_name_grade: float = 0.0
     start_date_grade: float = 0.0
     end_date_grade: float = 0.0
@@ -90,6 +90,9 @@ def read_grading_file(loc: str) -> GradeForResponse:
 
     return grading_data
 
+def read_grading_file_with_metadata(loc: str) -> tuple[str, GradeForResponse]:
+    return read_grading_file(loc), os.path.basename(loc)
+
 def read_all_data(dir: str, reader_func: Callable[[str], T]) -> list[T]:
     metadatas = []
     for filename in os.listdir(dir):
@@ -134,14 +137,16 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
                 event_grade = GradeForSingleEvent(event)
                 while True:
                     try:
-                        event_grade.event_name_grade = float(input("Grade the accuracy of 'event_name' (0.0 -> 1.0): "))
-                        event_grade.start_date_grade = float(input("Grade the accuracy of 'start_date' (0.0 -> 1.0): "))
-                        event_grade.end_date_grade = float(input("Grade the accuracy of 'end_date' (0.0 -> 1.0): "))
-                        event_grade.country_grade = float(input("Grade the accuracy of 'country' (0.0 -> 1.0): "))
-                        event_grade.city_grade = float(input("Grade the accuracy of 'city' (0.0 -> 1.0): "))
-                        event_grade.address_grade = float(input("Grade the accuracy of 'address' (0.0 -> 1.0): "))
-                        event_grade.room_grade = float(input("Grade the accuracy of 'room' (0.0 -> 1.0): "))
-                        event_grade.categories_grade = float(input("Grade the accuracy of 'tags' (0.0 -> 1.0): "))
+                        event_grade.should_be_graded = True if input("Should this event be graded (y/n)? ") == "y" else False
+                        if(event_grade.should_be_graded == True):
+                            event_grade.event_name_grade = float(input("Grade the accuracy of 'event_name' (0.0 -> 1.0): "))
+                            event_grade.start_date_grade = float(input("Grade the accuracy of 'start_date' (0.0 -> 1.0): "))
+                            event_grade.end_date_grade = float(input("Grade the accuracy of 'end_date' (0.0 -> 1.0): "))
+                            event_grade.country_grade = float(input("Grade the accuracy of 'country' (0.0 -> 1.0): "))
+                            event_grade.city_grade = float(input("Grade the accuracy of 'city' (0.0 -> 1.0): "))
+                            event_grade.address_grade = float(input("Grade the accuracy of 'address' (0.0 -> 1.0): "))
+                            event_grade.room_grade = float(input("Grade the accuracy of 'room' (0.0 -> 1.0): "))
+                            event_grade.categories_grade = float(input("Grade the accuracy of 'tags' (0.0 -> 1.0): "))
                         break
 
                     except KeyboardInterrupt:
@@ -168,5 +173,63 @@ def add_manual_grading_for_everything(responses: list[ResponseData]):
         print("")
         print("")
 
-generated_responses = read_all_data(RESPONSES_LOCATION, read_response_file)
-add_manual_grading_for_everything(generated_responses)
+def generate_average_grades(graded_emails: list[ManualGradingData]):
+    grading_data = {
+        # Each list has the average grade for all responses in an exemplar (for events that should be graded anyway)
+        "no_events": {
+            "event_finding_grade": []
+        },
+        "with_events": {
+            "event_finding_grade": [],
+
+            "event_name_grade": [],
+            "start_date_grade": [],
+            "end_date_grade": [],
+            "country_grade": [],
+            "city_grade": [],
+            "address_grade": [],
+            "room_grade": [],
+            "categories_grade": [],
+        }
+    }
+
+    for graded_email_llm_response in graded_emails:
+        for graded_one_generated_response in graded_email_llm_response.exemplars:
+            if(len(graded_email_llm_response.expected_response) == 0):
+                grading_data["no_events"]["event_finding_grade"].append(graded_one_generated_response.event_finding_grade)
+            else:
+                grading_data["with_events"]["event_finding_grade"].append(graded_one_generated_response.event_finding_grade)
+
+                grading_data["with_events"]["event_name_grade"].append(
+                    statistics.mean([item.event_name_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["start_date_grade"].append(
+                    statistics.mean([item.start_date_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["end_date_grade"].append(
+                    statistics.mean([item.end_date_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["country_grade"].append(
+                    statistics.mean([item.country_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["city_grade"].append(
+                    statistics.mean([item.city_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["address_grade"].append(
+                    statistics.mean([item.address_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["room_grade"].append(
+                    statistics.mean([item.room_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+                grading_data["with_events"]["categories_grade"].append(
+                    statistics.mean([item.categories_grade for item in graded_one_generated_response.grades_for_each_event])
+                )
+
+    # floats between 0.0 -> 1.0 representing 0% to 100%
+    print(json.dumps(grading_data, indent="\t"))
+
+#generated_responses = read_all_data(RESPONSES_LOCATION, read_response_file)
+#add_manual_grading_for_everything(generated_responses)
+
+graded_email_responses = read_all_data(GRADED_RESPONSES_LOCATION, read_grading_file)
+generate_average_grades(graded_email_responses)

@@ -164,7 +164,9 @@ if __name__ == "__main__":
         eval_dataset=validation_ds,
         args=TrainingArguments(
             save_strategy="best",
-            per_device_train_batch_size = 8,
+            metric_for_best_model="eval_loss",
+
+            per_device_train_batch_size = BATCH_SIZE,
             gradient_accumulation_steps = 4,
             num_train_epochs=100.0,
             learning_rate = 2e-4,
@@ -179,10 +181,9 @@ if __name__ == "__main__":
             report_to = "none", # Use this for WandB etc
 
             fp16_full_eval = True,
-            per_device_eval_batch_size = 8,
+            per_device_eval_batch_size = BATCH_SIZE,
             eval_accumulation_steps = 4,
-            eval_strategy = "steps",
-            eval_steps = BATCH_SIZE / len(training_ds),
+            eval_strategy = "epoch"
         )
     )
     trainer.train()

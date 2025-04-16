@@ -55,7 +55,7 @@ def read_all_responses(dir: str) -> list[ResponseData]:
             metadatas += read_all_responses(obj_loc)
         elif(filename != "SYS_PROMPT.txt"):
             metadatas.append(
-                read_all_responses(f"{dir}/{filename}")
+                read_response_file(f"{dir}/{filename}")
             )
 
     return metadatas

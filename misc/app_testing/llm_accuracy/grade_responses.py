@@ -3,6 +3,7 @@
 # against expected responses
 
 import os, json, random
+import dataclasses
 from dataclasses import dataclass
 from includes.model import Llama3Model
 from includes.email_data import str_to_mail
@@ -26,7 +27,7 @@ class ResponseData:
 @dataclass
 class GradeForResponse:
     llm_response: list[dict]
-    event_name_grade: float
+    event_name_grade: float = 0.0
 
 @dataclass
 class ManualGradingData:
@@ -68,20 +69,26 @@ def print_response(custom_text: str, events_response: list[dict]):
 def manually_grade(response_data: ResponseData) -> ManualGradingData:
     grading = ManualGradingData([])
 
-    for llm_response in response_data.llm_responses:
-        print_response("EXPECTED RESULT", response_data.expected_response)
-        print_response("GENERATED TEXT", llm_response)
+    for i, llm_response in enumerate(response_data.llm_responses):
+        grade = GradeForResponse(llm_response)
 
-        grade = GradeForResponse()
-        grade.llm_response = llm_response
-        while True:
-            try:
-                grade.event_name_grade = input("Grade the accuracy of 'event_name' (0.0 -> 1.0): ")
-                break
-            except KeyboardInterrupt:
-                raise KeyboardInterrupt
-            except:
-                continue
+        if(len(response_data.expected_response) == 0 and len(llm_response) != 0
+           or len(response_data.expected_response) > 0 and len(llm_response) == 0
+           ):
+            print(f"Skipping exemplar {i+1} for {response_data.filename} because LLM generated events when none are supposed to be there (or vice versa)")
+            grade.event_name_grade = 0.0
+        else:
+            print_response("EXPECTED RESULT", response_data.expected_response)
+            print_response("GENERATED TEXT", llm_response)
+
+            while True:
+                try:
+                    grade.event_name_grade = input("Grade the accuracy of 'event_name' (0.0 -> 1.0): ")
+                    break
+                except KeyboardInterrupt:
+                    raise KeyboardInterrupt
+                except:
+                    continue
 
         grading.exemplars.append(grade)
     
@@ -92,7 +99,7 @@ def add_manual_grading_for_everything(responses: list[ResponseData]):
         grading = manually_grade(response)
 
         with open(f"{GRADED_RESPONSES_LOCATION}/{response.filename}", "w", encoding="UTF-8") as f:
-            f.write(json.dumps(grading, indent="\t"))
+            f.write(json.dumps(dataclasses.asdict(grading), indent="\t"))
             print(f"Saved grade to file {GRADED_RESPONSES_LOCATION}/{response.filename}")
 
         print(f"Progress: {i+1}/{len(responses)}")

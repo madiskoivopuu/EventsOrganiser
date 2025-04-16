@@ -1,0 +1,135 @@
+{
+	"exemplars": [
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.201 Andmebaasid",
+					"start_date": null,
+					"end_date": "2023-06-18T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Manufacturing",
+						"Presentation",
+						"Deadline",
+						"Convention",
+						"University of Tartu"
+					]
+				},
+				{
+					"event_name": "Korduseksam",
+					"start_date": null,
+					"end_date": "2023-07-01T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "1008",
+					"tags": [
+						"Registration",
+						"Deadline",
+						"Convention",
+						"University of Tartu"
+					]
+				},
+				{
+					"event_name": "Suveilmad",
+					"start_date": null,
+					"end_date": "2023-06-18T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Student union",
+						"Habits",
+						"Student council"
+					]
+				}
+			],
+			"event_name_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "Registration deadline for Kordusekamis",
+					"start_date": null,
+					"end_date": "2023-07-18T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"University of Tartu"
+					]
+				},
+				{
+					"event_name": "Summer break",
+					"start_date": "2023-06-19T00:00:00+00:00",
+					"end_date": "2023-08-28T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Student union",
+						"Student council",
+						"University of Tartu",
+						"Student union",
+						"Student council"
+					]
+				}
+			],
+			"event_name_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.201 Andmebaasid",
+					"start_date": "2023-06-19T00:00:00+00:00",
+					"end_date": "2023-06-19T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Manufacturing",
+						"Presentation",
+						"Deadline",
+						"Convention"
+					]
+				},
+				{
+					"event_name": "Kordusekamis",
+					"start_date": "2023-06-19T00:00:00+00:00",
+					"end_date": "2023-06-19T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "1008",
+					"tags": [
+						"Deadline",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Suveilmade nautimist",
+					"start_date": "2023-06-19T00:00:00+00:00",
+					"end_date": "2023-06-19T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Student union",
+						"University of Tartu"
+					]
+				}
+			],
+			"event_name_grade": 0.0
+		}
+	]
+}

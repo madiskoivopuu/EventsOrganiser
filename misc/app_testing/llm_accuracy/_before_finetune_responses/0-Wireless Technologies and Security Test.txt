@@ -76,18 +76,7 @@
 	"Medicine"
 ]
 !<-=->!
-[
-	{
-		"event_name": "",
-		"start_date": "",
-		"end_date": "",
-		"country": "",
-		"city": "",
-		"address": "",
-		"room": "",
-		"tags": []
-	}
-]
+[]
 !<-=->!
 [
 	{

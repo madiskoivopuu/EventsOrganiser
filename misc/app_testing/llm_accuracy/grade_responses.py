@@ -98,7 +98,7 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
         else:            
             for i, event in enumerate(llm_response):
                 print_response("EXPECTED RESULT", response_data.expected_response)
-                print_response(f"GENERATED EVENT ({i+1}/{len(llm_response)})", response_data.expected_response)
+                print_response(f"GENERATED EVENT ({i+1}/{len(llm_response)})", event)
 
                 event_grade = GradeForSingleEvent(event)
                 while True:

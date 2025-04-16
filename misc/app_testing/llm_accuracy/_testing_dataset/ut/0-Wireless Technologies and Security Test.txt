@@ -1,4 +1,5 @@
-in English; no events
+in English;
+technically it could have an event, but its only 15 minutes since now so it doesn't make that much sense for the LLM to parse it
 !<-=->!
 
 !<-=->!
@@ -59,15 +60,4 @@ jaanika.kirsimagi@ut.ee
     }
 }
 !<-=->!
-[
-    {
-        "event_name": "",
-        "start_date": "",
-        "end_date": "",
-        "country": "",
-        "city": "",
-        "address": "",
-        "room": "",
-        "tags": []
-    }
-]
+[]

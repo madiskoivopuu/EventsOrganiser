@@ -1,6 +1,6 @@
 in English; has events
 !<-=->!
-Deadline; Convention; Presentation;
+Deadline; Convention; Presentation; Art exhibition; Movie; Party; Birthday
 !<-=->!
 vkamins@enron.com
 !<-=->!

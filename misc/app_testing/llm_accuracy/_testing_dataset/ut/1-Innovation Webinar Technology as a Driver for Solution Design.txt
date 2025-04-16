@@ -1,7 +1,7 @@
 in English;
 has events
 !<-=->!
-Webinar; Manufacturing; University of Tartu
+Webinar; Manufacturing; University of Tartu; Psychology; Mental health; Film screening; UI/UX workshop; Community service; Tech talk; Robotics; Engineering; Art exhibition; Dance night
 !<-=->!
 reader-email@gmail.com
 !<-=->!

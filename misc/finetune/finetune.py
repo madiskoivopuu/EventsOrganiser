@@ -163,9 +163,10 @@ if __name__ == "__main__":
         train_dataset=training_ds, 
         eval_dataset=validation_ds,
         args=TrainingArguments(
+            save_strategy="best",
             per_device_train_batch_size = 8,
             gradient_accumulation_steps = 4,
-            num_train_epochs=10.0,
+            num_train_epochs=100.0,
             learning_rate = 2e-4,
             fp16 = not unsloth.is_bfloat16_supported(),
             bf16 = unsloth.is_bfloat16_supported(),

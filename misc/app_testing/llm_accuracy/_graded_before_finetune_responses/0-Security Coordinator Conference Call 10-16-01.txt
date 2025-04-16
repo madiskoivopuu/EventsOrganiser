@@ -1,0 +1,291 @@
+{
+	"expected_response": [],
+	"exemplars": [
+		{
+			"llm_response": [
+				{
+					"event_name": "NERC Security Call",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				},
+				{
+					"event_name": "NIPC Security Alert",
+					"start_date": null,
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				},
+				{
+					"event_name": "DOE Security Alert",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				},
+				{
+					"event_name": "Mid-Atlantic Electric Utility Incident",
+					"start_date": null,
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				},
+				{
+					"event_name": "EHV Station Incident",
+					"start_date": null,
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				},
+				{
+					"event_name": "Power Plant Incident",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Registration",
+						"Presentation"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "NERC Security Call",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T17:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Possible Bomb Threat at Nuclear Plant in ERCOT",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T00:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Suspcious Substance at Mid-Atlantic Electric Utility",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T00:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Unidentified Individuals at Midwest EHV Station",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T00:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Phone Call at Southwest Power Plant",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T00:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				},
+				{
+					"event_name": "Suspicious Individuals at Southwest Power Plant",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T00:00:00-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Presentation",
+						"Manufacturing",
+						"University of Tartu",
+						"Elections",
+						"Registration"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "NERC Security Call",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Convention",
+						"Deadline",
+						"Convention"
+					]
+				},
+				{
+					"event_name": "Bomb threat at Nuclear Plant in ERCOT",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Olympiad"
+					]
+				},
+				{
+					"event_name": "Suspcious substance at Mid-Atlantic Electric Utility",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Power World",
+						"Deadline",
+						"Application"
+					]
+				},
+				{
+					"event_name": "Unidentified indivduals at Midwest EHV station",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Game jam",
+						"Deadline",
+						"Training"
+					]
+				},
+				{
+					"event_name": "Phone call at Power Plant in Southwest",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Biotech",
+						"Deadline",
+						"Habits"
+					]
+				},
+				{
+					"event_name": "Suspcious people at Power Plant in Southwest",
+					"start_date": "2001-10-16T00:00:00-07:00",
+					"end_date": "2001-10-16T23:59:59-07:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Student council",
+						"Student union",
+						"Deadline"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		}
+	]
+}

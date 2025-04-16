@@ -1,0 +1,63 @@
+{
+	"expected_response": [],
+	"exemplars": [
+		{
+			"llm_response": [
+				{
+					"event_name": "Kursuse l\u00f5pus\u00f5hette",
+					"start_date": "2023-05-26",
+					"end_date": "2023-05-26",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Olympiad",
+						"Deadline",
+						"Student council"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.982 Ootame tagasisidet OOPi kursusele",
+					"start_date": "2023-05-26T10:00:00+02:00",
+					"end_date": "2023-05-26T10:15:00+02:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Olympiad",
+						"Deadline"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.982 Ootame tagasisidet OOPi kursusele",
+					"start_date": null,
+					"end_date": "2023-05-26T23:59:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"Medicine"
+					]
+				}
+			],
+			"grades_for_each_event": [],
+			"event_finding_grade": 0.0
+		}
+	]
+}

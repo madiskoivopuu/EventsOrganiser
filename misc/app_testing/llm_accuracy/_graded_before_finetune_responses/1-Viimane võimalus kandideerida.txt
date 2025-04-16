@@ -1,0 +1,139 @@
+{
+	"expected_response": [
+		{
+			"event_name": "\u00dcli\u00f5pilasesindajaks kandideerimise t\u00e4htaeg",
+			"start_date": null,
+			"end_date": "2024-04-12T23:59:00",
+			"country": "",
+			"city": "",
+			"address": "",
+			"room": "",
+			"tags": [
+				"University of Tartu",
+				"Student council",
+				"Application",
+				"Deadline"
+			]
+		}
+	],
+	"exemplars": [
+		{
+			"llm_response": [
+				{
+					"event_name": "Student council elections",
+					"start_date": "2024-04-14T00:00:00+02:00",
+					"end_date": "2024-04-14T23:59:00+02:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Student council"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "Student council elections",
+						"start_date": "2024-04-14T00:00:00+02:00",
+						"end_date": "2024-04-14T23:59:00+02:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "",
+						"tags": [
+							"Student council"
+						]
+					},
+					"event_name_grade": 0.5,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 1.0
+				}
+			],
+			"event_finding_grade": 1.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "Kandideerimise viimane v\u00f5imalus",
+					"start_date": "2024-04-12T00:00:00+02:00",
+					"end_date": "2024-04-12T23:59:59+02:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Deadline",
+						"University of Tartu"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "Kandideerimise viimane v\u00f5imalus",
+						"start_date": "2024-04-12T00:00:00+02:00",
+						"end_date": "2024-04-12T23:59:59+02:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "",
+						"tags": [
+							"Deadline",
+							"University of Tartu"
+						]
+					},
+					"event_name_grade": 0.8,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 1.0
+				}
+			],
+			"event_finding_grade": 1.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "Kandideerimise v\u00f5imalus",
+					"start_date": null,
+					"end_date": "2024-04-12T23:59:00+02:00",
+					"country": "Eesti",
+					"city": "Tartu",
+					"address": "T\u00dc\u00dcE kodulehitus",
+					"room": "",
+					"tags": [
+						"Student council",
+						"Deadline"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "Kandideerimise v\u00f5imalus",
+						"start_date": null,
+						"end_date": "2024-04-12T23:59:00+02:00",
+						"country": "Eesti",
+						"city": "Tartu",
+						"address": "T\u00dc\u00dcE kodulehitus",
+						"room": "",
+						"tags": [
+							"Student council",
+							"Deadline"
+						]
+					},
+					"event_name_grade": 0.8,
+					"country_grade": 0.0,
+					"city_grade": 0.0,
+					"address_grade": 0.0,
+					"room_grade": 1.0
+				}
+			],
+			"event_finding_grade": 1.0
+		}
+	]
+}

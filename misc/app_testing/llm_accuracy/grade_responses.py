@@ -8,13 +8,14 @@ from dataclasses import dataclass
 from includes.model import Llama3Model
 from includes.email_data import str_to_mail
 import traceback, sys
-
-import autograder
+from typing import TypeVar, Callable
 
 RESPONSES_LOCATION = "./_before_finetune_responses"
 GRADED_RESPONSES_LOCATION = "./_graded_before_finetune_responses"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
                                    # this will also be the exact same separator for output, which contains generated stuff
+
+T = TypeVar("T")
 
 @dataclass
 class ResponseData:
@@ -30,10 +31,13 @@ class ResponseData:
 class GradeForSingleEvent:
     llm_generated_event: dict
     event_name_grade: float = 0.0
+    start_date_grade: float = 0.0
+    end_date_grade: float = 0.0
     country_grade: float = 0.0
     city_grade: float = 0.0
     address_grade: float = 0.0
     room_grade: float = 0.0
+    categories_grade: float = 0.0
 
 @dataclass
 class GradeForResponse:
@@ -61,16 +65,41 @@ def read_response_file(loc: str) -> ResponseData:
             llm_responses=[json.loads(resp) for resp in content[3:]]
         )
 
-def read_all_responses(dir: str) -> list[ResponseData]:
+def read_grading_file(loc: str) -> GradeForResponse:
+    with open(f"{loc}", "r", encoding="UTF-8") as f:
+        json_data = json.load(f)
+
+        grading_data = ManualGradingData(
+            json_data["expected_response"],
+            []
+        )
+
+        for exemplar_json in json_data["exemplars"]:
+            exemplar = GradeForResponse(
+                exemplar_json["llm_response"],
+                [],
+                exemplar_json["event_finding_grade"]
+            )
+
+            for event_grade_json in exemplar_json["grades_for_each_event"]:
+                exemplar.grades_for_each_event.append(
+                    GradeForSingleEvent(**event_grade_json)
+                )
+
+            grading_data.exemplars.append(exemplar)
+
+    return grading_data
+
+def read_all_data(dir: str, reader_func: Callable[[str], T]) -> list[T]:
     metadatas = []
     for filename in os.listdir(dir):
         obj_loc = f"{dir}/{filename}"
 
         if(not os.path.isfile(obj_loc)):
-            metadatas += read_all_responses(obj_loc)
+            metadatas += read_all_data(obj_loc)
         elif(filename != "SYS_PROMPT.txt"):
             metadatas.append(
-                read_response_file(f"{dir}/{filename}")
+                reader_func(f"{dir}/{filename}")
             )
 
     return metadatas
@@ -106,12 +135,15 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
                 while True:
                     try:
                         event_grade.event_name_grade = float(input("Grade the accuracy of 'event_name' (0.0 -> 1.0): "))
+                        event_grade.start_date_grade = float(input("Grade the accuracy of 'start_date' (0.0 -> 1.0): "))
+                        event_grade.end_date_grade = float(input("Grade the accuracy of 'end_date' (0.0 -> 1.0): "))
                         event_grade.country_grade = float(input("Grade the accuracy of 'country' (0.0 -> 1.0): "))
                         event_grade.city_grade = float(input("Grade the accuracy of 'city' (0.0 -> 1.0): "))
                         event_grade.address_grade = float(input("Grade the accuracy of 'address' (0.0 -> 1.0): "))
                         event_grade.room_grade = float(input("Grade the accuracy of 'room' (0.0 -> 1.0): "))
-                        
+                        event_grade.categories_grade = float(input("Grade the accuracy of 'tags' (0.0 -> 1.0): "))
                         break
+
                     except KeyboardInterrupt:
                         raise KeyboardInterrupt
                     except:
@@ -136,5 +168,5 @@ def add_manual_grading_for_everything(responses: list[ResponseData]):
         print("")
         print("")
 
-generated_responses = read_all_responses(RESPONSES_LOCATION)
+generated_responses = read_all_data(RESPONSES_LOCATION, read_response_file)
 add_manual_grading_for_everything(generated_responses)

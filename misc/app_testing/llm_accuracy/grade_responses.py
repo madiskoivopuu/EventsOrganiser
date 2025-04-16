@@ -87,7 +87,7 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
     for i, llm_response in enumerate(response_data.llm_responses):
         response_grade = GradeForResponse(
             llm_response,
-            grades_for_generated_events=[]
+            grades_for_each_event=[]
         )
 
         if(len(response_data.expected_response) == 0 and len(llm_response) != 0

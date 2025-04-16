@@ -114,9 +114,10 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
                         raise KeyboardInterrupt
                     except:
                         continue
-
                 response_grade.grades_for_each_event.append(event_grade)
-    
+
+            response_grade.event_finding_grade = float(input("Grade the accuracy of LLM finding correct events (0.0 -> 1.0, correct ÷ total): "))
+
         grading.exemplars.append(response_grade)
     
     return grading

@@ -2,7 +2,7 @@ in English & Estonian;
 this email has a timezone defined which the LLM should pick up
 expected output is in English
 !<-=->!
-Incubator; Deadline
+Incubator; Deadline; Biotechnology; Painting workshop; Cybersecurity; Philosophy; Chemistry; Physical exercise; Race; Roundtable
 !<-=->!
 steven.jaagup.lepp@ut.ee
 !<-=->!
@@ -78,7 +78,7 @@ steven.jaagup.lepp@ut.ee
         "address": "",
         "room": "",
         "tags": [
-            "Deadline", "Incubator"
+            "Biotechnology", "Deadline", "Incubator"
         ]
     }
 ]

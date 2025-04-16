@@ -1,7 +1,7 @@
 in both Estonian and English; 
 in this case the expected response is in Estonian, with only tags in English
 !<-=->!
-Deadline; Discussion; Politics
+Deadline; Discussion; Politics; Cybersecurity; Robotics; Book club; Demo day; Internship; Scholarship
 !<-=->!
 onne.opilane@ut.ee
 !<-=->!

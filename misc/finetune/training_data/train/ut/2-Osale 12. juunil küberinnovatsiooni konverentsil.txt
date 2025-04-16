@@ -2,7 +2,7 @@ mainly Estonian, a bit of English;
 since time isn't mentioned explicitly, the AI should just put it as an 1-day event (spanning the entire day)
 expected output is in Estonian
 !<-=->!
-Conference; Deadline; University of Tartu; Registration
+Conference; Deadline; University of Tartu; Registration; Painting workshop; Urban mobility; Art exhibition; Music
 !<-=->!
 steven.jaagup.lepp@ut.ee
 !<-=->!

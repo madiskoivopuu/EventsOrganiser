@@ -2,7 +2,7 @@ in Estonian, English and Russian;
 good example for the LLM so that it does not produce duplicate events because of different languages
 response is in Estonian
 !<-=->!
-Survey; University of Tartu
+Survey; University of Tartu; Sports; Gaming; Jogging; Rowing; Deadlift; Book club; Cybersecurity
 !<-=->!
 karlis.karu@ut.ee
 !<-=->!

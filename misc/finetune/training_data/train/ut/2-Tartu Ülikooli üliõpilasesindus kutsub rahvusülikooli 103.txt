@@ -2,7 +2,7 @@ in Estonian;
 has events and one example of a deadline, where the end date is 1 second before the time mentioned in mail
 (20 dec -> deadline is, 19 dec 23:59:59)
 !<-=->!
-University of Tartu; Anniversary; Ball; Dancing; Deadline; Nomination
+University of Tartu; Anniversary; Ball; Dancing; Deadline; Nomination; Finance; Value investing; Chemistry; Astronomy
 !<-=->!
 paavo.pesuseeni@ut.ee
 !<-=->!

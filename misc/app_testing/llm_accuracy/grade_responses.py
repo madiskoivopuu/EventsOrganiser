@@ -14,82 +14,90 @@ INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which cont
                                    # this will also be the exact same separator for output, which contains generated stuff
 
 @dataclass
-class TrainingData:
+class ResponseData:
     file_location: str
     filename: str
-    comment: str
-    categories: list[str]
-    reader_email: str
+    
     mail_data: str
-    expected_output: list[dict[str]]
+    categories: list[str]
+    expected_response: list[dict]
+    llm_responses: list[list[dict]]
 
-def read_prompt_file(loc: str) -> TrainingData:
+@dataclass
+class GradeForResponse:
+    llm_response: list[dict]
+    event_name_grade: float
+
+@dataclass
+class ManualGradingData:
+    exemplars: list[GradeForResponse]
+
+def read_response_file(loc: str) -> ResponseData:
     with open(f"{loc}", "r", encoding="UTF-8") as f:
         content = f.read().split(INPUT_OUTPUT_SEPARATOR)
 
-        return TrainingData(
+        return ResponseData(
             file_location=loc,
             filename=os.path.basename(loc),
-            comment=content[0].strip(),
-            categories=[category.strip() for category in content[1].split(";") if len(category.strip()) > 0],
-            reader_email=content[2],
-            mail_data=content[3].strip(),
-            expected_output=json.loads(content[4])
+            
+            mail_data=content[0],
+            categories=json.loads(content[1]),
+            expected_response=json.loads(content[2]),
+            llm_responses=[json.loads(resp) for resp in content[3:]]
         )
 
-def read_all_prompts(dir: str) -> list[TrainingData]:
+def read_all_responses(dir: str) -> list[ResponseData]:
     metadatas = []
     for filename in os.listdir(dir):
         obj_loc = f"{dir}/{filename}"
 
         if(not os.path.isfile(obj_loc)):
-            metadatas += read_all_prompts(obj_loc)
+            metadatas += read_all_responses(obj_loc)
         elif(filename != "SYS_PROMPT.txt"):
             metadatas.append(
-                read_prompt_file(f"{dir}/{filename}")
+                read_all_responses(f"{dir}/{filename}")
             )
 
     return metadatas
 
-def get_all_unique_categories(metadatas: list[TrainingData]) -> list[str]:
-    categories = set()
-    for metadata in metadatas:
-        for tag in metadata.categories:
-            if(tag.strip() != ""):
-                categories.add(tag)
+def print_response(custom_text: str, events_response: list[dict]):
+    print(f"---------------{custom_text} START-----------------")
+    print(json.dumps(events_response, indent="\t"))
+    print(f"---------------{custom_text} END-------------------")
 
-    return list(categories)
+def manually_grade(response_data: ResponseData) -> ManualGradingData:
+    grading = ManualGradingData([])
 
-dataset = read_all_prompts(DATASET_LOC)
-all_categories = get_all_unique_categories(dataset)
+    for llm_response in response_data.llm_responses:
+        print_response("EXPECTED RESULT", response_data.expected_response)
+        print_response("GENERATED TEXT", llm_response)
 
-for data in dataset:
-    with open(f"{OUTPUT_LOC}/{data.filename}", "w", encoding="UTF-8") as f:
-        f.write(data.mail_data)
+        grade = GradeForResponse()
+        grade.llm_response = llm_response
+        while True:
+            try:
+                grade.event_name_grade = input("Grade the accuracy of 'event_name' (0.0 -> 1.0): ")
+                break
+            except KeyboardInterrupt:
+                raise KeyboardInterrupt
+            except:
+                continue
 
-        f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
-        f.write(json.dumps(data.expected_output, indent="\t"))
+        grading.exemplars.append(grade)
+    
+    return grading
 
-        categories = data.categories.copy()
-        if(len(categories) == 0):
-            categories = all_categories.copy()
+def add_manual_grading_for_everything(responses: list[ResponseData]):
+    for i, response in enumerate(responses):
+        grading = manually_grade(response)
 
-        f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
-        f.write(json.dumps(categories, indent="\t"))
-        random.shuffle(categories) # for LLM to get a different order of categories every time
+        with open(f"{GRADED_RESPONSES_LOCATION}/{response.filename}", "w", encoding="UTF-8") as f:
+            f.write(json.dumps(grading, indent="\t"))
+            print(f"Saved grade to file {GRADED_RESPONSES_LOCATION}/{response.filename}")
 
-        for _ in range(ANSWERS_TO_GENERATE):
-            f.write(f"\n{INPUT_OUTPUT_SEPARATOR}\n")
+        print(f"Progress: {i+1}/{len(responses)}")
+        print("")
+        print("")
 
-            while True:
-                try:
-                    email = str_to_mail(data.mail_data, data.reader_email)
-                    response = LLM.parse_events_from_email(email, categories)
-                    f.write(json.dumps(response, indent="\t"))
-                    break
-                except KeyboardInterrupt:
-                    sys.exit(0)
-                except:
-                    traceback.print_exc()
-                    print("Redoing this e-mail")
-                    continue
+generated_responses = read_all_responses(RESPONSES_LOCATION)
+add_manual_grading_for_everything(generated_responses)

@@ -226,7 +226,18 @@ def generate_average_grades(graded_emails: list[ManualGradingData]):
                 )
 
     # floats between 0.0 -> 1.0 representing 0% to 100%
-    print(json.dumps(grading_data, indent="\t"))
+    print("-----------NO EVENTS STATS-----------")
+    print("event_finding_grade: ", statistics.mean(grading_data["no_events"]["event_finding_grade"]))
+    print("----------WITH EVENTS STATS----------")
+    print("event_finding_grade: ", statistics.mean(grading_data["with_events"]["event_finding_grade"]))
+    print("event_name_grade: ", statistics.mean(grading_data["with_events"]["event_name_grade"]))
+    print("start_date_grade: ", statistics.mean(grading_data["with_events"]["start_date_grade"]))
+    print("end_date_grade: ", statistics.mean(grading_data["with_events"]["end_date_grade"]))
+    print("country_grade: ", statistics.mean(grading_data["with_events"]["country_grade"]))
+    print("city_grade: ", statistics.mean(grading_data["with_events"]["city_grade"]))
+    print("address_grade: ", statistics.mean(grading_data["with_events"]["address_grade"]))
+    print("room_grade: ", statistics.mean(grading_data["with_events"]["room_grade"]))
+    print("categories_grade: ", statistics.mean(grading_data["with_events"]["categories_grade"]))
 
 #generated_responses = read_all_data(RESPONSES_LOCATION, read_response_file)
 #add_manual_grading_for_everything(generated_responses)

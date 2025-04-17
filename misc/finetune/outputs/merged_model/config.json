@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "./llm",
+  "_name_or_path": "./trainable_llm/llama3.2-3b-instruct",
   "architectures": [
     "LlamaForCausalLM"
   ],

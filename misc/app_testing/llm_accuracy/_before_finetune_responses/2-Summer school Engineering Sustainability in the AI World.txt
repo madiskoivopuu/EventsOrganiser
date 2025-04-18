@@ -1,9 +1,3 @@
-in English; two events
-!<-=->!
-Summer school; AI; Deadline; Registration; Party; Cybersecurity; Sports; Running; Walking
-!<-=->!
-raul.kangur@ut.ee
-!<-=->!
 {
     "@odata.etag": "W/\"CQAAABYAAABJvb8eBOBkTbkZuk8Vsug2AAJ/3SjU\"",
     "id": "AAMkADVjYjM3M2Q3LTg1ZTYtNDA1OC1hMWE5LTk5Y2Q1MzYzYmMxOABGAAAAAACoJRdBch4KQaIer0kPqtwKBwBJvb8eBOBkTbkZuk8Vsug2AAAAAAEMAABJvb8eBOBkTbkZuk8Vsug2AAKAbKRtAAA=",
@@ -67,28 +61,105 @@ raul.kangur@ut.ee
 }
 !<-=->!
 [
-    {
-        "event_name": "[REGISTRATION REQUIRED] Summer school - Engineering Sustainability in the AI World",
-        "start_date": "2025-07-21T00:00:00",
-        "end_date": "2025-07-30T23:59:00",
-        "country": "Germany",
-        "city": "Lübeck",
-        "address": "",
-        "room": "",
-        "tags": [
-            "Summer school", "AI"
-        ]
-    },
-    {
-        "event_name": "Summer school registration deadline - Engineering Sustainability in the AI World",
-        "start_date": null,
-        "end_date": "2025-05-06T23:59:00",
-        "country": "",
-        "city": "",
-        "address": "",
-        "room": "",
-        "tags": [
-            "Summer school", "AI", "Deadline", "Registration"
-        ]
-    }
+	"Summer school",
+	"AI",
+	"Deadline",
+	"Registration"
+]
+!<-=->!
+[
+	{
+		"event_name": "[REGISTRATION REQUIRED] Summer school - Engineering Sustainability in the AI World",
+		"start_date": "2025-07-21T00:00:00",
+		"end_date": "2025-07-30T23:59:00",
+		"country": "Germany",
+		"city": "L\u00fcbeck",
+		"address": "",
+		"room": "",
+		"tags": [
+			"Summer school",
+			"AI"
+		]
+	},
+	{
+		"event_name": "Summer school registration deadline - Engineering Sustainability in the AI World",
+		"start_date": null,
+		"end_date": "2025-05-06T23:59:00",
+		"country": "",
+		"city": "",
+		"address": "",
+		"room": "",
+		"tags": [
+			"Summer school",
+			"AI",
+			"Deadline",
+			"Registration"
+		]
+	}
+]
+!<-=->!
+[
+	{
+		"event_name": "Summer school \"Engineering Sustainability in the AI World\"",
+		"start_date": "2025-07-21T00:00:00+00:00",
+		"end_date": "2025-07-30T23:59:00+00:00",
+		"country": "Germany",
+		"city": "L\u00fcbeck",
+		"address": "Technische Hochschule L\u00fcbeck",
+		"room": "",
+		"tags": [
+			"Summer school",
+			"AI",
+			"Summer school"
+		]
+	}
+]
+!<-=->!
+[
+	{
+		"event_name": "Summer school \"Engineering Sustainability in the AI World\"",
+		"start_date": "2025-07-21T00:00:00Z",
+		"end_date": "2025-07-30T23:59:00Z",
+		"country": "Germany",
+		"city": "L\u00fcbeck",
+		"address": "A large brick building with two tall towers.",
+		"room": "",
+		"tags": [
+			"Summer school",
+			"AI",
+			"Summer school"
+		]
+	}
+]
+!<-=->!
+[
+	{
+		"event_name": "Summer school \"Engineering Sustainability in the AI World\"",
+		"start_date": "2025-07-21T00:00:00",
+		"end_date": "2025-07-30T23:59:00",
+		"country": "Germany",
+		"city": "L\u00fcbeck",
+		"address": "Technische Hochschule L\u00fcbeck",
+		"room": "",
+		"tags": [
+			"Summer school",
+			"AI",
+			"Summer school",
+			"Summer school",
+			"Summer school"
+		]
+	},
+	{
+		"event_name": "Application deadline",
+		"start_date": "2025-05-06T00:00:00",
+		"end_date": "2025-05-06T23:59:00",
+		"country": "Germany",
+		"city": "",
+		"address": "",
+		"room": "",
+		"tags": [
+			"Deadline",
+			"Registration"
+		]
+	}
 ]

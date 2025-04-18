@@ -106,7 +106,7 @@ madis.koivopuu@ut.ee
     },
     {
         "event_name": "LTAT.04.009 quiz 6",
-        "start_date": "",
+        "start_date": null,
         "end_date": "2024-12-20T23:59:00",
         "country": "",
         "city": "",

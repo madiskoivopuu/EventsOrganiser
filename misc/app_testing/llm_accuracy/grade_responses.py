@@ -239,6 +239,17 @@ def generate_average_grades(graded_emails: list[ManualGradingData]):
     print("room_grade: ", statistics.mean(grading_data["with_events"]["room_grade"]))
     print("categories_grade: ", statistics.mean(grading_data["with_events"]["categories_grade"]))
 
+    all_correct_probability = statistics.mean(grading_data["with_events"]["event_finding_grade"]) \
+    * statistics.mean(grading_data["with_events"]["event_name_grade"]) \
+    * statistics.mean(grading_data["with_events"]["start_date_grade"]) \
+    * statistics.mean(grading_data["with_events"]["end_date_grade"]) \
+    * statistics.mean(grading_data["with_events"]["country_grade"]) \
+    * statistics.mean(grading_data["with_events"]["city_grade"]) \
+    * statistics.mean(grading_data["with_events"]["address_grade"]) \
+    * statistics.mean(grading_data["with_events"]["room_grade"]) \
+    * statistics.mean(grading_data["with_events"]["categories_grade"])
+    print(f"GENERAL GRADE (P that all of the above are correct): {all_correct_probability}")
+
 #generated_responses = read_all_data(RESPONSES_LOCATION, read_response_file)
 #add_manual_grading_for_everything(generated_responses)
 

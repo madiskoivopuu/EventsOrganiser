@@ -110,7 +110,7 @@ def generate_chats_from_prompts(metadatas: list[TrainingData]) -> list[str]:
 
 def begin_training():
     def formatting_prompts_func(data):
-        global tokenizer 
+        nonlocal tokenizer 
     
         convos = data["messages"]
         texts = [tokenizer.apply_chat_template(convo, tokenize = False, add_generation_prompt = False) for convo in convos]
@@ -198,9 +198,10 @@ def merge_lora_checkpoint(checkpoint_dir):
         dtype=torch.bfloat16
     )
 
-    unsloth.save.unsloth_save_pretrained_merged(lora_model, "./outputs/merged_model_2025_04_17", tokenizer)
+    unsloth.save.unsloth_save_pretrained_merged(lora_model, "./outputs/merged_model_2025_04_19", tokenizer)
 
 # followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer
 # and https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
 if __name__ == "__main__":
-    merge_lora_checkpoint("./outputs/checkpoint-216")
+    #merge_lora_checkpoint("./outputs/checkpoint-216")
+    begin_training()

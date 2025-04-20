@@ -8,9 +8,9 @@ from includes.model import Llama3Model
 from includes.email_data import str_to_mail
 import traceback, sys
 
-LLM = Llama3Model("./llm/Llama-3.2-3B-Instruct.gguf")
+LLM = Llama3Model("./llm/Llama3.2-3B-Instruct-finetuned-2025-04-17.gguf")
 DATASET_LOC = "./_testing_dataset"
-OUTPUT_LOC = "./_before_finetune_responses"
+OUTPUT_LOC = "./_after_finetune_responses"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
                                    # this will also be the exact same separator for output, which contains generated stuff
 MAX_SEQ_LENGTH = 32768

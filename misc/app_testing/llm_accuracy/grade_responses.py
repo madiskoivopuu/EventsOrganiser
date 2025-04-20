@@ -8,8 +8,8 @@ from dataclasses import dataclass
 import statistics
 from typing import TypeVar, Callable
 
-RESPONSES_LOCATION = "./_before_finetune_responses"
-GRADED_RESPONSES_LOCATION = "./_graded_before_finetune_responses"
+RESPONSES_LOCATION = "./_after_finetune_responses"
+GRADED_RESPONSES_LOCATION = "./_graded_after_finetune_responses"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
                                    # this will also be the exact same separator for output, which contains generated stuff
 
@@ -128,6 +128,10 @@ def manually_grade(response_data: ResponseData) -> ManualGradingData:
            or len(response_data.expected_response) > 0 and len(llm_response) == 0
            ):
             print(f"Skipping exemplar {i+1} for {response_data.filename} because LLM generated events when none are supposed to be there (or vice versa)")
+        
+        elif(len(response_data.expected_response) == 0 and len(llm_response) == 0):
+            print(f"Skipping correct exemplar {i+1} for {response_data.filename}, LLM generated correct answer")
+            response_grade.event_finding_grade = 1.0
         
         else:            
             for i, event in enumerate(llm_response):

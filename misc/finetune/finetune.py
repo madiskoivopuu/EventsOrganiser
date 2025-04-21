@@ -142,11 +142,6 @@ def begin_training():
         tokenizer,
         chat_template = "llama-3.1",
     )
-    
-    SYS_PROMPT = ""
-    with open(f"{DATASET_LOC}/SYS_PROMPT.txt", "r", encoding="UTF-8") as f:
-        SYS_PROMPT = f.read()
-
     training_prompts = read_all_prompts(f"{DATASET_LOC}/train")
     validation_prompts = read_all_prompts(f"{DATASET_LOC}/train")
 

@@ -9,7 +9,7 @@ import statistics
 from typing import TypeVar, Callable
 
 RESPONSES_LOCATION = "./_after_finetune_responses"
-GRADED_RESPONSES_LOCATION = "./_graded_after_finetune_responses"
+GRADED_RESPONSES_LOCATION = "./_graded_before_finetune_responses"
 INPUT_OUTPUT_SEPARATOR = "!<-=->!" # for simplicity we use text files which contain stuff separated by this token (input above, output below)
                                    # this will also be the exact same separator for output, which contains generated stuff
 
@@ -204,29 +204,29 @@ def generate_average_grades(graded_emails: list[ManualGradingData]):
             else:
                 grading_data["with_events"]["event_finding_grade"].append(graded_one_generated_response.event_finding_grade)
 
-                grading_data["with_events"]["event_name_grade"].append(
-                    statistics.mean([item.event_name_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["event_name_grade"].extend(
+                    [item.event_name_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["start_date_grade"].append(
-                    statistics.mean([item.start_date_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["start_date_grade"].extend(
+                    [item.start_date_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["end_date_grade"].append(
-                    statistics.mean([item.end_date_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["end_date_grade"].extend(
+                    [item.end_date_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["country_grade"].append(
-                    statistics.mean([item.country_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["country_grade"].extend(
+                    [item.country_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["city_grade"].append(
-                    statistics.mean([item.city_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["city_grade"].extend(
+                    [item.city_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["address_grade"].append(
-                    statistics.mean([item.address_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["address_grade"].extend(
+                    [item.address_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["room_grade"].append(
-                    statistics.mean([item.room_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["room_grade"].extend(
+                    [item.room_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
-                grading_data["with_events"]["categories_grade"].append(
-                    statistics.mean([item.categories_grade for item in graded_one_generated_response.grades_for_each_event])
+                grading_data["with_events"]["categories_grade"].extend(
+                    [item.categories_grade for item in graded_one_generated_response.grades_for_each_event]
                 )
 
     # floats between 0.0 -> 1.0 representing 0% to 100%

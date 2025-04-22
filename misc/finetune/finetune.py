@@ -175,7 +175,6 @@ def begin_training():
 
             fp16_full_eval = True,
             per_device_eval_batch_size = BATCH_SIZE,
-            eval_accumulation_steps = 4,
             eval_strategy = "epoch"
         )
     )
@@ -198,5 +197,5 @@ def merge_lora_checkpoint(checkpoint_dir):
 # followed https://huggingface.co/docs/trl/en/sft_trainer#supervised-fine-tuning-trainer
 # and https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
 if __name__ == "__main__":
-    merge_lora_checkpoint("./outputs/checkpoint-210")
-    #begin_training()
+    #merge_lora_checkpoint("./outputs/checkpoint-210")
+    begin_training()

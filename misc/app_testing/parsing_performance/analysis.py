@@ -102,8 +102,8 @@ def generate_avg_email_process_time_graph(
 
     drawn_plot = df.plot(
         y="Processing duration", 
-        xlabel="Testi käimisaeg", 
-        ylabel="Keskmine e-kirja töötlemise aeg",
+        xlabel="Testi käimisaeg (tundides)", 
+        ylabel="Sõnumim e-kirja töötlemise aeg (tundides)",
         title="Testprogrammi saadetud e-kirjade keskmine töötlusaeg testi käimisaja vältel"
     )
     drawn_plot.yaxis.set_major_formatter(fmt)
@@ -118,6 +118,8 @@ def generate_avg_parse_time_graph(
         max_interval: float = 270
         ):
     import matplotlib.pyplot as plt
+    from matplotlib.axis import Axis
+    import matplotlib.ticker as tkr
 
     parsing_times_sec: list[float] = []
     for performance_data in parsing_performance_data:
@@ -161,13 +163,16 @@ def generate_avg_parse_time_graph(
         x_values[-1] = f"[{first_interval}, ∞)"
 
 
-    plt.bar(
+    fig, ax = plt.subplots()
+    ax.bar(
         x_values,
         y_values,
     )
+    Axis.set_major_locator(ax.yaxis, tkr.MultipleLocator(50))
+
+    plt.xlabel("E-kirjade arv")
+    plt.ylabel("Töötlemisaja vahemik (sekundites)")
     plt.title("")
-    plt.xlabel("")
-    plt.ylabel("")
 
     plt.show()
 

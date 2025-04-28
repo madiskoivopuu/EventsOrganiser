@@ -78,7 +78,12 @@ def generate_avg_email_process_time_graph(
 
     def y_formatter(x: float, pos):
         timedelta = pd.Timedelta(x, "second")
-        return str(timedelta).split(" ")[-1] # days aren't relevant atm cause none of the parsing times exceed 1 day
+
+        time_as_str = str(timedelta)
+        time_as_str = time_as_str.replace("0 days", "")
+        time_as_str = time_as_str.replace("days", "päev")
+
+        return time_as_str # days aren't relevant atm cause none of the parsing times exceed 1 day
     fmt = tkr.FuncFormatter(y_formatter)
 
     parsing_performance_data = sorted(parsing_performance_data, key=lambda val: val.sent_date)
@@ -179,5 +184,5 @@ def generate_avg_parse_time_graph(
 data = get_parsing_performance_data()
 
 #print(get_entire_parsing_duration(data))
-#generate_avg_email_process_time_graph(data)
-generate_avg_parse_time_graph(data)
+generate_avg_email_process_time_graph(data)
+#generate_avg_parse_time_graph(data)

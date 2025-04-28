@@ -170,9 +170,9 @@ def generate_avg_parse_time_graph(
     )
     Axis.set_major_locator(ax.yaxis, tkr.MultipleLocator(50))
 
-    plt.xlabel("E-kirjade arv")
-    plt.ylabel("Töötlemisaja vahemik (sekundites)")
-    plt.title("")
+    plt.xlabel("Töötlemisaja vahemik (sekundites)")
+    plt.ylabel("E-kirjade arv")
+    plt.title("E-kirjade jaotus töötlemisaja põhjal")
 
     plt.show()
 

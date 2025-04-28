@@ -108,8 +108,8 @@ def generate_avg_email_process_time_graph(
     drawn_plot = df.plot(
         y="Processing duration", 
         xlabel="Testi käimisaeg (tundides)", 
-        ylabel="Sõnumim e-kirja töötlemise aeg (tundides)",
-        title="Testprogrammi saadetud e-kirjade keskmine töötlusaeg testi käimisaja vältel"
+        ylabel="Ühe e-kirja töötlemise aeg (tundides)",
+        title="Testprogrammi saadetud e-kirjade töötlusaeg testi käimisaja vältel"
     )
     drawn_plot.yaxis.set_major_formatter(fmt)
     drawn_plot.yaxis.set_major_locator(tkr.MultipleLocator(3600 * 2)) # sets y axis size... retarded but works

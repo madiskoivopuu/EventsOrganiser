@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, Request, Response, HTTPException
 
 import uuid, hashlib
 
-import icalendar
+import icalendar, icalendar.prop
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from datetime import timezone, timedelta
@@ -153,7 +153,7 @@ async def get_calendar_file(
 
         calendar_event["DTEND"] = icalendar.vDatetime(event_row.end_date_utc.replace(tzinfo=timezone.utc))
         calendar_event["LOCATION"] = event_row.address # TODO: handle empty string cases
-        calendar_event["CATEGORIES"] = ", ".join([tag_row.name for tag_row in event_row.tags])
+        calendar_event["CATEGORIES"] = icalendar.prop.vCategory([tag_row.name for tag_row in event_row.tags])
         calendar.add_component(calendar_event)
 
     return Response(calendar.to_ical(), media_type="text/calendar")

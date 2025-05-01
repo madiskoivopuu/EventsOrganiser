@@ -143,7 +143,7 @@ async def get_calendar_file(
     async for (event_row, ) in query_result.unique():
         calendar_event = icalendar.Event()
         calendar_event["UID"] = uuid.UUID(create_event_hash(event_row)[:32])
-        calendar_event["DTSTAMP"] = event_row.parsed_at.astimezone(timezone.utc)
+        calendar_event["DTSTAMP"] = icalendar.vDatetime(event_row.parsed_at.astimezone(timezone.utc))
 
         calendar_event["SUMMARY"] = event_row.event_name
         if(event_row.start_date_utc is not None):

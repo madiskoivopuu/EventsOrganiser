@@ -1,11 +1,11 @@
 from fastapi import Depends, APIRouter, Request, Response, HTTPException
 
-import uuid
+import uuid, hashlib
 
 import icalendar
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
-from datetime import timezone
+from datetime import timezone, timedelta
 
 import sys
 sys.path.append('..')
@@ -127,18 +127,24 @@ async def get_calendar_file(
             .where(tables.EventsTable.user_id == calendar_user.user_id, tables.EventsTable.user_acc_type == calendar_user.user_acc_type) #\
     query_result = await db_session.stream(query)
 
-    calendar: icalendar.Calendar = icalendar.Calendar()
+    calendar = icalendar.Calendar()
+    calendar["VERSION"] = "2.0"
+    calendar["PRODID"] = "Events Organiser v1.0"
+
     async for (event_row, ) in query_result.unique():
         calendar_event = icalendar.Event()
-        calendar_event.add("SUMMARY", event_row.event_name)
-        if(event_row.start_date_utc is not None):
-            calendar_event.add("DTSTART", event_row.start_date_utc.replace(tzinfo=timezone.utc))
-        else:  # deadline
-            calendar_event.add("DTSTART", event_row.end_date_utc.replace(tzinfo=timezone.utc))
+        calendar_event["UID"] = uuid.UUID(hashlib.sha256(event_row.email_link.encode('utf-8'))[:32])
+        calendar_event["DTSTAMP"] = event_row.parsed_at.astimezone(timezone.utc)
 
-        calendar_event.add("DTEND", event_row.end_date_utc.replace(tzinfo=timezone.utc))
-        calendar_event.add("LOCATION", event_row.address) # TODO: handle empty string cases
-        calendar_event.add("CATEGORIES", ", ".join([tag_row.name for tag_row in event_row.tags]))
+        calendar_event["SUMMARY"] = event_row.event_name
+        if(event_row.start_date_utc is not None):
+            calendar_event["DTSTART"] = event_row.start_date_utc.replace(tzinfo=timezone.utc)
+        else: # deadline
+            calendar_event["DTSTART"] = event_row.end_date_utc.replace(tzinfo=timezone.utc) - timedelta(minutes=15)
+
+        calendar_event["DTEND"] = event_row.end_date_utc.replace(tzinfo=timezone.utc)
+        calendar_event["LOCATION"] = event_row.address # TODO: handle empty string cases
+        calendar_event["CATEGORIES"] = ", ".join([tag_row.name for tag_row in event_row.tags])
         calendar.add_component(calendar_event)
 
     return Response(calendar.to_ical(), media_type="text/calendar")

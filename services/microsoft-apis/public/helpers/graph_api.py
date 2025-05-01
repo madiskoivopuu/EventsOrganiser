@@ -51,7 +51,7 @@ async def update_token_if_needed(
                         # check for an error that says that the refresh token has expired
                         resp_data = await resp.json()
 
-                        if(any(error_code in resp_data["error_codes"] for error_code in [50173, 70043, 700082, 70008])):
+                        if(any(error_code in resp_data["error_codes"] for error_code in [50173, 70000, 70043, 700082, 70008])):
                             return None
 
                         raise TokenUpdateError(f"Received 'Bad request' error trying to update token. Response: {resp_text}")

@@ -16,6 +16,15 @@ from auth import UserData
 import helpers
 import db
 
+def create_event_hash(event_row: tables.EventsTable) -> bytes:
+    hash = hashlib.sha256(
+        event_row.email_link.encode("utf-8") +
+        event_row.parsed_at.isoformat().encode("utf-8")
+    )
+
+    return hash.hexdigest()
+
+
 calendar_router = APIRouter(
     prefix="/api/events"
 )
@@ -133,16 +142,16 @@ async def get_calendar_file(
 
     async for (event_row, ) in query_result.unique():
         calendar_event = icalendar.Event()
-        calendar_event["UID"] = uuid.UUID(hashlib.sha256(event_row.email_link.encode('utf-8')).hexdigest()[:32])
+        calendar_event["UID"] = uuid.UUID(create_event_hash(event_row)[:32])
         calendar_event["DTSTAMP"] = event_row.parsed_at.astimezone(timezone.utc)
 
         calendar_event["SUMMARY"] = event_row.event_name
         if(event_row.start_date_utc is not None):
-            calendar_event["DTSTART"] = event_row.start_date_utc.replace(tzinfo=timezone.utc)
+            calendar_event["DTSTART"] = icalendar.vDatetime(event_row.start_date_utc.replace(tzinfo=timezone.utc))
         else: # deadline
-            calendar_event["DTSTART"] = event_row.end_date_utc.replace(tzinfo=timezone.utc) - timedelta(minutes=15)
+            calendar_event["DTSTART"] = icalendar.vDatetime(event_row.end_date_utc.replace(tzinfo=timezone.utc) - timedelta(minutes=15))
 
-        calendar_event["DTEND"] = event_row.end_date_utc.replace(tzinfo=timezone.utc)
+        calendar_event["DTEND"] = icalendar.vDatetime(event_row.end_date_utc.replace(tzinfo=timezone.utc))
         calendar_event["LOCATION"] = event_row.address # TODO: handle empty string cases
         calendar_event["CATEGORIES"] = ", ".join([tag_row.name for tag_row in event_row.tags])
         calendar.add_component(calendar_event)

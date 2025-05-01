@@ -88,7 +88,7 @@ async def update_event(
 
     event.event_name = new_data.event_name
     event.start_date_utc = new_data.start_date
-    event.end_date_utc = new_data.start_date
+    event.end_date_utc = new_data.end_date
     event.address = new_data.address
     event.tags = []
     for (tag, ) in tags_query_result.all():

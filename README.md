@@ -7,9 +7,14 @@ This is a general overview of where the project files reside
 .
 ├── ansible                 # Playbooks for automatically setting this application up in a Ubuntu server
 ├── misc                    # Code that is made as a prototype or to help improve the app in some way. This is basically a testing ground for code.
+|   ├── app_testing         # Validation (parsing performance, LLM parsing accuracy) related tests
+|   ├── finetune            # Training data & training program to finetune LLM to work better for finding events
+|   └── microsoft_auth_prototype    # First prototype of the events organiser app
+|
 ├── react-webpage           # Source files (alternatively `lib` or `app`)
 |   ├── dist                # Compiled website files w/ javascript bundles
 |   └── src                 # Source files for the React app
+|
 ├── services                # Backend microservices
 |   └── service
 |       ├── common          # Common python files for the public and private service

@@ -174,7 +174,7 @@ def begin_training():
         train_dataset=training_ds, 
         eval_dataset=validation_ds,
         args=TrainingArguments(
-            # need 2 argumenti panevad SFTTraineri salvestama keelemudeli
+            # need 2 argumenti panevad SFTTraineri salvestama keelemudeli (täpsemalt PEFT vahekihi)
             # ainult siis, kui selle kaofunktsiooni väärtus on testandmetel
             # väiksem võrreldes eelmiste epohhidega
             # sedasi salvestatakse selline mudel, mis ei ole treeningandmetel ülesobitatud

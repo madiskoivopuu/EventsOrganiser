@@ -138,7 +138,7 @@ def begin_training():
     # PEFT = performance-efficient fine tuning
     # get_peft_model loob enne viimast keelemudeli kihti paar lisakihti
     # need lisakihid on treenitavad, samas kui keelemudeli originaalseid kihte ei treenita
-    model = FastLanguageModel.get_peft_model( # argumendid on jäetud samaks, mis olid unslothi Llama 3.2 peenhäälestamise juhendis
+    model = FastLanguageModel.get_peft_model( # argumendid on jäetud samaks, mis olid unslothi Llama 3.2 peenhäälestamise juhendis https://colab.research.google.com/github/unslothai/notebooks/blob/main/nb/Llama3.2_(1B_and_3B)-Conversational.ipynb
         model,
         r = 16, # Choose any number > 0 ! Suggested 8, 16, 32, 64, 128
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj",

@@ -46,7 +46,7 @@ async def get_events(
                 tables.EventsTable.user_acc_type == user.account_type
             )
     if(request_data.direction == "forward"):
-        query = query.where(tables.EventsTable.start_date_utc >= request_data.from_time)
+        query = query.where(tables.EventsTable.end_date_utc >= request_data.from_time)
     else:
         query = query.where(tables.EventsTable.end_date_utc < request_data.from_time)
         

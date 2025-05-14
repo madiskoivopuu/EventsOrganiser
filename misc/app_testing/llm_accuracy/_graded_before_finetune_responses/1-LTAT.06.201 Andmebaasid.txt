@@ -1,0 +1,188 @@
+{
+	"expected_response": [
+		{
+			"event_name": "[VAJA REGISTREERIDA] Andmebaaside \u00f5ppeaine korduseksam",
+			"start_date": "2023-06-19T00:00:00",
+			"end_date": "2023-06-19T23:59:00",
+			"country": "",
+			"city": "",
+			"address": "",
+			"room": "ruum 1008",
+			"tags": [
+				"Databases",
+				"Resit exam"
+			]
+		}
+	],
+	"exemplars": [
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.201 Andmebaasid",
+					"start_date": "2023-06-19T00:00:00+00:00",
+					"end_date": "2023-06-19T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Scholarship",
+						"Databases"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "LTAT.06.201 Andmebaasid",
+						"start_date": "2023-06-19T00:00:00+00:00",
+						"end_date": "2023-06-19T23:59:00+00:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "",
+						"tags": [
+							"Scholarship",
+							"Databases"
+						]
+					},
+					"should_be_graded": true,
+					"event_name_grade": 0.3,
+					"start_date_grade": 0.6666666666666666,
+					"end_date_grade": 0.6666666666666666,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 0.0,
+					"categories_grade": 0.5
+				}
+			],
+			"event_finding_grade": 1.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "End of LTAT.06.201 Andmebaasid course",
+					"start_date": "2023-06-19T00:00:00+02:00",
+					"end_date": "2023-06-19T23:59:00+02:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Cybersecurity"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "End of LTAT.06.201 Andmebaasid course",
+						"start_date": "2023-06-19T00:00:00+02:00",
+						"end_date": "2023-06-19T23:59:00+02:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "",
+						"tags": [
+							"Cybersecurity"
+						]
+					},
+					"should_be_graded": true,
+					"event_name_grade": 0.3,
+					"start_date_grade": 0.6666666666666666,
+					"end_date_grade": 0.6666666666666666,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 0.0,
+					"categories_grade": 0.0
+				}
+			],
+			"event_finding_grade": 1.0
+		},
+		{
+			"llm_response": [
+				{
+					"event_name": "LTAT.06.201 Andmebaasid",
+					"start_date": null,
+					"end_date": "2023-06-30T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "",
+					"tags": [
+						"Cybersecurity",
+						"Scholarship",
+						"Hackathon"
+					]
+				},
+				{
+					"event_name": "Korduseksam",
+					"start_date": null,
+					"end_date": "2023-07-03T23:59:00+00:00",
+					"country": "",
+					"city": "",
+					"address": "",
+					"room": "1008",
+					"tags": [
+						"Resit exam",
+						"Databases"
+					]
+				}
+			],
+			"grades_for_each_event": [
+				{
+					"llm_generated_event": {
+						"event_name": "LTAT.06.201 Andmebaasid",
+						"start_date": null,
+						"end_date": "2023-06-30T23:59:00+00:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "",
+						"tags": [
+							"Cybersecurity",
+							"Scholarship",
+							"Hackathon"
+						]
+					},
+					"should_be_graded": true,
+					"event_name_grade": 0.3,
+					"start_date_grade": 0.0,
+					"end_date_grade": 0.3333333333333333,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 0.0,
+					"categories_grade": 0.0
+				},
+				{
+					"llm_generated_event": {
+						"event_name": "Korduseksam",
+						"start_date": null,
+						"end_date": "2023-07-03T23:59:00+00:00",
+						"country": "",
+						"city": "",
+						"address": "",
+						"room": "1008",
+						"tags": [
+							"Resit exam",
+							"Databases"
+						]
+					},
+					"should_be_graded": true,
+					"event_name_grade": 0.6,
+					"start_date_grade": 0.0,
+					"end_date_grade": 0.3333333333333333,
+					"country_grade": 1.0,
+					"city_grade": 1.0,
+					"address_grade": 1.0,
+					"room_grade": 1.0,
+					"categories_grade": 1.0
+				}
+			],
+			"event_finding_grade": 1.0
+		}
+	]
+}

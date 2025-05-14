@@ -1,6 +1,8 @@
-in Estonian; no events
+in Estonian; 
+has one event, where the date has to be generated based on the word "tomorrow"
+for this event though, the LLM can't determine the exact time since it isn't mentioned, so it should default to entire day..
 !<-=->!
-
+Resit exam; Databases; Hackathon; Cybersecurity; Internship; Scholarship
 !<-=->!
 reader-email@gmail.com
 !<-=->!
@@ -59,4 +61,17 @@ reader-email@gmail.com
     }
 }
 !<-=->!
-[]
+[
+    {
+        "event_name": "[VAJA REGISTREERIDA] Andmebaaside õppeaine korduseksam",
+        "start_date": "2023-06-19T00:00:00",
+        "end_date": "2023-06-19T23:59:00",
+        "country": "",
+        "city": "",
+        "address": "",
+        "room": "ruum 1008",
+        "tags": [
+            "Databases", "Resit exam"
+        ]
+    }
+]
